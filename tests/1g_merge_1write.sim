@@ -1,0 +1,6 @@
+seed 938
+mode merge
+init 100000000
+seqread 5000
+write 10000000
+seqread 5000

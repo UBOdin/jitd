@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <logger name="jitd.Driver" level="INFO"/>
+    <logger name="jitd.ScriptDriver" level="INFO"/>
+    <logger name="jitd.MergeMode" level="INFO"/>
+    <logger name="jitd.PushdownMergeMode" level="WARN"/>
+    <logger name="jitd.CrackerMode" level="WARN"/>
+    <logger name="jitd.ArrayCog" level="WARN"/>
+    <logger name="jitd.KeyValueIterator" level="WARN"/>
+    <Root level="warn">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

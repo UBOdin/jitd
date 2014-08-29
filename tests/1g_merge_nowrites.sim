@@ -1,0 +1,3 @@
+mode merge
+init 100000000
+seqread 10000

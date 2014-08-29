@@ -1,0 +1,5 @@
+mode merge
+init 100000000
+seqread 500
+write 1000000
+seqread 500

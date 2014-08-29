@@ -1,0 +1,5 @@
+mode cracker
+init 100000000
+seqread 5000
+mode merge
+seqread 5000

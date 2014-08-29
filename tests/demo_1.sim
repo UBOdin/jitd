@@ -1,0 +1,6 @@
+mode cracker
+init 10000
+read
+dump
+read
+

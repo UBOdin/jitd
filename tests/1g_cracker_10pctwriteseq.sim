@@ -1,0 +1,9 @@
+mode cracker
+init 100000000
+seqread 300
+write 10000000
+seqread 100
+write 10000000
+seqread 100
+write 10000000
+seqread 100

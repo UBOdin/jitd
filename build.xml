@@ -1,0 +1,61 @@
+<project name="Astral" default="compile">
+  
+  <property name="src" location="src/"/>
+  <property name="build" location="build/"/>
+  <property name="dist" location="dist/"/>
+  <property name="lib" location="lib/"/>
+
+  <path id="lib.classpath">
+    <fileset dir="${lib}">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${src}" 
+           destdir="${build}" 
+           includeantruntime="true"
+           deprecation="yes"
+           classpath="${toString:lib.classpath}"
+           debug="on">
+      <compilerarg value="-Xlint:unchecked" />
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${dist}/jitd.jar" 
+         basedir="${build}"/>
+  </target>
+  
+  <target name="init">
+    <mkdir dir="${build}"/>
+    <mkdir dir="${dist}"/>
+  </target>
+  
+  <target name="clean">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+  
+  <target name="runtest" depends="compile">
+    <java classname="jitd.Driver"
+          classpath="${toString:lib.classpath}:build"
+          maxmemory="30G"
+          fork="YES"/>
+  </target>
+  
+  <target name="unittest" depends="compile">
+    <junit haltonerror="true"
+           showoutput="true"
+           fork="yes">
+      <jvmarg value="-Dlog4j.configurationFile=log4j2.xml"/>
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <pathelement location="${build}" />
+        <path refid="lib.classpath" />
+      </classpath>
+      <test name="jitd.test.ModeTest" />
+    </junit>
+  </target>
+  
+</project>

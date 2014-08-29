@@ -1,0 +1,351 @@
+
+require "rubygems"
+require "gnuplot"
+
+$:.push("graph")
+  require "csvx.rb"
+  require "util.rb"
+  require "plot.rb"
+
+$terminal = "pdf fsize 10"
+
+def dataset(file)
+  File.open(file) do |f|
+    f.map do |l|
+      case l
+        when /\[main\] INFO  - ([^ ]+)( \(([0-9]+)\))?: ([0-9]+) us/
+          [$1.downcase.to_sym, $3.to_i, $4.to_i]
+      end
+    end.compact
+  end
+end
+
+$tobeopened = []
+
+def open(file)
+  case `uname`.chomp.to_sym
+    when :Darwin then
+      if $tobeopened == []
+        at_exit { system("open #{$tobeopened.join(" ")}"); }
+      end
+      $tobeopened.push file
+  end
+end
+
+task :clean do
+  system("rm -f results/*.png results/*.pdf")
+end
+
+def throughput(data, step_size, cumulative = true)
+  time_accum = 0;
+  op_accum = 0;
+  data.
+    delete_if { |r| r[0] != :read }.
+    map do |op, idx, time|
+      time = time.to_f / 1000000;
+      time_accum = time_accum + time;
+      
+      if(time_accum > step_size) then
+        
+        num_steps = (time_accum / step_size).to_i;
+        time_accum = time_accum - (step_size * num_steps);
+        num_ops = op_accum;
+        unless cumulative then
+          op_accum = 1;
+        end
+        (0...num_steps).map do 
+          tmp = num_ops; 
+          num_ops = 0 unless cumulative;
+          tmp 
+        end
+      else 
+        op_accum += 1;
+        []
+      end
+    end.
+    flatten + [op_accum * step_size.to_f / time_accum]
+end
+
+def step_throughput(data, window_size)
+  time_accum = 0;
+  window = [];
+  data.
+    delete_if { |r| r[0] != :read }.
+    map do |op, idx, time| 
+      time_accum += time.to_f / (1000*1000)
+      window.push(time_accum)
+      window.shift while window[0] < (time_accum - window_size);
+      [idx, window.length]
+    end
+end
+
+$all_results = Dir["results/*.out"].map { |x| x.gsub(/results\/(.*)\.out/, "\\1") }
+$all_result_files = $all_results.map { |x| "results/#{x}.out" }
+
+file "results/window.pdf" => $all_result_files do
+  Gnuplot.open do |gp|
+    Gnuplot::Plot.new(gp) do |plot|
+      
+      plot.terminal $terminal
+      plot.output "'results/window.pdf'"
+      plot.logscale "y"
+      plot.yrange "[0.00001:1000]"
+      plot.ylabel "100 Read Window Average (s)"
+      plot.xlabel "Iteration"
+    
+      $all_results.each do |fname|
+        fname = "results/#{fname}.out"
+        plot.data << Gnuplot::DataSet.new(
+            dataset(fname).
+              delete_if { |r| r[0] != :read }.
+              map { |r| [r[1], r[2].to_f / 1000000] }.
+              window(100) { |x| [x[0][0], x.unzip[1].avg] }.
+              unzip
+          ) do |ds|
+            ds.title = fname
+            ds.with = "lines"
+          end
+      end
+    end
+  end
+  open("results/window.pdf");
+end
+
+["90", "95", "99", "100"].each do |x|
+  cracker_file = "results/1g_#{x}r_cracker.out";
+  merge_file = "results/1g_#{x}r_merge.out";
+  file "results/window_#{x}.pdf" => [cracker_file, merge_file] do
+    Gnuplot.open do |gp|
+      Gnuplot::Plot.new(gp) do |plot|
+        
+        plot.terminal $terminal
+        plot.output "'results/window_#{x}.pdf'"
+        plot.logscale "y"
+        plot.yrange "[0.00001:10]"
+        plot.ylabel "100 Read Window Average (s)"
+        plot.xlabel "Iteration"
+      
+        [cracker_file, merge_file].each do |fname|
+          plot.data << Gnuplot::DataSet.new(
+              dataset(fname).
+                delete_if { |r| r[0] != :read }.
+                map { |r| [r[1], r[2].to_f / 1000000] }.
+                window(100) { |x| [x[0][0], x.unzip[1].avg] }.
+                unzip
+            ) do |ds|
+              ds.title = fname
+              ds.with = "lines"
+            end
+        end
+      end
+    end
+    open("results/window_#{x}.pdf");    
+  end
+  task :window => "results/window_#{x}.pdf"
+end
+
+$all_results.each do |f|
+  fname = "results/#{f}.out";
+  file "results/#{f}.pdf" => ["results/#{f}.out", "rakefile"] do
+    puts "Plotting #{fname}"
+    Gnuplot.open do |gp|
+      Gnuplot::Plot.new(gp) do |plot|
+        
+        pretty_plot(plot, :logy => true, :fontscale => 1.4, :sizex => 6)
+        plot.output "'results/#{f}.pdf'"
+        plot.xlabel "Iteration"
+        plot.ylabel "Time (s)"
+        plot.yrange "[0.00001:10]"
+        plot.xrange "[0:10000]"
+        plot.key "top right"
+        plot.border "15 lc rgb \"#000000\" lw 1.5"
+        
+#        if(dataset(fname).index { |r| r[0] == :write })
+#          plot.data << Gnuplot::DataSet.new(
+#            dataset(fname).
+#              delete_if { |r| r[0] != :write }.
+#              map { |r| [r[1].to_i,100] }.
+#              unzip
+#          ) do |ds|
+#            ds.with = "impulses " +pretty_style(1, :pt => nil)
+#            ds.title = "10% Write"
+#          end
+#        end
+        
+        plot.data << Gnuplot::DataSet.new(
+          dataset(fname).
+            delete_if { |r| r[0] != :read }.
+            map { |r| [r[1].to_i,r[2].to_f / 1000000] }.
+            unzip
+        ) do |ds|
+          ds.title = "Reads"
+          ds.with = "points "+pretty_style(0, :ps => 0.1)
+        end
+      end
+    end
+    
+    open("results/#{f}.pdf")
+  end
+  task :default => "results/#{f}.pdf"
+end
+
+[
+  ["tp", "Throughput", false],
+  ["cmp", "Completion", true]
+].each do |tp_suffix, tp_description, tp_argument|
+  [
+    "nowrites",
+    "1pctwrite",
+    "10pctwrite",
+    "10pctwriteseq",
+  ].each do |f|
+    sourcefiles = [
+      ["Cracking", "results/1g_cracker_#{f}.out"],
+      ["Merge", "results/1g_merge_#{f}.out"],
+      ["Swap", "results/1g_swap_#{f}.out"],
+    ].delete_if { |r| not File.exists? r[1] }
+    file "results/#{f}_#{tp_suffix}.pdf" => sourcefiles.unzip[1] do
+      puts "Plotting #{f} #{tp_description}"
+      Gnuplot.open do |gp|
+        Gnuplot::Plot.new(gp) do |plot|
+          
+          plot.terminal $terminal
+          plot.output "'results/#{f}_#{tp_suffix}.pdf'"
+          plot.xlabel "Time (s)"
+          plot.ylabel tp_description
+  
+          sourcefiles.each do |descr, fname|
+            plot.data << Gnuplot::DataSet.new(
+              throughput(dataset(fname), 1, tp_argument)
+            ) do |ds|
+              ds.title = "Read #{tp_description} (#{descr})"
+              ds.with = "lines"
+            end
+          end
+          
+        end
+      end
+      open("results/#{f}_#{tp_suffix}.pdf")
+    end
+#    task :throughput => "results/#{f}_#{tp_suffix}.pdf"
+  end
+end
+
+
+[
+  "1write"
+].each do |f|
+  sourcefiles = [
+    ["Cracking", "results/1g_cracker_#{f}.out"],
+    ["Merge", "results/1g_merge_#{f}.out"],
+    ["Swap", "results/1g_swap_#{f}.out"],
+    ["Transition", "results/1g_transition_#{f}.out"],
+  ].delete_if { |r| not File.exists? r[1] }
+  
+  output_file1 = "results/#{f}_througput.pdf"
+  file output_file1 => ["rakefile"]+sourcefiles.map { |r| r[1] } do 
+      Gnuplot.open do |gp|
+        Gnuplot::Plot.new(gp) do |plot|
+          pretty_plot(plot, :fontscale => 1.2)
+          
+          plot.terminal $terminal
+          plot.output "'#{output_file1}'"
+          plot.xlabel "Iteration"
+          plot.ylabel "Throughput (ops/s)"
+          plot.logscale "y"
+          plot.xrange "[0:10000]"
+          plot.yrange "[0.7:90000]"
+          plot.key "top center horizontal maxcols 2 opaque box lw 1 height 0.6"
+          plot.border "15 lc rgb \"#000000\" lw 1.5"
+          
+          i = -1;
+          
+          sourcefiles.each do |descr, fname|
+            plot.data << Gnuplot::DataSet.new(
+              step_throughput(dataset(fname), 1.0).
+#                window(100) { |w| [ w[0][0], w.unzip[1].avg ] }.
+#                every(100).
+                unzip
+            ) do |ds|
+              ds.title = descr
+              ds.with = "linespoints "+pretty_style(i += 1, :pi => 500, :ps => 2);
+            end
+          end
+          
+#          plot.data << Gnuplot::DataSet.new(
+#            dataset(sourcefiles[0][1]).
+#              delete_if { |r| r[0] != :write }.
+#              map { |op, idx, time| p [idx.to_i, 200000] }.
+#              unzip
+#          ) do |ds|
+#            ds.notitle 
+#            ds.with = "impulses lc rgbcolor \"#000000\" lw 3"
+#          end
+          
+        end
+      end
+      open(output_file1)
+  end
+  task :throughput => output_file1;
+  
+  output_file2 = "results/#{f}_histogram.pdf"
+  file output_file2 => ["rakefile"]+sourcefiles.map { |r| r[1] } do 
+    Gnuplot.open do |gp|
+      Gnuplot::Plot.new(gp) do |plot|
+        pretty_plot(plot, :fontscale => 1.2, :logy => false, :sizex => 6, :rounded => false)
+        
+        plot.output "'#{output_file2}'"
+        plot.key "top right horizontal maxcols 2 opaque box lw 1 height 1"
+        plot.border "15 lc rgb \"#000000\" lw 1.5"
+        plot.yrange "[1:60000]"
+        plot.xrange "[0:59]"
+        plot.ylabel "Frequency (count)"
+        plot.xlabel "Read Cost (s)"
+        plot.boxwidth "0.7"
+        plot.grid "noxtics"
+        plot.logscale "y"
+        
+        i = -1;
+        
+        binSize = 5 # 10 / binSize bins per logstep
+        binWidth = sourcefiles.length+3;
+
+        xcap = 8
+        xtics = (0...xcap).map do |exp|
+          [ 
+            "\"1.0e#{exp-6}\" #{exp*10}",
+            "\"5.0e#{exp-6}\" #{exp*10+5}",
+          ]
+        end.flatten.join(", ")
+        plot.xtics "rotate by -25 (#{xtics})"
+        patterns = [4, 2, 5, 6]
+
+        sourcefiles.each do |descr, fname|
+          plot.data << Gnuplot::DataSet.new(
+                
+          dataset(fname).
+             delete_if { |r| r[0] != :read }.
+             map { |op, seq, time| 
+               pow = (Math.log10(time).floor);
+               exp = 10**pow;
+               subTime = (time/(exp.floor * binSize)).floor
+               [[subTime * exp * binSize, pow*10+subTime*binSize], subTime]
+             }.
+             reduce { |k, cnt| cnt.count.to_f }.
+             map { |k, cnt| [ k[1] + (binSize * (1/binWidth.to_f) * (i+1)), cnt ] }.
+             sort { |a, b| a[0] <=> b[0] }.
+             unzip
+          ) do |ds|
+            ds.title = descr
+            ds.with = "boxes "+pretty_style(i += 1, :pt => nil, :lw => nil, 
+                                            :fill => "pattern #{patterns[i]}");
+#            ds.with = "linespoints "+pretty_style(i += 1, :ps => 3)
+          end
+        end
+                
+      end
+    end
+    open(output_file2)
+  end
+  task :hist => output_file2;
+end

@@ -1,0 +1,15 @@
+seed 938
+mode cracker
+init 100000000
+seqread 1000
+transition cracker merge 1000
+seqread 1000
+mode merge
+seqread 3000
+write 10000000
+mode cracker
+seqread 1000
+transition cracker merge 1000
+seqread 1000
+mode merge
+seqread 3000
