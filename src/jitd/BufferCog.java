@@ -6,6 +6,8 @@ import java.util.*;
  * A cog representing a collection of objects.  Similar to ArrayCog, except not fixed-size.  
  */
 
+import java.util.*; 
+
 public class BufferCog extends Cog
 {
   public static final int BLOCK_SIZE = 1024;

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ME=$(dirname $0)/..
+
+JARFILES=$(echo $ME/lib/*.jar | tr ' ' ':')
+CLASSPATH=$ME/build:$JARFILES:$ME
+java -Xmx12g -cp $CLASSPATH jitd.demo.DemoServer $*

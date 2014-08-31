@@ -3,8 +3,10 @@ package jitd;
 /**
  * A cog representing a single k/v pair.
  * 
- * ®Leaf(k, v) is a singleton collection.
+ * Leaf(k, v) is a singleton collection.
  */
+
+import java.util.*; 
 
 public class LeafCog extends Cog
 {

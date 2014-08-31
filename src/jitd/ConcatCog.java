@@ -6,6 +6,7 @@ package jitd;
  * Concat(lhs, rhs) contains all of the k/v pairs in both lhs and rhs.
  */
 
+import java.util.*; 
 
 public class ConcatCog extends Cog
 {
@@ -41,6 +42,11 @@ public class ConcatCog extends Cog
             rhs.toString(prefix+"  ")+", \n"+
            prefix + ")";
   }
+  
+  public String toLocalString()
+  {
+    return "Concat(...)";
+  }
 
   public long min()
   {
@@ -49,5 +55,9 @@ public class ConcatCog extends Cog
   public long max()
   {
     return Math.max(lhs.max(), rhs.max());
+  }
+
+  public List<Cog> children() { 
+    return Arrays.asList(new Cog[]{ lhs, rhs }); 
   }
 }

@@ -47,6 +47,11 @@ public class BTreeCog extends Cog
            prefix + ")";
   }
   
+  public String toLocalString()
+  {
+    return "BNode("+sep+")";
+  }
+  
   public long min(){
     long ret = lhs.min();
     if(ret == Long.MAX_VALUE){ return rhs.min(); }
@@ -89,4 +94,7 @@ public class BTreeCog extends Cog
     }
   }
   
+  public List<Cog> children() { 
+    return Arrays.asList(new Cog[]{ lhs, rhs }); 
+  }
 }

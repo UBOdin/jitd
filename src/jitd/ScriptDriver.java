@@ -17,7 +17,7 @@ public class ScriptDriver {
   private static Logger log = 
     org.apache.logging.log4j.LogManager.getLogger();
   
-  Driver driver = new Driver(new Mode(), null);
+  public Driver driver = new Driver(new Mode(), null);
   boolean fixedMode = false;
   KeyValueIterator.RandomIterator rand = new KeyValueIterator.RandomIterator();
   long timer = 0, start = 0;
@@ -188,7 +188,11 @@ public class ScriptDriver {
     }
     
     for(String file : args.getFiles()){
-      sd.execStream(new FileReader(file));
+      if(file.equals("-")){
+        sd.execStream(new InputStreamReader(System.in));
+      } else {
+        sd.execStream(new FileReader(file));
+      }
     }
     log.info("Total Time: {}", sd.timer);
   }

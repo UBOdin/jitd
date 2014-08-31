@@ -36,6 +36,11 @@ public class SubArrayCog extends Cog
     return "SubArray("+start+", "+count+", "+base+")";
   }
   
+  public String toLocalString()
+  {
+    return "SubArray("+start+", "+count+")";
+  }
+  
   public long min()
   {
     if(base == null){ return Long.MAX_VALUE; }
@@ -47,4 +52,7 @@ public class SubArrayCog extends Cog
     return base.max();
   }
 
+  public List<Cog> children() { 
+    return Arrays.asList(new Cog[]{ base }); 
+  }
 }

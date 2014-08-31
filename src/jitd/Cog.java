@@ -7,6 +7,7 @@ package jitd;
  * based on how we want the datastructure to behave at this particular instant.
  */
 
+import java.util.*; 
 
 public abstract class Cog 
 {
@@ -15,4 +16,7 @@ public abstract class Cog
   public abstract long min();
   public abstract long max();
   public String toString(String prefix){ return prefix + toString(); }
+  public String toLocalString(){ return toString(); }
+  public List<Cog> children() { return Arrays.asList(new Cog[0]); }
+  
 }
