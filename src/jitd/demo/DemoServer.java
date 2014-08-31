@@ -96,7 +96,7 @@ public class DemoServer {
           Headers requestHeaders = x.getRequestHeaders();
           
           URI req = x.getRequestURI();
-          
+          String args[] = getArguments(x);
           
           switch(req.getPath()){
             case "/init":
@@ -106,6 +106,28 @@ public class DemoServer {
             case "/dump":
               dump(x, sd.driver.root);
               break;
+            case "/read":
+              sd.read();
+              success(x);
+              break;
+            case "/mode":{
+              if(args.length < 1){
+                error(x, "No mode specified");
+              } else {
+                Mode m = null;
+                switch(args[0].toLowerCase()){
+                  case "naive": m = new Mode(); break;
+                  case "crack": m = new CrackerMode(); break;
+                  case "merge": m = new PushdownMergeMode(); break;
+                }
+                if(m == null){ error(x, "Invalid Mode: '"+args[0]+"'"); }
+                else {
+                  sd.driver.mode = m;
+                  success(x);
+                }
+              }
+            }
+              
             default:
               error(x, "Unknown operation: "+req.getPath());
               break;
