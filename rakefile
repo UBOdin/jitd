@@ -32,6 +32,8 @@ def open(file)
   end
 end
 
+directory "results"
+
 task :clean do
   system("rm -f results/*.png results/*.pdf")
 end
@@ -82,7 +84,7 @@ end
 $all_results = Dir["results/*.out"].map { |x| x.gsub(/results\/(.*)\.out/, "\\1") }
 $all_result_files = $all_results.map { |x| "results/#{x}.out" }
 
-file "results/window.pdf" => $all_result_files do
+file "results/window.pdf" => $all_result_files+[:results] do
   Gnuplot.open do |gp|
     Gnuplot::Plot.new(gp) do |plot|
       
@@ -114,7 +116,7 @@ end
 ["90", "95", "99", "100"].each do |x|
   cracker_file = "results/1g_#{x}r_cracker.out";
   merge_file = "results/1g_#{x}r_merge.out";
-  file "results/window_#{x}.pdf" => [cracker_file, merge_file] do
+  file "results/window_#{x}.pdf" => [cracker_file, merge_file, :results] do
     Gnuplot.open do |gp|
       Gnuplot::Plot.new(gp) do |plot|
         
@@ -204,7 +206,7 @@ end
       ["Merge", "results/1g_merge_#{f}.out"],
       ["Swap", "results/1g_swap_#{f}.out"],
     ].delete_if { |r| not File.exists? r[1] }
-    file "results/#{f}_#{tp_suffix}.pdf" => sourcefiles.unzip[1] do
+    file "results/#{f}_#{tp_suffix}.pdf" => [sourcefiles.unzip[1], :results] do
       puts "Plotting #{f} #{tp_description}"
       Gnuplot.open do |gp|
         Gnuplot::Plot.new(gp) do |plot|
@@ -243,7 +245,7 @@ end
   ].delete_if { |r| not File.exists? r[1] }
   
   output_file1 = "results/#{f}_througput.pdf"
-  file output_file1 => ["rakefile"]+sourcefiles.map { |r| r[1] } do 
+  file output_file1 => ["rakefile", :results]+sourcefiles.map { |r| r[1] } do 
       Gnuplot.open do |gp|
         Gnuplot::Plot.new(gp) do |plot|
           pretty_plot(plot, :fontscale => 1.2)
@@ -289,7 +291,7 @@ end
   task :throughput => output_file1;
   
   output_file2 = "results/#{f}_histogram.pdf"
-  file output_file2 => ["rakefile"]+sourcefiles.map { |r| r[1] } do 
+  file output_file2 => ["rakefile", :results]+sourcefiles.map { |r| r[1] } do 
     Gnuplot.open do |gp|
       Gnuplot::Plot.new(gp) do |plot|
         pretty_plot(plot, :fontscale => 1.2, :logy => false, :sizex => 6, :rounded => false)
