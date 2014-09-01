@@ -33,12 +33,7 @@ initTree();
 //setInterval(function() { 
 refreshTree("http://localhost:8010/dump");
 
-setInterval(function() { 
-  console.log("Merging");
-  d3.json("http://localhost:8010/dump", function(a, b) { updateJson(b); })
-  },
-  1000
-);
+setInterval(function() { refreshTree("http://localhost:8010/dump") }, 1000);
 
 // }, 500 );
 //setInterval(function() { updateTree(root); }, 500);

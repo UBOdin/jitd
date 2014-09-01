@@ -54,14 +54,16 @@ public class DemoServer {
     throws JSONException
   {
     JSONObject obj = new JSONObject();
-    obj.put("name", cog.toLocalString());
-    List<Cog> children = cog.children();
-    if(children.size() > 0){
-      JSONArray dumpedChildren = new JSONArray();
-      for(Cog child : children){
-        dumpedChildren.put(dump(child));
+    obj.put("name", cog == null ? "NULL" : cog.toLocalString());
+    if(cog != null){
+      List<Cog> children = cog.children();
+      if(children.size() > 0){
+        JSONArray dumpedChildren = new JSONArray();
+        for(Cog child : children){
+          dumpedChildren.put(dump(child));
+        }
+        obj.put("children", dumpedChildren);
       }
-      obj.put("children", dumpedChildren);
     }
     return obj;
   }
@@ -85,53 +87,58 @@ public class DemoServer {
     
     server.createContext("/", new HttpHandler() {
       public void handle(HttpExchange x) throws IOException {
+        try {
         
-        String requestMethod = x.getRequestMethod();
-        if (requestMethod.equalsIgnoreCase("GET")) {
-          Headers responseHeaders = x.getResponseHeaders();
-          responseHeaders.set("Content-Type", "application/json");
-          x.sendResponseHeaders(200, 0);
-    
-          OutputStream responseBody = x.getResponseBody();
-          Headers requestHeaders = x.getRequestHeaders();
-          
-          URI req = x.getRequestURI();
-          String args[] = getArguments(x);
-          
-          switch(req.getPath()){
-            case "/init":
-              sd.init(1000);
-              success(x);
-              break;
-            case "/dump":
-              dump(x, sd.driver.root);
-              break;
-            case "/read":
-              sd.read();
-              success(x);
-              break;
-            case "/mode":{
-              if(args.length < 1){
-                error(x, "No mode specified");
-              } else {
-                Mode m = null;
-                switch(args[0].toLowerCase()){
-                  case "naive": m = new Mode(); break;
-                  case "crack": m = new CrackerMode(); break;
-                  case "merge": m = new PushdownMergeMode(); break;
-                }
-                if(m == null){ error(x, "Invalid Mode: '"+args[0]+"'"); }
-                else {
-                  sd.driver.mode = m;
-                  success(x);
+          String requestMethod = x.getRequestMethod();
+          if (requestMethod.equalsIgnoreCase("GET")) {
+            Headers responseHeaders = x.getResponseHeaders();
+            responseHeaders.set("Content-Type", "application/json");
+            x.sendResponseHeaders(200, 0);
+      
+            OutputStream responseBody = x.getResponseBody();
+            Headers requestHeaders = x.getRequestHeaders();
+            
+            URI req = x.getRequestURI();
+            String args[] = getArguments(x);
+            
+            switch(req.getPath()){
+              case "/init":
+                sd.init(1000);
+                success(x);
+                break;
+              case "/dump":
+                dump(x, sd.driver.root);
+                break;
+              case "/read":
+                sd.read();
+                success(x);
+                break;
+              case "/mode":{
+                if(args.length < 1){
+                  error(x, "No mode specified");
+                } else {
+                  Mode m = null;
+                  switch(args[0].toLowerCase()){
+                    case "naive": m = new Mode(); break;
+                    case "crack": m = new CrackerMode(); break;
+                    case "merge": m = new PushdownMergeMode(); break;
+                  }
+                  if(m == null){ error(x, "Invalid Mode: '"+args[0]+"'"); }
+                  else {
+                    sd.driver.mode = m;
+                    success(x);
+                  }
                 }
               }
+                
+              default:
+                error(x, "Unknown operation: "+req.getPath());
+                break;
             }
-              
-            default:
-              error(x, "Unknown operation: "+req.getPath());
-              break;
           }
+        } catch(Exception e) {
+          e.printStackTrace();
+          throw new IOException("Error while processing", e);
         }
         
       }

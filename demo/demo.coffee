@@ -5,14 +5,15 @@
 tree = null;
 vis = null;
 m = [20, 120, 20, 120];
-w = window.innerWidth - m[1] - m[3];
-h = window.innerHeight - m[0] - m[2];
+w = window.innerWidth-60 - m[1] - m[3];
+h = window.innerHeight-60 - m[0] - m[2];
 i = 0;
 root = null;
 diagonal = d3.svg.diagonal()
            .projection((d) -> [d.y, d.x]);
+workQueue = [];
 
-window.initTree = () ->
+initTree = () ->
   tree = d3.layout.tree()
          .size([h, w])
   vis = d3.select("#body")
@@ -21,78 +22,85 @@ window.initTree = () ->
             .attr("height", h + m[0] + m[2])
          .append("svg:g")
             .attr("transform", "translate(" + m[3] + "," + m[0] + ")")
+  setInterval((() -> 
+    while workQueue.length > 0
+      op = workQueue.splice(0, 1)[0]
+      console.log(op)
+      op.perform()
+      updateTree(op.node)
+    ), 100
+  )
 
-window.loadTree = (json) -> 
+task = (node, op) ->
+  workQueue.push({
+    perform: op,
+    node:    node
+  });
+
+loadTree = (json) -> 
   root = json;
   root.x0 = h / 2;
   root.y0 = 0;
-  updateTree(root);
+  task(root, () -> null)
 
-window.updateJson = (x) -> 
-  if(root.name != x.name)
+updateJson = (x) -> 
+  if(not root? or root.name != x.name)
     loadTree(x)
   else
-    root = mergeTrees(root, x);
-    updateTree(null);
+    mergeTrees(root, x);
 
-pushPending = (node, x, y) ->
-  console.log("Pushing from "+node.name)
-  node.sourceX = x
-  node.sourceY = y
-  if node.children? 
-    pushPending n for n in node.children
+deleteChild = (node, name) -> 
+  console.log("Delete " + name + " from " + node.name)
+  c = if node.children? then node.children else node._children
+  idx = (y.name for y in c).indexOf(name)
+  c.splice(idx, 1) if idx >= 0
+
+addChildren = (node, children) ->
+  console.log("Add " + children.length + " to " + node.name)
+  c = if node.children? then node.children else node._children
+  if c?
+    console.log("append")
+    if node.children?
+      node.children = node.children.concat(children)
+    else 
+      node._children = node._children.concat(children)
+  else
+    console.log("replace")
+    node.children = children
+
+deleteChildren = (node) ->
+  console.log("Clear " + node.name)
+  delete old.children if old.children?
+  delete old._children if old._children?
 
 mergeTrees = (old, received) -> 
 #  console.log("Merging: ")
 #  console.log(old)
 #  console.log(received)
-  if(old.name != received.name)
-    old.name = received.name;
   mergeChildren = (children) ->
-    children = 
-      for x in children
-        do (x) -> 
-          idx = (y.name for y in received.children).indexOf(x.name)
-          if idx >= 0
-            mergeTrees(x, received.children.splice(idx, 1)[0])
-          else
-            null
-#    console.log("Merge Children Before:")
-#    console.log(children)
-    children = (y for y in children when y?)
-#    console.log("Merge Children:")
-#    console.log(children)
-#    console.log(received.children)
+    for x in children
+      do (x) -> 
+        idx = (y.name for y in received.children).indexOf(x.name)
+        if idx >= 0
+          mergeTrees(x, received.children.splice(idx, 1)[0])
+        else
+          task(old, () -> deleteChild(old, x.name))
     if received.children? and received.children.length > 0
-      console.log(""+received.children.length+" new kids @ " + old.name)
-      pushPending(old, old.x0, old.y0)
-      children = children.concat(received.children) 
-#    console.log("Merged: ")
-#    console.log(children)
-    children
+      task(old, () -> addChildren(old, received.children))
   if(received.children?)
     if(old._children?)
-#      console.log("Toggle off")
-      old._children = mergeChildren(old._children)
+      mergeChildren(old._children)
     else
-      if(old.children)
-#        console.log("Toggle on")
-        old.children = mergeChildren(old.children)
+      if(old.children?)
+        mergeChildren(old.children)
       else
 #        console.log("Overwrite")
-        pushPending(old, old.x0, old.y0)
-        old._children = received.children
+        task(old, () -> addChildren(old, received.children))
   else
-#    console.log("Overwrite empty")
     if old.children? or old._children? 
-      pushPending(old, old.x0, old.y0)
-      delete old.children if old.children?
-      delete old._children if old._children?
-#  console.log("Final:")
-#  console.log(old)
-  old
+      task(old, () -> deleteChildren(old))
 
-window.updateTree = (source) ->
+updateTree = (source) ->
   duration = 500
   nodes = tree.nodes(root).reverse();
 #  nodes.forEach((d) -> d.y = d.depth * 180 );
@@ -171,7 +179,7 @@ window.updateTree = (source) ->
       d.y0 = d.y;
   );
 
-window.toggleTreeNode = (d) ->
+toggleTreeNode = (d) ->
   if(d.children) 
     d._children = d.children
     d.children = null
@@ -180,5 +188,9 @@ window.toggleTreeNode = (d) ->
     d._children = null
   
 
-window.refreshTree = (url) -> 
-  d3.json(url, (err, json) -> loadTree(json));
+refreshTree = (url) -> 
+  d3.json(url, (err, json) -> updateJson(json));
+
+
+window.initTree = initTree;
+window.refreshTree = refreshTree;
