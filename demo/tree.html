@@ -1,0 +1,42 @@
+<html><head>
+
+<title>JITD Demo</title>
+
+<script type="text/javascript" src="d3.min.js"></script>
+<script type="text/javascript" src="demo.js"></script>
+
+<style type="text/css">
+.node circle {
+  cursor: pointer;
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-size: 11px;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+</style>
+
+</head><body>
+
+<div id="body"></div>
+
+<script type="text/javascript">
+initTree();
+//setInterval(function() { 
+refreshTree("http://localhost:8010/dump");
+
+setInterval(function() { refreshTree("http://localhost:8010/dump") }, 1000);
+
+// }, 500 );
+//setInterval(function() { updateTree(root); }, 500);
+</script>
+
+</body></html>

@@ -8,9 +8,9 @@
 
   m = [20, 120, 20, 120];
 
-  w = window.innerWidth - 60 - m[1] - m[3];
+  w = document.width - 60 - m[1] - m[3];
 
-  h = window.innerHeight - 60 - m[0] - m[2];
+  h = document.height - 60 - m[0] - m[2];
 
   i = 0;
 

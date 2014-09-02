@@ -1,0 +1,60 @@
+<html><head>
+<title>JITD Commands</title>
+</head>
+
+
+<script type="text/javascript" src="d3.min.js"></script>
+
+<script type="text/javascript">
+
+function log(msg){
+  console.log(msg);
+}
+
+function command(cmd){
+  log("Processing: " + cmd);
+  d3.json("http://localhost:8010/"+cmd, function(err, result){
+    if(err != null){
+      log(err);
+    } else {
+      if(result.status == "success"){
+        log("...done");
+      } else {
+        log(result.err);
+      }
+    }
+  })
+}
+</script>
+
+<body>
+
+<h2 style="text-decoration:underline;text-align:center;">Just In Time Datastructures</h2>
+<table height="90%" width="100%">
+<tr valign="middle" height="*"><td align="center">
+  
+  <div>
+    Mode: Cracker, Merge(Binsize, Blocksize)
+  </div>
+  
+  <div>
+    Initialize(size, sort?)
+  </div>
+
+  <div>
+    Read One(Random, Width | Start, Stop)
+  </div>
+  
+  <div>
+    Read Many(count)
+  </div>
+  
+  <div>
+    Write(size, sort?)
+  </div>
+
+</td></tr></table>
+<div id="status" style="background-color: #cccccc; width:100\%; height: 40px"></div>
+
+
+</body>

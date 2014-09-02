@@ -5,8 +5,8 @@
 tree = null;
 vis = null;
 m = [20, 120, 20, 120];
-w = window.innerWidth-60 - m[1] - m[3];
-h = window.innerHeight-60 - m[0] - m[2];
+w = document.width - 60 - m[1] - m[3];
+h = document.height - 60 - m[0] - m[2];
 i = 0;
 root = null;
 diagonal = d3.svg.diagonal()
