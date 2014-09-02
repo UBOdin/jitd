@@ -32,27 +32,71 @@ function command(cmd){
 <h2 style="text-decoration:underline;text-align:center;">Just In Time Datastructures</h2>
 <table height="90%" width="100%">
 <tr valign="middle" height="*"><td align="center">
-  
+    <hr/>
   <div>
-    Mode: Cracker, Merge(Binsize, Blocksize)
+    <form action="http://locahost:8010/mode" method="get">
+      <table>
+      <tr>
+        <th align="right">Mode:</th>
+        <td>
+          <select name="mode">
+            <option value="naive">Naive Reads</option>
+            <option value="crack">Cracking</option>
+            <option value="merge">Adaptive Merge</option>
+          </select>
+        </td>
+      </tr><tr>
+        <th align="right">Merge Block Size:</th>
+        <td align="left"><input type="text" name="blocks" size=7 value=100 /></td>
+      </tr><tr>
+        <th align="right">Merge Partition Size:</th>
+        <td align="left"><input type="text" name="parts" size=7 value=1000 /></th>
+      </tr>
+      </table>
+    </form>
   </div>
-  
+    <hr/>
   <div>
-    Initialize(size, sort?)
+    <form action="http://locahost:8010/init" method="get">
+      <input type="submit" value="Initialize" /> with 
+      <input type="size" value="1000" name="size" size=10/> random values
+    </form>
   </div>
-
+    <hr/>
   <div>
-    Read One(Random, Width | Start, Stop)
+    <form action="http://locahost:8010/readmany" method="get">
+      <input type="submit" value="Write" />
+      <input type="text" name="count" value="100" size=5 />
+      random values
+    </form>
   </div>
-  
+    <hr/>
   <div>
-    Read Many(count)
+    <form action="http://locahost:8010/read" method="get">
+      <table>
+        <tr><td rowspan=2>
+          <input type="submit" value="Read" /> 
+          <input type="text" name="width" value="100" size=5 />
+          keys from
+        <td>
+          <input type="radio" name="src" value="rand" checked/> a random key
+        </td></tr>
+        <tr><td>
+          <input type="radio" name="src" value="fixed" /> key 
+          <input type="text" name="width" value="100" size=10 />
+        </td></tr>
+      </table>
   </div>
-  
+    <hr/>
   <div>
-    Write(size, sort?)
+    <form action="http://locahost:8010/readmany" method="get">
+      <input type="submit" value="Perform" />
+      <input type="text" name="count" value="100" size=5 />
+      reads for 
+      <input type="text" name="width" value="100" size=5 />
+      keys each
   </div>
-
+    <hr/>
 </td></tr></table>
 <div id="status" style="background-color: #cccccc; width:100\%; height: 40px"></div>
 
