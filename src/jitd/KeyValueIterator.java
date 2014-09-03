@@ -96,7 +96,7 @@ public abstract class KeyValueIterator
     Integer max;
     long key, value;
     Random rand = new Random();
-    public static long KEY_RANGE = 1000*1000*1000*1000;
+    public static long KEY_RANGE = 10*1000; //1000*1000*1000*1000;
     
     public RandomIterator() { this.max = null; }
     public RandomIterator(int max) { this.max = new Integer(max); }

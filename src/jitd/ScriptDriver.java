@@ -12,7 +12,7 @@ import jitd.test.*;
 
 public class ScriptDriver {
   
-  static final long READ_WIDTH = 2*1000*1000;
+  static final long READ_WIDTH = 1000;// 2*1000*1000;
   
   private static Logger log = 
     org.apache.logging.log4j.LogManager.getLogger();
