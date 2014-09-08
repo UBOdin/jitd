@@ -32,6 +32,7 @@ Compile using ant
 
 Running performance tests: 
 * ./bin/jitdscript { scriptFile | - }
+
 Running the visual demo: 
 * ./bin/demo
 * open demo/tree.html
