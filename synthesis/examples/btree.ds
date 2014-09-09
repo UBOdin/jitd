@@ -1,0 +1,41 @@
+cog Concat (
+  pointer lhs,
+  pointer rhs
+);
+
+cog BTree is Concat (
+  long sep
+);
+
+cog Array (
+  int start,
+  int len,
+  record_buffer records
+);
+
+cog SortedArray is Array ();
+
+fun iterator scan(long low, long high) is
+  BTree(a, b, sep) with { sep <= low } -> {
+    return b.scan(low, high);
+  }
+  
+  BTree(a, b, sep) with { sep >= high } -> {
+    return a.scan(low, high);
+  }
+  
+  Concat(a, b) -> {
+    return iterator_concat(
+      a.scan(low, high), 
+      b.scan(low, high)
+    );
+  }
+  
+  Array(start, len, buffer) -> {
+    return array_scan(high, low, start, len, buffer);
+  }
+  
+  SortedArray(start, len, buffer) -> {
+    return array_binarysearch(high, low, start, len, buffer);
+  }
+;

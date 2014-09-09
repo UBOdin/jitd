@@ -1,7 +1,11 @@
 
 
 FILES = \
-	src/Datastructure
+	src/Var\
+	src/Cog\
+	src/Pattern\
+	src/Function\
+	src/JITD
 
 LEXERS = src/JITDLexer
 PARSERS = src/JITDParser
@@ -13,7 +17,7 @@ AUTOGENFILES = \
 FILES += $(AUTOGENFILES)
 DIRS = $(shell for i in $(FILES) ; do dirname $$i; done | sort | uniq)
 
-OCAMLC = ocamlc $(patsubst %, -I %, $(DIRS))
+OCAMLC = ocamlc -g $(patsubst %, -I %, $(DIRS))
 
 C_FILES = $(patsubst %, %.cmo, $(FILES))
 
@@ -35,7 +39,7 @@ $(C_FILES) : %.cmo : %.ml
 	@echo Compiling $(*)
 	@$(OCAMLC) -c $<
 
-jitd: $(patsubst %, %.cmo, $(FILES))
+jitd: $(patsubst %, %.cmo, $(FILES)) src/Driver.ml
 	@echo Building $@
 	@$(OCAMLC) -o $@ $^
 
