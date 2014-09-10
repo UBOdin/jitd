@@ -16,8 +16,9 @@ let error ?(loc = symbol_start_pos ()) msg =
 %token LPAREN RPAREN
 %token <string> ID
 %token IS A WITH
-%token COG FUNCTION
+%token COG FUNCTION INCLUDE
 %token <string> CBLOCK
+%token <string> STRING
 
 %start op_list
 %type <JITD.op_t list> op_list
@@ -30,8 +31,9 @@ op_list:
   | error  { error "Missing semicolon after operator" }
 
 op:
-  | COG ds        { JITD.OpCog($2) }
-  | FUNCTION func { JITD.OpFn($2) }
+  | COG ds             { JITD.OpCog($2) }
+  | FUNCTION func      { JITD.OpFn($2) }
+  | INCLUDE STRING     { JITD.OpInclude($2) }
   | error { error "Invalid command" }
 
 ds: 
@@ -73,7 +75,7 @@ trigger:
   | pattern ARROW CBLOCK { ($1, $3) }
 
 pattern:
-  | ID LPAREN pattern_arg_list RPAREN with_clause { ($1, $3, $5) }
+  | ID LPAREN pattern_arg_list RPAREN with_clause { Pattern.make_cog $1 $3 $5 }
 
 with_clause:
   | WITH CBLOCK    { Some($2) }
@@ -84,6 +86,6 @@ pattern_arg_list:
   | pattern_arg                        { [$1] }
 
 pattern_arg:
-  | ID LPAREN pattern_arg_list RPAREN with_clause { Pattern.ACog($1, $3, $5) }
-  | ID                                            { Pattern.AField($1) }
+  | ID LPAREN pattern_arg_list RPAREN with_clause { Pattern.make_cog_arg $1 $3 $5 }
+  | ID                                            { Pattern.make_field_arg $1 }
 

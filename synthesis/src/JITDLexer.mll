@@ -27,6 +27,7 @@ let keywords = List.fold_left
     ( "COG",      COG );
     ( "FUNCTION", FUNCTION );
     ( "FUN",      FUNCTION );
+    ( "INCLUDE",  INCLUDE);
   ];;
 }
 
@@ -45,6 +46,7 @@ rule token = parse
                           else ID(s) 
                          }
   | '{'                  { CBLOCK(cblock 1 lexbuf) }
+  | '"'                  { STRING(string_literal lexbuf) }
   | eof                  { EOF }
   | _                    { raise (JITD.ParseError("Unexpected character",
                                                   lexbuf.Lexing.lex_curr_p)) }
@@ -55,3 +57,7 @@ and cblock depth = parse
   | [^'}']+ as s         { s^(cblock depth lexbuf) }
   | eof                  { raise (JITD.ParseError("unterminated C block", 
                                                   lexbuf.Lexing.lex_curr_p)) }
+and string_literal = parse
+  | "\\\""               { "\""^(string_literal lexbuf) }
+  | [^'"']+ as s         { s^(string_literal lexbuf) }
+  | "\""                 { "" }

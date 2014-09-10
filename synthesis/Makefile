@@ -1,12 +1,15 @@
 
 
 FILES = \
+	src/PrettyFormat\
 	src/Var\
 	src/Cog\
 	src/Pattern\
 	src/Function\
 	src/JITD\
 	src/CGen
+
+LIBS = str
 
 LEXERS = src/JITDLexer
 PARSERS = src/JITDParser
@@ -18,7 +21,9 @@ AUTOGENFILES = \
 FILES += $(AUTOGENFILES)
 DIRS = $(shell for i in $(FILES) ; do dirname $$i; done | sort | uniq)
 
-OCAMLC = ocamlc -g $(patsubst %, -I %, $(DIRS))
+OCAML_ARGS += $(patsubst %,%.cma,$(LIBS))
+
+OCAMLC = ocamlc -g $(patsubst %, -I %, $(DIRS)) $(OCAML_ARGS)
 
 C_FILES = $(patsubst %, %.cmo, $(FILES))
 
@@ -48,7 +53,10 @@ clean:
 	rm -f $(C_FILES)
 	rm -f $(patsubst %.cmo,%.cmi,$(C_FILES))
 	rm -f $(patsubst %,%.ml,$(AUTOGENFILES)) $(patsubst %,%.mli,$(PARSERS))
-	rm -f jitd Driver.{cmo,cmx,cmi,cmxi}
+	rm -f jitd src/*.{cmo,cmx,cmi,cmxi}
+	make -C examples clean
 	
+test: jitd
+	@make -C examples test
 
-.PHONY: all clean
+.PHONY: all clean test

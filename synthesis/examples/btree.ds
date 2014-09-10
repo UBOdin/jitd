@@ -1,3 +1,5 @@
+include "btree_lib.h";
+
 cog Concat (
   pointer lhs,
   pointer rhs
@@ -10,32 +12,34 @@ cog BTree is Concat (
 cog Array (
   int start,
   int len,
-  record_buffer records
+  buffer records
 );
 
 cog SortedArray is Array ();
 
 fun iterator scan(long low, long high) is
   BTree(a, b, sep) with { sep <= low } -> {
-    return b.scan(low, high);
+    return scan(b, low, high);
   }
   
   BTree(a, b, sep) with { sep >= high } -> {
-    return a.scan(low, high);
+    return scan(a, low, high);
   }
   
   Concat(a, b) -> {
-    return iterator_concat(
-      a.scan(low, high), 
-      b.scan(low, high)
+    return iter_concat(
+      scan(a, low, high), 
+      scan(b, low, high)
     );
   }
   
-  Array(start, len, buffer) -> {
-    return array_scan(high, low, start, len, buffer);
+  SortedArray(start, len, b) -> {
+    return array_binarysearch_scan(low, high, start, len, b);
   }
   
-  SortedArray(start, len, buffer) -> {
-    return array_binarysearch(high, low, start, len, buffer);
+  Array(start, len, b) -> {
+    return array_scan(low, high, start, len, b);
   }
 ;
+
+

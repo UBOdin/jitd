@@ -15,7 +15,7 @@ Arg.parse
   (fun f -> source_files := f :: !source_files)
 	"jitd [options] files";;
 
-let (cogs, fns) =
+let file =
   JITD.split_file (
     List.flatten
       (List.map 
@@ -36,4 +36,5 @@ let (cogs, fns) =
     )
 ;;
 
-CGen.build_cogs cogs;;
+print_endline 
+  (PrettyFormat.render (CGen.build_program file));;
