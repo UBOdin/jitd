@@ -15,16 +15,25 @@ Arg.parse
   (fun f -> source_files := f :: !source_files)
 	"jitd [options] files";;
 
-List.iter 
-  (fun f -> 
-    let buf = (Lexing.from_channel (open_in f)) in
-      try 
-        let oplist:JITD.op_t list = 
-          JITDParser.op_list JITDLexer.token buf
-        in
-          List.iter print_endline (List.map JITD.string_of_op oplist)
-    with 
-      JITD.ParseError(msg, pos) ->
-        print_endline ("Syntax Error ("^f^":"^(string_of_int pos.Lexing.pos_lnum)^" '"^(Lexing.lexeme buf)^"'): "^msg)
-  )
-  (List.rev !source_files) 
+let (cogs, fns) =
+  JITD.split_file (
+    List.flatten
+      (List.map 
+        (fun f -> 
+          let buf = (Lexing.from_channel (open_in f)) in
+            try 
+              JITDParser.op_list JITDLexer.token buf
+            with 
+              JITD.ParseError(msg, pos) ->
+                print_endline ("Syntax Error ("^
+                                f^":"^
+                                (string_of_int pos.Lexing.pos_lnum)^" '"^
+                                (Lexing.lexeme buf)^"'): "^msg);
+                exit (-1)
+        )
+        (List.rev !source_files) 
+      )
+    )
+;;
+
+CGen.build_cogs cogs;;

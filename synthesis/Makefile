@@ -5,7 +5,8 @@ FILES = \
 	src/Cog\
 	src/Pattern\
 	src/Function\
-	src/JITD
+	src/JITD\
+	src/CGen
 
 LEXERS = src/JITDLexer
 PARSERS = src/JITDParser
@@ -47,7 +48,7 @@ clean:
 	rm -f $(C_FILES)
 	rm -f $(patsubst %.cmo,%.cmi,$(C_FILES))
 	rm -f $(patsubst %,%.ml,$(AUTOGENFILES)) $(patsubst %,%.mli,$(PARSERS))
-	rm -f jitd
+	rm -f jitd Driver.{cmo,cmx,cmi,cmxi}
 	
 
 .PHONY: all clean
