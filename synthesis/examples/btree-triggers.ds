@@ -17,68 +17,94 @@ cog Array (
 
 cog SortedArray is Array ();
 
+cog Empty ();
+
 fun iterator scan(long low, long high) is
-  BTree(a, b, sep) with { sep <= low } -> {
+  | BTree(a, b, sep) with { sep <= low } -> {
     return scan(b, low, high);
   }
   
-  BTree(a, b, sep) with { sep >= high } -> {
+  | BTree(a, b, sep) with { sep >= high } -> {
     return scan(a, low, high);
   }
   
-  Concat(a, b) -> {
+  | Concat(a, b) -> {
     return iter_concat(
       scan(a, low, high), 
       scan(b, low, high)
     );
   }
   
-  SortedArray(start, len, b) -> {
+  | SortedArray(start, len, b) -> {
     return array_binarysearch_scan(low, high, start, len, b);
   }
   
-  Array(start, len, b) -> {
+  | Array(start, len, b) -> {
     return array_scan(low, high, start, len, b);
+  }
+  
+  | Empty() -> {
+    return iter_empty();
   }
 ;
 
 fun void append(cog *c) is
-  a -> { 
-    return make_concat(a, c);
-  }
+  | a -> cog Concat(a, c)
 ;
 
-trigger pivot_one(long key) on
-  BTree(a, b, sep) with { sep <= key } -> [b]
-  BTree(a, b, sep) with { sep > key }  -> [a]
+trigger pivot_one(long key) over
+  BTree(a, b, sep) -> 
+    case 
+      when { sep > key  } then recur [a]
+      when { sep <= key } then recur [b]
+    end
 is
-  SortedArray(_, _, _) as a -> { return a; }
-  Array(start, len, b) as a -> {
-    int lhsCount = record_pivot(b->data, key, start, len);
-    buffer_retain(b); //retain x2 - release x1 = retain x1 
-    cog *ret =
-      make_btree(
-        make_sortedarray(start, lhsCount, b),
-        make_sortedarray(start, start+lhsCount, len-lhsCount, b),
-        key
-      );
-    cog_free(a);
-    return ret;
-  }
+  | SortedArray(_, _, _) as a -> cog a
+  | Array(start, len, b) as a -> 
+    {
+      int lhsCount = record_pivot(b->data, key, start, len) - start;
+      buffer_retain(b); //retain x2 - release x1 = retain x1 
+    } 
+    case
+      when { lhsCount <= 0 }         -> cog BTree(Empty, a, key);
+      when { lhsCount == start+len } -> cog BTree(a, Empty, key)
+      else
+        cog BTree(
+          Array(start, { lhsCount }, b),
+          Array({ start+lhsCount }, { len - lhsCount } , b)
+          key
+        )
+    end
 ;
 
-trigger pivot_two(long low, long high) on
-  BTree(a, b, sep) with { sep >= low }   -> [b]
-  BTree(a, b, sep) with { sep <= high }  -> [a]
-  BTree(a, b, sep) -> { apply_pivot_one(a, low); apply_pivot_one(b, high); }
-is
-  SortedArray(_, _, _) as a -> { return a; }
-  Array(start, len, b) as a -> {
-    a->type = COG_SORTEDARRAY;
-    record_pivot_two(b->data, low, high, start, len)
-  }
-;
+trigger pushdown() is
+  Concat(BTree(a, b, sep), Array(start,len,b) as c) -> 
+    { 
+      int pivot; 
+      buffer_retain(b);
+    }
+    case 
+      when c is SortedArray 
+            { pivot = record_binary_search(b->data, sep, start, start+len) - low; }
+      else  { pivot = record_pivot(b->data, sep, start, start+len) - low; }
+    end
+    case 
+      when { pivot == start }
+        cog BTree(a, Concat(b, c), sep)
+      when { pivot == start+len }
+        cog BTree(Concat(a, c), b, sep)
+      else
+        { buffer_retain(b); }
+        cog BTree(
+          Concat(a, Array(low, pivot, b)),
+          Concat(b, Array({ low + pivot} , { len - pivot }, b)),
+          sep
+        ) 
+    end
+          
+    
 
 mode cracker is
-  on scan(low, high) apply pivot_two(low, high)
+  on scan(low, high) apply topdown pivot_one(low)
+                     apply topdown pivot_one(high)
 ;

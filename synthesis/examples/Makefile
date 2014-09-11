@@ -17,6 +17,5 @@ clean:
 	rm -f $(patsubst %,%.c,$(FILES))
 	rm -f $(FILES)
 	rm -rf *.{dSYM,o}
-	
-	
+
 .PHONY: test clean
