@@ -1,0 +1,84 @@
+include "btree_lib.h";
+
+cog Concat (
+  pointer lhs,
+  pointer rhs
+);
+
+cog BTree is Concat (
+  long sep
+);
+
+cog Array (
+  int start,
+  int len,
+  buffer records
+);
+
+cog SortedArray is Array ();
+
+fun iterator scan(long low, long high) is
+  BTree(a, b, sep) with { sep <= low } -> {
+    return scan(b, low, high);
+  }
+  
+  BTree(a, b, sep) with { sep >= high } -> {
+    return scan(a, low, high);
+  }
+  
+  Concat(a, b) -> {
+    return iter_concat(
+      scan(a, low, high), 
+      scan(b, low, high)
+    );
+  }
+  
+  SortedArray(start, len, b) -> {
+    return array_binarysearch_scan(low, high, start, len, b);
+  }
+  
+  Array(start, len, b) -> {
+    return array_scan(low, high, start, len, b);
+  }
+;
+
+fun void append(cog *c) is
+  a -> { 
+    return make_concat(a, c);
+  }
+;
+
+trigger pivot_one(long key) on
+  BTree(a, b, sep) with { sep <= key } -> [b]
+  BTree(a, b, sep) with { sep > key }  -> [a]
+is
+  SortedArray(_, _, _) as a -> { return a; }
+  Array(start, len, b) as a -> {
+    int lhsCount = record_pivot(b->data, key, start, len);
+    buffer_retain(b); //retain x2 - release x1 = retain x1 
+    cog *ret =
+      make_btree(
+        make_sortedarray(start, lhsCount, b),
+        make_sortedarray(start, start+lhsCount, len-lhsCount, b),
+        key
+      );
+    cog_free(a);
+    return ret;
+  }
+;
+
+trigger pivot_two(long low, long high) on
+  BTree(a, b, sep) with { sep >= low }   -> [b]
+  BTree(a, b, sep) with { sep <= high }  -> [a]
+  BTree(a, b, sep) -> { apply_pivot_one(a, low); apply_pivot_one(b, high); }
+is
+  SortedArray(_, _, _) as a -> { return a; }
+  Array(start, len, b) as a -> {
+    a->type = COG_SORTEDARRAY;
+    record_pivot_two(b->data, low, high, start, len)
+  }
+;
+
+mode cracker is
+  on scan(low, high) apply pivot_two(low, high)
+;
