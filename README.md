@@ -38,8 +38,8 @@ Running the visual demo:
 * open demo/tree.html
 
 At the moment, the Visual demo UI is under development.  Commands are issued through web requests
-* curl http://localhost:8010/init        # Initialize a 1000 record database
-* curl http://localhost:8010/mode?[mode] # Switch to [mode] (Available Modes: 'naive', 'crack', 'merge')
-* curl http://localhost:8010/read        # Perform one read
+* `curl http://localhost:8010/init        `# Initialize a 1000 record database
+* `curl http://localhost:8010/mode?[mode] `# Switch to [mode] (Available Modes: 'naive', 'crack', 'merge')
+* `curl http://localhost:8010/read        `# Perform one read
 
 Commands are interpreted by an inline class defined in jitd.demo.DemoServer.main().
