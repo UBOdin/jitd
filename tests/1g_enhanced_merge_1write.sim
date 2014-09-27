@@ -1,0 +1,6 @@
+seed 938
+mode enhancedmerge
+init 100000000
+seqread 5000
+write 10000000
+seqread 5000

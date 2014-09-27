@@ -20,7 +20,8 @@ public class ModeTest {
       { new Mode(), "Default Mode" },
       { new CrackerMode(), "Cracker Mode" },
       { new MergeMode(), "Merge Mode" },
-      { new PushdownMergeMode(), "Pushdown Merge Mode" }
+      { new PushdownMergeMode(), "Pushdown Merge Mode" },
+      { new EnhancedMergeMode(), "Enhanced Merge Mode" }
     });
   }
   

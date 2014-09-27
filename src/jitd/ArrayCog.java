@@ -157,9 +157,7 @@ public class ArrayCog extends Cog
   public int indexOfFirst(long key)
   {
     int highIdx = indexOf(key);
-    if(highIdx > 0){
-      while(keys[highIdx-1] >= key) { highIdx--; }
-    }
+    while(highIdx >0 && keys[highIdx-1] >= key) { highIdx--; }
     while(highIdx < length && keys[highIdx] < key){ highIdx++; }
     return highIdx;
   }

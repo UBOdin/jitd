@@ -9,7 +9,7 @@ import jitd.util.*;
 /**
  *
  */
-public class PushdownMergeMode extends Mode
+public class EnhancedMergeMode extends Mode
 {
 
   public static boolean allowInPlace = true;
@@ -43,7 +43,7 @@ public class PushdownMergeMode extends Mode
           ret.b = cog;
         }
         return ret;
-      } else if(low > bcog.sep) {
+      } else if(low >= bcog.sep) {
         ret = amerge(bcog.rhs, low, high);
         if(ret.b != bcog.rhs){
           ret.b = new BTreeCog(bcog.sep, bcog.lhs, ret.b);
@@ -114,16 +114,17 @@ public class PushdownMergeMode extends Mode
   
   public Pair<KeyValueIterator, Cog> mergePartitions(Cog cog, long low, long high)
   {
-    List<Cog> partitions = gatherPartitions(cog);
+	List<Cog> partitions = gatherPartitions(cog);
     assert(partitions.size() >= 1);
 
-    Cog[] replacements = new Cog[partitions.size() - 1];
+    Cog rightReplacement = new SubArrayCog(null, 0, 0);
+    Cog leftReplacement = new SubArrayCog(null, 0, 0);
     KeyValueIterator[] sources = new KeyValueIterator[partitions.size()];
     
     boolean hasMergeWork = false;
     
     int records = 0;
-    for(int i = 1; i < partitions.size(); i++){
+    for(int i = 0; i < partitions.size(); i++){
       log.trace("Partition {}: {} records", i, partitions.get(i).length());
       ExtractedComponents components =
         extractPartitions(partitions.get(i), low, high);
@@ -139,36 +140,20 @@ public class PushdownMergeMode extends Mode
         hasMergeWork = true;
       }
       
-      if(components.lhs == null && components.rhs == null){
-        replacements[i-1] = null;
-      } else {
-        replacements[i-1] = new SubArrayCog(null, 0, 0);
-        if(components.rhs != null){
-          replacements[i-1] = new BTreeCog(high, replacements[i-1], components.rhs);
-        }
-        if(components.lhs != null){
-          replacements[i-1] = new BTreeCog(low, components.lhs, replacements[i-1]);
-        }
-        records += replacements[i-1].length();
-      }
+	  if(components.rhs != null){
+		rightReplacement = new ConcatCog(rightReplacement, components.rhs);
+		records += components.rhs.length();
+	  }
+	  if(components.lhs != null){
+		leftReplacement = new ConcatCog(leftReplacement, components.lhs);
+        records += components.lhs.length();
+	  }
     }
     log.trace("Records Retained: {}", records);
     
     if(hasMergeWork){
       log.trace("Root: {} records", partitions.get(0).length());
       long startTime = System.nanoTime();
-      ExtractedComponents root =
-        extractPartitions(partitions.get(0), low, high, true);
-      
-      log.trace("Root: {} lhs, {} rhs", 
-        root.lhs == null ? 0 : root.lhs.length(),
-        root.rhs == null ? 0 : root.rhs.length()
-      );
-      
-      log.info("Root Extraction: {} us", System.nanoTime() - startTime);
-      startTime = System.nanoTime();
-
-      sources[0] = root.iter;
 
       // Merge join
       KeyValueIterator mergedStream = 
@@ -199,37 +184,25 @@ public class PushdownMergeMode extends Mode
       
       if(rootMID == null){
         ret = new KeyValueIterator.EmptyIterator();
-        if(root.lhs != null){
-          if(root.rhs != null){
-            rootMID = new BTreeCog(high, root.lhs, root.rhs);
-          } else {
-            rootMID = root.lhs;
-          }
-        } else if(root.rhs != null){
-          rootMID = root.rhs;
-        }
+        rootMID = new BTreeCog(high, leftReplacement, rightReplacement);
       } else {
         ret = scan(rootMID, low, high);
-        if(root.lhs != null){
-          rootMID = new BTreeCog(rootMID.min(), root.lhs, rootMID);
+        if(leftReplacement.length() != 0){
+          rootMID = new BTreeCog(rootMID.min(), leftReplacement, rootMID);
         }
-        if(root.rhs != null){
-          rootMID = new BTreeCog(root.rhs.min(), rootMID, root.rhs);
-        }
-      }
-      for(Cog repl : replacements){
-        if(repl != null){
-          rootMID = new ConcatCog(rootMID, repl);
+        if(rightReplacement.length() != 0){
+          rootMID = new BTreeCog(rightReplacement.min(), rootMID, rightReplacement);
         }
       }
       return new Pair<KeyValueIterator, Cog>(ret, rootMID);
     } else {
       long startTime = System.nanoTime();
       Pair<KeyValueIterator, Cog> ret = amerge(partitions.get(0), low, high);
-      for(Cog repl : replacements){
-        if(repl != null){
-          ret.b = new ConcatCog(ret.b, repl);
-        }
+      if(leftReplacement != null){
+        ret.b = new ConcatCog(ret.b, leftReplacement);
+      }
+      if(rightReplacement != null){
+        ret.b = new ConcatCog(ret.b, rightReplacement);
       }
       log.info("Reassemble: {} us", System.nanoTime() - startTime);
       return ret;
@@ -248,7 +221,7 @@ public class PushdownMergeMode extends Mode
     if(cog instanceof BTreeCog){
       BTreeCog bcog = (BTreeCog)cog;
       ExtractedComponents ret;
-      if(bcog.sep < low){
+      if(bcog.sep <= low){
         ret = extractPartitions(bcog.rhs, low, high, fullBlocks);
         ret.lhs = (ret.lhs == null) ? bcog.lhs : new BTreeCog(bcog.sep, bcog.lhs, ret.lhs);
       } else if(bcog.sep >= high){
@@ -335,11 +308,11 @@ public class PushdownMergeMode extends Mode
       gatherPartitions(ret, ccog.lhs);
       gatherPartitions(ret, ccog.rhs);
     } else {
-      if(curr instanceof ArrayCog && !((ArrayCog)curr).sorted){
-    	  gatherPartitions(ret, partitionCog(curr));
-      } else {
-        ret.add(curr);
-      }
+    	if(curr instanceof ArrayCog && !((ArrayCog)curr).sorted){
+  	  gatherPartitions(ret, partitionCog(curr));
+    } else {
+      ret.add(curr);
+    }
     }
     return ret;
   }

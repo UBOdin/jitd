@@ -77,6 +77,7 @@ public class ScriptDriver {
       case "cracker"     : return new CrackerMode();
       case "merge"       : return new PushdownMergeMode();
       case "simplemerge" : return new MergeMode();
+      case "enhancedmerge" : return new EnhancedMergeMode();
       default: 
         log.fatal("Unknown Mode '{}'", mode);
         System.exit(-1);

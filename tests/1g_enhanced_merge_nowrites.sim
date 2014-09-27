@@ -1,0 +1,3 @@
+mode enhancedmerge
+init 100000000
+seqread 10000

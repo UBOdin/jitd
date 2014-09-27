@@ -44,12 +44,12 @@ public class SubArrayCog extends Cog
   public long min()
   {
     if(base == null){ return Long.MAX_VALUE; }
-    return base.min();
+    return base.keys[start];
   }
   public long max()
   {
     if(base == null){ return Long.MIN_VALUE; }
-    return base.max();
+    return base.keys[start+count-1];
   }
 
   public List<Cog> children() { 
