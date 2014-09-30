@@ -13,3 +13,6 @@ hs_err_pid*
 
 # Generated source files
 synthesis/examples/btree.c
+
+# Local-only files
+results
