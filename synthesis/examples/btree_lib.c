@@ -49,31 +49,31 @@ void record_swap(record ir, record jr){
   record_copy(jr, ir);
   record_copy(&tmp, jr);
 }
-void record_dump(record r, int low, int high)
+void record_dump(record r, int start, int end)
 {
   int i;
-  for(i = low; i < high; i++){
+  for(i = start; i < end; i++){
     printf(" %ld ", r[i].key);
   }
   printf("\n");
 }
-void record_sort(record r, int low, int high)
+void record_sort(record r, int start, int end)
 {
   int mid, i;
   long pivot;
-//  printf("Sorting %d-%d\n", low, high);
-//  record_dump(r, low, high);
-  if(high - low <= 1){ return; }
-  if(high - low == 2){
-    if(r[low].key > r[low+1].key){
-      record_swap(&(r[low]), &(r[low+1]));
+//  printf("Sorting %d-%d\n", start, end);
+//  record_dump(r, start, end);
+  if(end - start <= 1){ return; }
+  if(end - start == 2){
+    if(r[start].key > r[start+1].key){
+      record_swap(&(r[start]), &(r[start+1]));
     }
     return;
   }
-  mid = low;
-  i = low;
-  pivot = r[low + rand() % (high-low)].key+1;
-  while(i < high){
+  mid = start;
+  i = start;
+  pivot = r[start + rand() % (end-start)].key+1;
+  while(i < end){
 //    printf("         %ld \n", r[i].key);
     if(r[i].key < pivot){
       if(i != mid){
@@ -84,14 +84,14 @@ void record_sort(record r, int low, int high)
     }
     i++;
   }
-//  printf("  pivot: %ld @ %d in %d-%d\n", pivot, mid, low, high);
-  if(mid > low){
+//  printf("  pivot: %ld @ %d in %d-%d\n", pivot, mid, start, end);
+  if(mid > start){
 //    printf("recur left\n");
-    record_sort(r, low, mid);
+    record_sort(r, start, mid);
   }
-  if(mid < high){
+  if(mid < end){
 //    printf("recur right\n");
-    record_sort(r, mid, high);
+    record_sort(r, mid, end);
   }
 }
 
