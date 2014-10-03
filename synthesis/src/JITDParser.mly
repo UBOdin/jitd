@@ -13,12 +13,15 @@ let error ?(loc = symbol_start_pos ()) msg =
 %token EOC
 %token COMMA
 %token ARROW
+%token PIPE
+%token UNDERSCORE
 %token LPAREN RPAREN
 %token <string> ID
-%token IS A WITH
+%token IS A WITH AS
 %token COG FUNCTION INCLUDE
 %token <string> CBLOCK
 %token <string> STRING
+
 
 %start op_list
 %type <JITD.op_t list> op_list
@@ -75,17 +78,28 @@ trigger:
   | pattern ARROW CBLOCK { ($1, $3) }
 
 pattern:
-  | ID LPAREN pattern_arg_list RPAREN with_clause { Pattern.make_cog $1 $3 $5 }
+  | pattern_list      { $1 }
+  | PIPE pattern_list { $2 }
+  
+pattern_list:
+  | pattern_as PIPE pattern_list  { $1 :: $3 }
+  | pattern_as                    { [$1] }
 
-with_clause:
-  | WITH CBLOCK    { Some($2) }
-  |                { None }
+pattern_as:
+  | UNDERSCORE          { Pattern.wildcard }
+  | pattern_with        { $1 }
+  | pattern_with ID     { Pattern.make_as $1 $2 }
+  | pattern_with AS ID  { Pattern.make_as $1 $3 }
+  | ID                  { Pattern.make_as Pattern.wildcard $1 }
+
+pattern_with:
+  | pattern_base WITH CBLOCK { Pattern.make_with $1 $3 }
+  | pattern_base             { $1 }
+
+pattern_base:
+  | ID LPAREN pattern_arg_list RPAREN { Pattern.make_cog $1 $3 }
 
 pattern_arg_list:
-  | pattern_arg COMMA pattern_arg_list { $1 :: $3 }
-  | pattern_arg                        { [$1] }
-
-pattern_arg:
-  | ID LPAREN pattern_arg_list RPAREN with_clause { Pattern.make_cog_arg $1 $3 $5 }
-  | ID                                            { Pattern.make_field_arg $1 }
+  | pattern COMMA pattern_arg_list    { $1 :: $3 }
+  | pattern                           { [$1] }
 

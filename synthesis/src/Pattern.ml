@@ -1,20 +1,30 @@
 
-type cog_t = string
+type cog_t = string * t list
 
-type arg_t =
-  | ACog of t
-  | AField of string
+and t =
+  | PCog of cog_t
+  | PWildcard
+  | PWith of t * string
+  | POr of t list
+  | PAs of t * string
 
-and t = cog_t * arg_t list * string option
+let rec string_of_pattern:(t -> string) = function
+  | PCog(c, args)     -> string_of_pattern_cog (c,args)
+  | PWildcard         -> "_"
+  | PWith(a, w)       -> (string_of_pattern a)^(" WITH {"^w^"}")
+  | POr(args)         -> (String.concat "| " (List.map string_of_pattern args))
+  | PAs(PWildcard, s) -> s
+  | PAs(a, s)         -> (string_of_pattern a)^(" AS "^s)
 
-let rec string_of_pattern_arg:(arg_t -> string) = function
-  | ACog(c, args, w) -> string_of_pattern (c,args,w)
-  | AField(f)     -> f
+and string_of_pattern_cog ((cog, args):cog_t): string =
+  cog^"("^(String.concat "," (List.map string_of_pattern args))^")"
 
-and string_of_pattern (cog, args, w) =
-  cog^"("^(String.concat "," (List.map string_of_pattern_arg args))^")"^
-  (match w with None -> "" | Some(c) -> " with {"^c^"}")
 
-let make_cog cog args w     = ((String.uppercase cog), args, w)
-let make_cog_arg cog args w = ACog(make_cog cog args w)
-let make_field_arg arg      = AField(arg)
+let get_ors               = function | POr(args) -> args | x -> [x]
+let make_or a b           = POr((get_ors a) @ (get_ors b))
+let make_as a s           = PAs(a, s)
+let make_with base w      = PWith(base, w)
+let make_cog cog args     = ((String.uppercase cog), args)
+let make_cog_arg cog args = PCog(make_cog cog args)
+let make_field_arg arg    = PAs(PWildcard, arg)
+let wildcard              = PWildcard

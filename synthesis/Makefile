@@ -57,6 +57,8 @@ clean:
 	make -C examples clean
 	
 test: jitd
-	@make -C examples test
+	./jitd examples/btree-triggers.ds
+	#@make -C examples test
 
 .PHONY: all clean test
+

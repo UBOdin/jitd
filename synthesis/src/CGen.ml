@@ -134,15 +134,40 @@ let build_cogs (cogs:(Cog.t list)): PF.format =
 
 let build_pattern_match (cog_name: string)
                         (schema:schema_t) (hierarchy:hierarchy_t)
-                        ((cog,args,w): Pattern.t)
+                        (pattern: Pattern.t)
                         (effect: PF.format): PF.format =
   let field f = cog_name^"->"^f in
   let data_field f = field ("data."^(String.lowercase cog)^"."^f) in
+  let rcr name p e = 
+    build_pattern_match name schema hierarchy p e
+  in
+  match pattern with 
+    | PCog(cog, args) ->
+      let 
+      PF.ifblock
+        (* IF *)
+          (PF.list " || " (List.map (fun t -> 
+            PF.raw ((field "type")^" == COG_"^(String.uppercase t))
+          ) (cog :: StrMap.find cog (snd hierarchy))))
+        (* THEN *)
+          (List.fold_left (fun old new -> 
+            rcr 
+          ) effect args)
+        
+        
+        (build_pattern_match
+          
+      
+    
+    | PWildcard
+    | PWith
+    | POr
+    | PAs
+  
+  
   PF.block
     "if("
-      (PF.list " || " (List.map (fun t -> 
-        PF.raw ((field "type")^" == COG_"^(String.uppercase t))
-      ) (cog :: StrMap.find cog (snd hierarchy))))
+      
     ")" "{"
       (PF.lines [
         PF.lines (List.flatten (List.map2 (fun (field_name,field_t) -> function 

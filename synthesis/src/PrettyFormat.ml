@@ -18,6 +18,9 @@ let empty = raw ""
 let block l1 b1 r1 l2 b2 r2 = 
       list " " [(paren l1 b1 r1); (paren l2 b2 r2)]
 
+let ifthen (cond:format) (t:format) = 
+      block "if" cond ")" "{" t "}"
+
 let render fmt =
   let rec render_lines indent width fmt = 
     let r = render_lines (indent+2) width in

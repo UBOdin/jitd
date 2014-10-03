@@ -105,6 +105,6 @@ trigger pushdown() is
     
 
 mode cracker is
-  on scan(low, high) apply topdown pivot_one(low)
-                     apply topdown pivot_one(high)
+  before scan(low, high) apply topdown pivot_one(low)
+                         apply topdown pivot_one(high)
 ;
