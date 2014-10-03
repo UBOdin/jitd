@@ -22,11 +22,11 @@ type bin_op_t =
   | OpDivide
 
 type value_t = 
-  | ValC       of string
-  | ValBinOp   of bin_op_t * value_t list
-  | ValVar     of string
-  | ValConst   of const_t
-  | ValField   of value_t * string
+  | ValC    of string
+  | BinOp   of bin_op_t * value_t list
+  | Var     of string
+  | Const   of const_t
+  | Field   of value_t * string
 
 type arg_t = type_t * string
 
@@ -58,4 +58,11 @@ let cexpr c                     = CBlock(c)
 let define variable value block = LetBlock(variable, value, block)
 let call f args                 = FunctionCall(f, args)
 let seq exprs                   = Block(exprs)
-
+let list_of o                   = function | BinOp(cmpOp, l) when cmpOp = o -> l 
+                                           | x -> [x]
+let op o a b                    = BinOp(o, (list_of o a) @ (list_of o b))
+let op_and  = op OpAnd
+let op_or   = op OpOr
+let op_add  = op OpPlus
+let op_sub  = op OpMinus
+let op_mult = 
