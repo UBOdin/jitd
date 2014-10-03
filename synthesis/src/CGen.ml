@@ -4,11 +4,15 @@ exception GenErr of string;;
 module StrMap = Map.Make(String);;
 module PF = PrettyFormat;;
 
-open Function
 open JITD
+open Pattern
 
 type schema_t = Var.v list StrMap.t
 type hierarchy_t = string list StrMap.t * string list StrMap.t
+
+exception CodegenError of string
+
+let error msg = raise (CodegenError(msg))
 
 let names_of_cogs:(Cog.t list -> string list) = List.map (fun cog -> cog.Cog.name);;
 
@@ -50,15 +54,9 @@ let hierarchy_of_cogs:(Cog.t list -> hierarchy_t) =
   ) (StrMap.empty, StrMap.empty)
 ;;
 
-let cstring_of_field ((var_name, var_type):Var.v): string = 
-  ((match var_type with
-          | Var.Pointer -> "struct cog *"
-          | Var.Primitive(s) -> s^" "
-      )^var_name)
-;;
 
 let format_field (field:Var.v): PF.format =
-  PF.raw ((cstring_of_field field)^";")
+  PF.raw ((Var.string_of_var field)^";")
 ;;
 
 let format_cdata (cdata: string): PF.format =
@@ -76,7 +74,7 @@ let build_constructor (schema:schema_t) (cog:Cog.t): PF.format =
     PF.paren
       ("cog *make_"^(String.lowercase cog.Cog.name)^"(")
         (PF.list ", " 
-          (List.map (fun f -> PF.raw (cstring_of_field f)) fields)
+          (List.map (fun f -> PF.raw (Var.string_of_var f)) fields)
         )
       ") {";
     PF.indent 2
@@ -125,80 +123,113 @@ let build_cogs (cogs:(Cog.t list)): PF.format =
                       (PF.list " " (List.map format_field
                                              (StrMap.find name schema)))                        
                     ("} "^(String.lowercase name)^";")
-                ) names))
+                ) (List.filter (fun n -> StrMap.find n schema <> [])
+                               names)))
               "} data;";
           ]))
         "} cog;";
     ])
 ;;
 
-let build_pattern_match (cog_name: string)
+let rec build_pattern_match ((cog_name, cog_type): Var.v)
                         (schema:schema_t) (hierarchy:hierarchy_t)
                         (pattern: Pattern.t)
                         (effect: PF.format): PF.format =
   let field f = cog_name^"->"^f in
-  let data_field f = field ("data."^(String.lowercase cog)^"."^f) in
-  let rcr name p e = 
-    build_pattern_match name schema hierarchy p e
+  let data_field f = field ("data."^(String.lowercase cog_name)^"."^f) in
+  let rcr name t p e = 
+    build_pattern_match (name,t) schema hierarchy p e
   in
   match pattern with 
     | PCog(cog, args) ->
-      let 
-      PF.ifblock
+      PF.ifthen
         (* IF *)
           (PF.list " || " (List.map (fun t -> 
             PF.raw ((field "type")^" == COG_"^(String.uppercase t))
           ) (cog :: StrMap.find cog (snd hierarchy))))
         (* THEN *)
-          (List.fold_left (fun old new -> 
-            rcr 
-          ) effect args)
-        
-        
-        (build_pattern_match
-          
-      
-    
-    | PWildcard
-    | PWith
-    | POr
-    | PAs
-  
-  
-  PF.block
-    "if("
-      
-    ")" "{"
-      (PF.lines [
-        PF.lines (List.flatten (List.map2 (fun (field_name,field_t) -> function 
-          | Pattern.ACog _ -> []
-          | Pattern.AField(s) -> 
-            [ PF.raw ((cstring_of_field (s, field_t))^
-                      " = "^(data_field field_name)^";") ]
-        ) (StrMap.find cog schema) args));
-        (match w with 
-          | None -> effect
-          | Some(whenClause) ->
-            PF.block
-              "if(" (format_cdata whenClause) ")"
-              "{" effect "}"
-        );
-      ])    
-    "}"
+          (List.fold_left2 (fun old new_field new_pattern ->
+            rcr (data_field (fst new_field)) (snd new_field) new_pattern old
+          ) effect (StrMap.find cog schema) args)
+    | PWildcard -> effect
+    | PWith(arg, test) -> 
+      PF.ifthen
+        (* IF *)
+          (format_cdata test)
+        (* THEN *)
+          (rcr cog_name cog_type arg effect)
+    | PAs(arg, match_name) -> 
+      PF.paren "{"
+        (PF.lines [
+          PF.binop 
+            (PF.raw (Var.string_of_var (match_name, cog_type)))
+            " = "
+            (PF.raw (cog_name^";"))
+          ;
+          rcr cog_name cog_type arg effect
+        ]) "}"
+;;
+
+let rec construct_pattern (pattern:Pattern.t): PF.format =
+  match pattern with
+    | PCog(name, args) -> 
+      PF.paren ("make_"^(String.lowercase name)^"(")
+               (PF.list ", " (List.map construct_pattern args))
+               ")"
+    | PAs(PWildcard, name) -> PF.raw name
+    | _ -> error ("invalid pattern replacement: '"^(string_of_pattern pattern)^"'")
+;;
+
+let rec build_effect (raw_cog:string) (schema:schema_t) 
+                     (hierarchy:hierarchy_t) (eff:effect_t) =
+  let rcr = build_effect_list raw_cog schema hierarchy in
+  match eff with
+    | ECBlock(cdata) -> format_cdata cdata
+    | EReplace(p)    -> 
+      PF.paren ""
+        (PF.binop (PF.raw ("*"^raw_cog)) " = " (construct_pattern p)) ";"
+    | EApplyRule(r, tgt, args) -> 
+                        error "Don't know how to apply rules yet (CGen)"
+    | ECase([],otherwise) -> rcr otherwise
+    | ECase((first_c,first_e)::rest,otherwise) -> 
+      PF.lines ([
+        PF.paren ("if("^first_c^"){") (rcr first_e) "";
+      ] @ 
+      (List.map (fun (c, e) ->
+        PF.paren ("} else if("^c^"){") (rcr e) ""
+      ) rest) @
+      (if otherwise == [] then [] else 
+        [PF.paren "} else {" (rcr otherwise) ""]
+      ) @
+      [ PF.raw "}" ]
+      )
+and build_effect_list (raw_cog:string) (schema:schema_t) 
+                      (hierarchy:hierarchy_t) (effs:effect_t list) =
+  PF.lines (List.map (build_effect raw_cog schema hierarchy) effs)
 ;;
 
 let build_function (schema:schema_t) (hierarchy:hierarchy_t) 
-                   (fn:Function.t): PF.format =
+                   (fn:func_t): PF.format =
+  let cog_raw = ("cog_raw", Var.TPointer(Var.TCog)) in
+  let cog_var = ("cog", Var.TCog) in
   PF.lines [
-    PF.paren ((cstring_of_field (fn.name, fn.ret))^"(")
+    PF.paren ((Var.string_of_var (fn.name, fn.ret))^"(")
              (PF.list ", " 
-               (List.map (fun x -> PF.raw (cstring_of_field x)) 
-                 (("cog", Var.Pointer)::fn.args)))
+               (List.map (fun x -> PF.raw (Var.string_of_var x))
+                 (cog_raw::fn.args)))
              (") {");
     PF.indent 2 (PF.lines 
-      (List.map (fun (pattern, effect) ->
-        build_pattern_match "cog" schema hierarchy pattern (format_cdata effect)
-      ) fn.matches));
+      ((PF.raw "struct cog *cog = *cog_raw;")
+      ::(List.map (fun (pattern, effect) ->
+        let effects = 
+          (build_effect_list "cog_raw" schema hierarchy effect)
+        in let extended_effects = 
+          if fn.ret <> (Var.TCustom("void")) then effects else
+            PF.lines [effects; PF.raw "return;"]
+        in
+          build_pattern_match cog_var schema hierarchy pattern extended_effects
+                          
+      ) fn.matches)));
     PF.empty; 
     PF.raw ("  fprintf(stderr, \"Unmatched case in '"^fn.name^"'\\n\");");
     PF.raw ("  exit(-1);");

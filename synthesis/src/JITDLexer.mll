@@ -28,7 +28,15 @@ let keywords = List.fold_left
     ( "FUNCTION", FUNCTION );
     ( "FUN",      FUNCTION );
     ( "INCLUDE",  INCLUDE);
-    ( "AS",       AS)
+    ( "AS",       AS);
+    ( "CASE",     CASE);
+    ( "WHEN",     WHEN);
+    ( "ELSE",     ELSE);
+    ( "END",      END);
+    ( "APPLY",    APPLY);
+    ( "RECUR",    RECUR);
+    ( "RULE",     RULE);
+    ( "OVER",     OVER);
   ];;
 }
 
@@ -42,6 +50,8 @@ rule token = parse
   | "->"                 { ARROW }
   | '_'                  { UNDERSCORE }
   | "|"                  { PIPE }
+  | '['                  { LBRACK }
+  | ']'                  { RBRACK }
   | (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as s
                          { 
                           if StrMap.mem (String.uppercase s) keywords 

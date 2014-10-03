@@ -5,7 +5,6 @@ FILES = \
 	src/Var\
 	src/Cog\
 	src/Pattern\
-	src/Function\
 	src/JITD\
 	src/CGen
 

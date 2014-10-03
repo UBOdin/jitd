@@ -1,8 +1,8 @@
 include "btree_lib.h";
 
 cog Concat (
-  pointer lhs,
-  pointer rhs
+  cog lhs,
+  cog rhs
 );
 
 cog BTree is Concat (
@@ -48,17 +48,16 @@ fun iterator scan(long low, long high) is
   }
 ;
 
-fun void append(cog *c) is
+fun void append(cog c) is
   | a -> Concat(a, c)
 ;
 
-trigger pivot_one(long key) over
-  BTree(a, b, sep) -> 
+rule pivot_one(long key) is
+  | BTree(a, b, sep) -> 
     case 
-      when { sep > key  } then recur [a]
-      when { sep <= key } then recur [b]
+      when { sep > key  } -> apply a pivot_one(key)
+      when { sep <= key } -> apply b pivot_one(key)
     end
-is
   | SortedArray(_, _, _) as a -> a
   | Array(start, len, b) as a -> 
     {
@@ -69,42 +68,43 @@ is
       when { lhsCount <= 0 }         -> BTree(Empty, a, key)
       when { lhsCount == start+len } -> BTree(a, Empty, key)
       else
+        { int rhsStart = start + lhsCount;
+          int rhsLen = len - lhsCount;
+        }
         BTree(
-          Array(start, { lhsCount }, b),
-          Array({ start+lhsCount }, { len - lhsCount } , b)
+          Array(start, lhsCount, b),
+          Array(rhsStart, rhsLen, b),
           key
         )
     end
 ;
 
-trigger pushdown() is
-  Concat(BTree(a, b, sep), Array(start,len,b) as c) -> 
+rule pushdown() is
+  | Concat(BTree(a, b, sep), Array(start,len,b) as c) -> 
     { 
       int pivot; 
       buffer_retain(b);
     }
     case 
-      when c is SortedArray 
+      when { c->type == COG_SORTEDARRAY } -> 
             { pivot = record_binary_search(b->data, sep, start, start+len) - low; }
       else  { pivot = record_pivot(b->data, sep, start, start+len) - low; }
     end
     case 
-      when { pivot == start }
+      when { pivot == start } ->
         BTree(a, Concat(b, c), sep)
-      when { pivot == start+len }
+      when { pivot == start+len } ->
         BTree(Concat(a, c), b, sep)
       else
-        { buffer_retain(b); }
+        { int rhsLow = low + pivot;
+          int rhsLen = len - pivot;
+          buffer_retain(b);
+        }
         BTree(
           Concat(a, Array(low, pivot, b)),
-          Concat(b, Array({ low + pivot} , { len - pivot }, b)),
+          Concat(b, Array(rhsLow, rhsLen, b)),
           sep
         ) 
     end
-          
-    
+;          
 
-mode cracker is
-  before scan(low, high) apply topdown pivot_one(low)
-                         apply topdown pivot_one(high)
-;
