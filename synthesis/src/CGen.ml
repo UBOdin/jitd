@@ -66,9 +66,10 @@ let format_cdata (cdata: string): PF.format =
     | l -> PF.lines (List.map (fun a -> PF.raw (String.trim a)) l)
 ;;
 
+let data_field v cog f = (v^"->data."^(String.lowercase cog.Cog.name)^"."^f);;
+
 let build_constructor (schema:schema_t) (cog:Cog.t): PF.format =
-  let field f = "ret->"^f in
-  let data_field f = field ("data."^(String.lowercase cog.Cog.name)^"."^f) in
+  let data_field = data_field "ret" cog in
   let fields = StrMap.find cog.Cog.name schema in
   PF.lines ([
     PF.paren
@@ -80,10 +81,14 @@ let build_constructor (schema:schema_t) (cog:Cog.t): PF.format =
     PF.indent 2
       (PF.lines ([
         PF.raw "cog *ret = malloc(sizeof(struct cog));";
-        PF.raw ("ret->type = COG_"^(String.uppercase cog.Cog.name)^";")
-      ] @ (List.map (fun (f, _) -> 
-         PF.raw ((data_field f)^" = "^f^";")
-        ) fields
+        PF.raw ("ret->type = COG_"^(String.uppercase cog.Cog.name)^";");
+        PF.raw "ret->count = 1;";
+      ] @ (List.flatten (List.map (fun (f, ty) -> 
+							(if ty == Var.TCog then 
+								[PF.raw ("retain_cog("^f^");")]
+							else [])
+							@	[PF.raw ((data_field f)^" = "^f^";")]
+        ) fields)
       ) @ [
         PF.raw "return ret;"
       ]));
@@ -91,15 +96,41 @@ let build_constructor (schema:schema_t) (cog:Cog.t): PF.format =
   ])
 ;;
 
-let build_destructor: PF.format =
+let build_destructor (schema:schema_t): PF.format =
   PF.lines ([
     PF.paren
-      "void free_cog(cog *c) {"
+      "void release_cog(cog *c) {"
         (PF.lines [
-          PF.raw "free(c);"
+          PF.raw "c->count--;";
+          PF.ifthen 
+          	(PF.raw "c->count == 0")
+          	(PF.lines [
+          		PF.paren 
+          			"switch(c->type) {"
+          			(PF.lines (List.map (fun (cog,vars) ->
+          				PF.paren ("case COG_"^(String.uppercase cog)^":")
+          					(PF.lines (List.flatten (List.map 
+          						(fun (var_name,var_type) ->
+												if var_type == Var.TCog then
+													[PF.raw ("release_cog(c->data."^
+																		(String.lowercase cog)^
+																		"."^var_name^");")]
+												else []
+          					) vars)))
+          					"  break;"
+          			) (StrMap.bindings schema)))
+          			"}";
+          		PF.raw "free(c);";
+          	])
+          
         ])
       "}"
   ])
+;;
+let build_retainer: PF.format =
+	PF.paren "inline void retain_cog(cog *c) {"
+		(PF.raw "c->count++;")
+		"}"
 ;;
 
 let build_cogs (cogs:(Cog.t list)): PF.format = 
@@ -115,6 +146,7 @@ let build_cogs (cogs:(Cog.t list)): PF.format =
         "typedef struct cog {"
           (PF.lines ([
             PF.raw "cog_type type;";
+            PF.raw "unsigned int count;";
             PF.paren 
               "union {"
                 (PF.lines (List.map (fun name ->
@@ -136,12 +168,14 @@ let rec build_pattern_match ((cog_name, cog_type): Var.v)
                         (pattern: Pattern.t)
                         (effect: PF.format): PF.format =
   let field f = cog_name^"->"^f in
-  let data_field f = field ("data."^(String.lowercase cog_name)^"."^f) in
   let rcr name t p e = 
     build_pattern_match (name,t) schema hierarchy p e
   in
   match pattern with 
     | PCog(cog, args) ->
+			let data_field f = 
+				field ("data."^(String.lowercase cog)^"."^f) 
+			in
       PF.ifthen
         (* IF *)
           (PF.list " || " (List.map (fun t -> 
@@ -153,11 +187,14 @@ let rec build_pattern_match ((cog_name, cog_type): Var.v)
           ) effect (StrMap.find cog schema) args)
     | PWildcard -> effect
     | PWith(arg, test) -> 
-      PF.ifthen
-        (* IF *)
-          (format_cdata test)
-        (* THEN *)
-          (rcr cog_name cog_type arg effect)
+    	(* We need to gather all of the bindings in "arg" before performing
+    	   the test, so we push the test into the recursion *)
+			(rcr cog_name cog_type arg 
+				(PF.ifthen
+					(* IF *)
+						(format_cdata test)
+					(* THEN *)
+          	effect))
     | PAs(arg, match_name) -> 
       PF.paren "{"
         (PF.lines [
@@ -246,7 +283,8 @@ let build_program (file:JITD.t): PF.format =
     )@
     [ 
       PF.empty; build_cogs !(file.cogs); PF.empty; 
-      build_destructor;
+      build_destructor schema;
+      build_retainer;
     ] @
     (List.map (build_constructor schema) !(file.cogs))@
     (List.map (build_function schema hierarchy) !(file.functions))

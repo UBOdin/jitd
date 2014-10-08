@@ -7,7 +7,7 @@ test: $(FILES)
 $(FILES) : % : %_lib.o %.c %_driver.c
 	gcc -g -o $@ $(*)_lib.o $(*)_driver.c
 
-%.c : %.ds 
+%.c : %.ds ../jitd 
 	../jitd $< > $@
 
 %.o : %.c
