@@ -4,14 +4,12 @@ FILES = \
 	src/PrettyFormat\
 	src/Var\
 	src/Cog\
-	src/Pattern\
-	src/JITD\
-	src/CGen
+	src/diesel/Diesel
 
 LIBS = str
 
-LEXERS = src/JITDLexer
-PARSERS = src/JITDParser
+LEXERS = src/diesel/DieselLexer
+PARSERS = src/diesel/DieselParser
 
 AUTOGENFILES = \
 	$(patsubst %.mly, %, $(PARSERS))\
@@ -49,10 +47,12 @@ jitd: $(patsubst %, %.cmo, $(FILES)) src/Driver.ml
 	@$(OCAMLC) -o $@ $^
 
 clean: 
-	rm -f $(C_FILES)
-	rm -f $(patsubst %.cmo,%.cmi,$(C_FILES))
 	rm -f $(patsubst %,%.ml,$(AUTOGENFILES)) $(patsubst %,%.mli,$(PARSERS))
-	rm -f jitd src/*.{cmo,cmx,cmi,cmxi}
+	rm -f jitd 
+	rm -f $(patsubst %,%/*.cmo,$(DIRS))
+	rm -f $(patsubst %,%/*.cmx,$(DIRS))
+	rm -f $(patsubst %,%/*.cmi,$(DIRS))
+	rm -f $(patsubst %,%/*.cmxi,$(DIRS))
 	make -C examples clean
 	
 test: jitd
