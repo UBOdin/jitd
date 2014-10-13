@@ -1,4 +1,6 @@
 
+exception ParseError of string * Lexing.position
+
 type type_t =
   | TString
   | TBoolean
@@ -6,23 +8,13 @@ type type_t =
   | TFloat
   | TCog of string option
 
-type var_t of string
+type var_t = string
 
-type const_t of 
+type const_t =
   | CString of string
-  | CBool of boolean
-  | CInt of integer
+  | CBool of bool
+  | CInt of int
   | CFloat of float
-
-type cmp_op_t =
-  | CmpAnd
-  | CmpOr
-  | CmpEq
-  | CmpNeq
-  | CmpLt
-  | CmpLte
-  | CmpGt
-  | CmpGte
 
 type bin_op_t =
   | Add
@@ -30,10 +22,16 @@ type bin_op_t =
   | Subtract
   | Divide
 
-type expr_t =
-  | Cmp       of cmp_op_t * expr_t list
+type cmp_op_t = Eq | Neq | Lt | Lte | Gt | Gte
+
+type cmp_t =
+  | And  of cmp_t list
+  | Or   of cmp_t list
+  | Cmp  of cmp_op_t * expr_t * expr_t
+  | IsA  of expr_t * string
+   
+and expr_t =
   | BinOp     of bin_op_t * expr_t list
-  | IsA       of expr_t * string
   | Var       of var_t * (string * string) list
   | Const     of const_t
 
@@ -47,3 +45,10 @@ type t =
   | Bind  of var_t * expr_t * t 
   | Build of cog_constructor_t
 
+let or_list  = function  Or(x) -> x | x -> [x]
+let and_list = function And(x) -> x | x -> [x]
+let binop_list op = function BinOp(other_op, x) when op = other_op -> x | x -> [x]
+
+let mk_or a b  =  Or((or_list a)  @ (or_list b))
+let mk_and a b = And((and_list a) @ (and_list b))
+let mk_binop op a b = BinOp(op, (binop_list op a)@(binop_list op b))

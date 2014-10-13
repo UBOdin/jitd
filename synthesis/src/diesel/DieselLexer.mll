@@ -1,5 +1,5 @@
 {
-open JITDParser;;
+open DieselParser;;
 
 module StrMap = Map.Make(String);;
 
@@ -22,21 +22,17 @@ let keywords = List.fold_left
   (fun map (a,b) -> StrMap.add (String.uppercase a) b map)
   StrMap.empty
   [
-    ( "IS",       IS );
-    ( "WITH",     WITH );
-    ( "COG",      COG );
-    ( "FUNCTION", FUNCTION );
-    ( "FUN",      FUNCTION );
-    ( "INCLUDE",  INCLUDE);
-    ( "AS",       AS);
-    ( "CASE",     CASE);
-    ( "WHEN",     WHEN);
-    ( "ELSE",     ELSE);
-    ( "END",      END);
-    ( "APPLY",    APPLY);
-    ( "RECUR",    RECUR);
-    ( "RULE",     RULE);
-    ( "OVER",     OVER);
+    ( "CASE",     CASE );
+    ( "WHEN",     WHEN );
+    ( "THEN",     THEN );
+    ( "END",      END );
+    ( "LET",      LET );
+    ( "IN",       IN );
+    ( "BUILD",    BUILD );
+    ( "APPLY",    APPLY );
+    ( "TRUE",     TRUE );
+    ( "FALSE",    FALSE );
+    ( "ISA",      ISA );
   ];;
 }
 
@@ -45,31 +41,50 @@ rule token = parse
   | [' ' '\t']           { token lexbuf }
   | '('                  { LPAREN } 
   | ')'                  { RPAREN } 
-  | ';'                  { EOC } 
-  | ','                  { COMMA }
-  | "->"                 { ARROW }
-  | '_'                  { UNDERSCORE }
-  | "|"                  { PIPE }
+  | '{'                  { LBRACE } 
+  | '}'                  { RBRACE } 
   | '['                  { LBRACK }
   | ']'                  { RBRACK }
+  | ';'                  { EOC } 
+  | ','                  { COMMA }
+  | "|"                  { PIPE }
+  | '_'                  { UNDERSCORE }
+  | "@"                  { AT }
+  | ":="                 { ASSIGN }
+  | '.'                  { PERIOD }
+  | ':'                  { COLON }
+  | "=="                 { EQ }
+  | "!="                 { NEQ }
+  | "<"                  { LT }
+  | "<="                 { LTE }
+  | ">"                  { GT }
+  | ">="                 { GTE }
+  | "&&"                 { AND }
+  | "||"                 { OR }
+  | "+"                  { ADD }
+  | "-"                  { SUB }
+  | "*"                  { MULT }
+  | "/"                  { DIV }
   | (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as s
                          { 
                           if StrMap.mem (String.uppercase s) keywords 
                           then StrMap.find (String.uppercase s) keywords
                           else ID(s) 
                          }
-  | '{'                  { CBLOCK(cblock 1 lexbuf) }
-  | '"'                  { STRING(string_literal lexbuf) }
+  | '"'                  { STRINGCONST(string_literal lexbuf) }
+  | (['0' - '9']+ '.' ['0' - '9']*) as f  
+                         { FLOATCONST(float_of_string f) }
+  | (['0' - '9']+) as i  { INTCONST(int_of_string i) }
   | eof                  { EOF }
-  | _                    { raise (JITD.ParseError("Unexpected character",
-                                                  lexbuf.Lexing.lex_curr_p)) }
+  | _                    { raise (Diesel.ParseError("Unexpected character",
+                                                    lexbuf.Lexing.lex_curr_p)) }
 
 and cblock depth = parse
   | '{'                  { "{"^(cblock (depth+1) lexbuf) }
   | '}'                  { (if depth > 1 then "}"^(cblock (depth-1) lexbuf) else "") }
   | [^'}']+ as s         { s^(cblock depth lexbuf) }
-  | eof                  { raise (JITD.ParseError("unterminated C block", 
-                                                  lexbuf.Lexing.lex_curr_p)) }
+  | eof                  { raise (Diesel.ParseError("unterminated C block", 
+                                                    lexbuf.Lexing.lex_curr_p)) }
 and string_literal = parse
   | "\\\""               { "\""^(string_literal lexbuf) }
   | [^'"']+ as s         { s^(string_literal lexbuf) }

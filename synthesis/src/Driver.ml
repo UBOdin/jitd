@@ -1,6 +1,5 @@
 
 open Cog
-open JITD
 
 let source_files:string list ref = ref [];;
 
@@ -15,6 +14,8 @@ Arg.parse
   (fun f -> source_files := f :: !source_files)
 	"jitd [options] files";;
 
+
+(*
 let file =
   JITD.split_file (
     List.flatten
@@ -38,3 +39,5 @@ let file =
 
 print_endline 
   (PrettyFormat.render (CGen.build_program file));;
+
+*)
