@@ -19,7 +19,6 @@ void buffer_retain(buffer b)
 
 void buffer_release(buffer b)
 {
-  b->refcount --;
   if(b->refcount < 1){
     free(b);
   }
@@ -41,6 +40,11 @@ long buffer_value(buffer b, int i){
 void record_copy(record src, record dst){
   dst->key   = src->key;
   dst->value = src->value;
+}
+
+void record_set(record src, long key, long value){
+  src->key   = key;
+  src->value = value;
 }
 
 void record_swap(record ir, record jr){
@@ -112,6 +116,20 @@ int record_binarysearch(record r, long key, int start, int len)
   } else {
     return record_binarysearch(r, key, mid, len + start - mid);
   }
+}
+
+int radix(buffer b, int low, int cnt, int radix){
+  int radixPos =0;
+  int i=0;
+  for(i=0; i < cnt; i++) {
+    if(b->data[i+low].key < radix) {
+      if(radixPos < i) {
+        record_swap(&(b->data[i+low]), &(b->data[radixPos+low]));
+        radixPos++;
+      }
+    }
+  }
+  return radixPos;
 }
 
 // ITERATORS

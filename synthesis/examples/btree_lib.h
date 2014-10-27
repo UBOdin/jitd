@@ -185,6 +185,8 @@ void record_dump(record r, int start, int end);
 //  int len: The number of records following start to search
 int record_binarysearch(record r, long key, int start, int len);
 
+void record_set(record src, long key, long value);
+
 //////////////////////// ARRAY ITERATOR CONSTRUCTORS
 // Constructors for array iterators.  Use binarysearch_scan if the buffer is
 // sorted.  Use scan if the buffer is not sorted.
@@ -211,6 +213,5 @@ iterator array_binarysearch_scan(long low, long high, int start, int len, buffer
 //  buffer buffer: A sorted buffer to scan.
 iterator array_scan(long low, long high, int start, int len, buffer buffer);
 
-
-
+iterator array_iter_alloc(buffer b, int start, int end);
 #endif //BTREE_LIB_H_SHIELD

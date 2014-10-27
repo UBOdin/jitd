@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "btree.c"
+#include "btree.h"
+#include "cracker.h"
 
 #define BUFFER_SIZE 10
 #define KEY_RANGE   1000
@@ -35,21 +36,6 @@ cog *mk_random_array(int size)
 cog *mk_sorted_array(int size)
 {
   return make_sortedarray(0, size, mk_sorted_buffer(size));
-}
-
-void cleanup(cog *c){
-  switch(c->type){
-    case COG_CONCAT:
-    case COG_BTREE:
-      cleanup(c->data.concat.lhs);
-      cleanup(c->data.concat.rhs);
-      break;
-    case COG_ARRAY:
-    case COG_SORTEDARRAY:
-      buffer_release(c->data.array.records);
-      break;
-  }
-  free_cog(c);
 }
 
 void test_scan(cog *c, long low, long high)
@@ -86,7 +72,19 @@ void test3()
   cleanup(c);
 }
 
-
+void test4() {
+  printf("test 4\n");
+  cog *c = make_concat(
+            mk_random_array(BUFFER_SIZE),
+            mk_random_array(BUFFER_SIZE)
+          );
+  c = crack(c, 100, 200);
+  test_scan(c, 100, 200);
+  c = crack(c, 400, 700);
+  c = crack(c, 800, 900);
+  test_scan(c, 1, 1000);
+  cleanup(c);
+}
 
 int main(int argc, char **argv)
 {
@@ -97,4 +95,6 @@ int main(int argc, char **argv)
   test2();
   srand(rand_start);
   test3();
+  srand(rand_start);
+  test4();
 }
