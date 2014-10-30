@@ -11,8 +11,9 @@ dist/*.jar
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Generated source files
-synthesis/examples/btree.c
-
 # Local-only files
 results
+
+*.o
+*.dSYM
+synthesis/examples/btree
