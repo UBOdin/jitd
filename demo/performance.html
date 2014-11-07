@@ -1,11 +1,95 @@
 <html><head>
 <title>JITD Performance</title>
-</head><body>
 
-<table width="100%" height="100%">
-  <tr valign="middle">
-    <td align="center"><h2>Performance Chart Goes Here</h2></td>
-  </tr>
-</table>
+<script type="text/javascript" src="d3.min.js"></script>
+
+<style>
+.outerbody {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  vertical-align: middle;
+}
+.innerbody {
+  position: absolute;
+  top: 45%;  
+  width: 100%;
+}
+.chart {
+  position: relative;
+  margin: auto;
+  width: 100%;
+  height: 300;
+  vertical-align: bottom;
+  background-color: lightgrey;
+}
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+</style>
+
+<script>
+function plot(data) {
+  var chart = d3.select(".chart")
+  
+  var barWidth = 30;
+  var height = chart.property("clientHeight");
+  var width = chart.property("clientWidth");
+  
+  var y = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d.v; } )])
+            .range([0, height])
+  
+  var start = ((width - data.length * barWidth)/2);
+  
+  chart.text("");
+  
+  var bar = chart.selectAll("g")
+              .data(data)
+              .enter().append("g")
+                .attr("transform", function(d, i) { 
+                                      return "translate("+(start + i*barWidth)+",0)";
+                                   });
+  
+  bar.append("rect")
+        .attr("y", function(d) { return height-y(d.v); })
+        .attr("width", barWidth - 1)
+        .attr("height", function(d) { return y(d.v); })
+        .attr("fill", function(d) {
+            if(d.t == "read"){
+              return "steelblue";
+            } else {
+              return "#555";
+            }
+          });
+  
+  bar.append("text")
+        .attr("x", barWidth / 2)
+        .attr("y", height - 5)
+        .attr("dx", ".4em")
+        .text(function(d) { return d.v; });
+  
+}
+
+function reloadTimings(){
+  plot([{ t: "read", v: Math.floor(Math.random() * 50)},
+        { t: "write", v: Math.floor(Math.random() * 50)}, 
+        { t: "read", v: Math.floor(Math.random() * 50)}, 
+        { t: "read", v: Math.floor(Math.random() * 50)}, 
+        { t: "write", v: Math.floor(Math.random() * 50)}, 
+        { t: "read", v: Math.floor(Math.random() * 50) }
+      ]);
+  window.setTimeout(reloadTimings, 1000);
+}
+</script>
+
+</head><body onload="reloadTimings()">
+
+<div class="outerbody"><div class="innerbody">
+  <svg class="chart"></svg>
+</div></div>
+
 
 </body></html>
