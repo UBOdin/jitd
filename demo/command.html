@@ -11,9 +11,32 @@ function log(msg){
   console.log(msg);
 }
 
-function command(cmd){
+function param(block, v){
+  return d3.select('form#'+block).select('input#'+v).property('value')
+}
+function radio(block, v){
+  var opts = d3.select('form#'+block).selectAll('input#'+v);
+  var i;
+  for(i in opts[0]){
+    if(opts[0][i].checked){ return opts[0][i].value; }
+  }
+  return 
+  return "foo";
+}
+
+function command(cmd, args){
+  if(args == null){
+    args = {};
+  }
+  var sep = "?"
+  var i;
+  for(i in args){
+    cmd = cmd + sep + args[i] + "=" + param(cmd, args[i]);
+    sep = "&";
+  }
   log("Processing: " + cmd);
   d3.json("http://localhost:8010/"+cmd, function(err, result){
+    log("response");
     if(err != null){
       log(err);
     } else {
@@ -23,7 +46,8 @@ function command(cmd){
         log(result.err);
       }
     }
-  })
+  });
+  return false;
 }
 </script>
 
@@ -34,7 +58,7 @@ function command(cmd){
 <tr valign="middle" height="*"><td align="center">
     <hr/>
   <div>
-    <form action="http://locahost:8010/mode" method="get">
+    <form action="http://localhost:8010/mode" method="get">
       <table>
       <tr>
         <th align="right">Mode:</th>
@@ -57,39 +81,39 @@ function command(cmd){
   </div>
     <hr/>
   <div>
-    <form action="http://locahost:8010/init" method="get">
-      <input type="submit" value="Initialize" /> with 
-      <input type="size" value="1000" name="size" size=10/> random values
+    <form id="init">
+      <input type="submit" value="Initialize" onclick="command('init', [ 'size' ])" /> with 
+      <input type="text" value="1000" id="size" size=10/> random values
     </form>
   </div>
     <hr/>
   <div>
-    <form action="http://locahost:8010/readmany" method="get">
-      <input type="submit" value="Write" />
-      <input type="text" name="count" value="100" size=5 />
+    <form id="write">
+      <input type="submit" value="Write" onclick="command('write', [ 'size' ])" />
+      <input type="text" id="size" value="100" size=5 />
       random values
     </form>
   </div>
     <hr/>
   <div>
-    <form action="http://locahost:8010/read" method="get">
+    <form id="read">
       <table>
         <tr><td rowspan=2>
-          <input type="submit" value="Read" /> 
-          <input type="text" name="width" value="100" size=5 />
+          <input type="submit" value="Read" onclick="console.log(radio('read', 'src')); " /> 
+          <input type="text" id="width" value="100" size=5 />
           keys from
         <td>
-          <input type="radio" name="src" value="rand" checked/> a random key
+          <input type="radio" name="src" id="src" value="rand" checked/> a random key
         </td></tr>
         <tr><td>
-          <input type="radio" name="src" value="fixed" /> key 
-          <input type="text" name="width" value="100" size=10 />
+          <input type="radio" name="src" id="src" value="fixed" /> key 
+          <input type="text" id="key" value="100" size=10 />
         </td></tr>
       </table>
   </div>
     <hr/>
   <div>
-    <form action="http://locahost:8010/readmany" method="get">
+    <form action="http://localhost:8010/readmany" method="get">
       <input type="submit" value="Perform" />
       <input type="text" name="count" value="100" size=5 />
       reads for 

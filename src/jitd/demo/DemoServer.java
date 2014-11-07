@@ -5,6 +5,8 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.apache.logging.log4j.Logger;
+
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -15,6 +17,9 @@ import us.monoid.json.*;
 import jitd.*;
 
 public class DemoServer {
+
+  private static Logger log = 
+    org.apache.logging.log4j.LogManager.getLogger();
 
   public static void write(HttpExchange x, String msg)
     throws IOException
@@ -35,6 +40,7 @@ public class DemoServer {
   public static void error(HttpExchange x, String msg)
     throws IOException
   {
+    log.error(msg);
     write(x, "{'status':'error', 'msg':'"+
               msg.replaceAll("\\\\", "\\\\").replaceAll("'", "\\'")+
               "'}");
@@ -68,14 +74,19 @@ public class DemoServer {
     return obj;
   }
   
-  public static String[] getArguments(HttpExchange exchange)
+  public static Map<String,String> getArguments(HttpExchange exchange)
   {
     String query = exchange.getRequestURI().getQuery();
+    Map<String, String> ret = new HashMap<String, String>();
     if(query != null){
-      return query.split("&");
-    } else {
-      return new String[0];
+      for(String args : query.split("&")){
+        String kv[] = args.split("=");
+        if(kv.length == 2){
+          ret.put(kv[0], kv[1]);
+        }
+      }
     }
+    return ret;
   }
 
   public static void main(String[] args) throws IOException {
@@ -99,11 +110,14 @@ public class DemoServer {
             Headers requestHeaders = x.getRequestHeaders();
             
             URI req = x.getRequestURI();
-            String args[] = getArguments(x);
+            Map<String,String> args = getArguments(x);
             
             switch(req.getPath()){
               case "/init":
-                sd.init(1000);
+                sd.init(args.containsKey("size") 
+                            ? Integer.parseInt(args.get("size")) 
+                            : 1000
+                       );
                 success(x);
                 break;
               case "/dump":
@@ -113,17 +127,24 @@ public class DemoServer {
                 sd.read();
                 success(x);
                 break;
+              case "/write":
+                sd.write(args.containsKey("size") 
+                            ? Integer.parseInt(args.get("size")) 
+                            : 1000
+                        );
+                success(x);
+                break;
               case "/mode":{
-                if(args.length < 1){
+                if(!args.containsKey("m")){
                   error(x, "No mode specified");
                 } else {
                   Mode m = null;
-                  switch(args[0].toLowerCase()){
+                  switch(args.get("m")){
                     case "naive": m = new Mode(); break;
                     case "crack": m = new CrackerMode(); break;
                     case "merge": m = new PushdownMergeMode(); break;
                   }
-                  if(m == null){ error(x, "Invalid Mode: '"+args[0]+"'"); }
+                  if(m == null){ error(x, "Invalid Mode: '"+args.get("m")+"'"); }
                   else {
                     sd.driver.mode = m;
                     success(x);
