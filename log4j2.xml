@@ -14,6 +14,7 @@
     <logger name="jitd.CrackerMode" level="WARN"/>
     <logger name="jitd.ArrayCog" level="WARN"/>
     <logger name="jitd.KeyValueIterator" level="WARN"/>
+    <logger name="jitd.demo.DemoServer" level="INFO"/>
     <Root level="warn">
       <AppenderRef ref="Console"/>
     </Root>

@@ -168,13 +168,14 @@ public class DemoServer {
                     case "crack": m = new CrackerMode(); break;
                     case "merge": m = new PushdownMergeMode(); break;
                   }
+                  log.info("Now using policy: {} ( {} )", args.get("m"), m);
                   if(m == null){ error(x, "Invalid Mode: \""+args.get("m")+"\""); }
                   else {
                     sd.driver.mode = m;
                     success(x);
                   }
                 }
-              }
+              } break;
                 
               default:
                 error(x, "Unknown operation: "+req.getPath());

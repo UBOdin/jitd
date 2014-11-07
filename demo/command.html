@@ -9,11 +9,12 @@
 
 function log(msg){
   console.log(msg);
+  d3.select("div#status").text(msg);
 }
 
 function param(block, v){
   console.log("Fetching " + block + "." + v);
-  return d3.select('form#'+block).select('input#'+v).property('value')
+  return d3.select('form#'+block).select('#'+v).property('value')
 }
 function radio(block, v){
   var opts = d3.select('form#'+block).selectAll('input#'+v);
@@ -21,8 +22,7 @@ function radio(block, v){
   for(i in opts[0]){
     if(opts[0][i].checked){ return opts[0][i].value; }
   }
-  return 
-  return "foo";
+  return null;
 }
 
 function command(cmd, args){
@@ -36,15 +36,15 @@ function command(cmd, args){
     path = path + sep + args[i] + "=" + param(cmd, args[i]);
     sep = "&";
   }
-  log("Processing: " + cmd);
+  log("Pending ["+path+"]");
   d3.json("http://localhost:8010/"+path, function(err, result){
     if(err != null){
       log(err);
     } else {
       if(result.status == "success"){
-        log("...done");
+        log("Done ["+path+"]");
       } else {
-        log("Error: " + result.msg);
+        log("Error ["+path+"]: " + result.msg);
       }
     }
   });
@@ -58,12 +58,12 @@ function command(cmd, args){
 <tr valign="middle" height="*"><td align="center">
     <hr/>
   <div>
-    <form action="http://localhost:8010/mode" method="get">
+    <form id="mode">
       <table>
       <tr>
         <th align="right">Mode:</th>
         <td>
-          <select name="mode">
+          <select id="m" name="m" onChange="command('mode', ['m', 'blocks', 'parts'])">
             <option value="naive">Naive Reads</option>
             <option value="crack">Cracking</option>
             <option value="merge">Adaptive Merge</option>
@@ -71,10 +71,10 @@ function command(cmd, args){
         </td>
       </tr><tr>
         <th align="right">Merge Block Size:</th>
-        <td align="left"><input type="text" name="blocks" size=7 value=100 /></td>
+        <td align="left"><input type="text" id="blocks" name="blocks" size=7 value=100 /></td>
       </tr><tr>
         <th align="right">Merge Partition Size:</th>
-        <td align="left"><input type="text" name="parts" size=7 value=1000 /></th>
+        <td align="left"><input type="text" id="parts" name="parts" size=7 value=1000 /></th>
       </tr>
       </table>
     </form>
@@ -131,7 +131,7 @@ function command(cmd, args){
   </div>
     <hr/>
 </td></tr></table>
-<div id="status" style="background-color: #cccccc; width:100\%; height: 40px"></div>
+<div id="status" style="background-color: #cccccc; width:100\%; height: 30px; text-align: center; padding-top: 10px;">Ready...</div>
 
 
 </body>

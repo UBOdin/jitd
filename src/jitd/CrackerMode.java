@@ -120,6 +120,52 @@ public class CrackerMode extends Mode
       log.trace("Unable to push-down: " + cog);
       if(lhs != ccog.lhs || rhs != ccog.rhs){
         return new ConcatCog(lhs, rhs);
+      } else if(lhs instanceof BTreeCog && rhs instanceof BTreeCog) {
+        BTreeCog lb = (BTreeCog)lhs, 
+                 rb = (BTreeCog)rhs;
+        if(lb.sep == rb.sep){
+          return new BTreeCog(
+            lb.sep,
+            new ConcatCog(lb.lhs, rb.lhs),
+            new ConcatCog(lb.rhs, rb.rhs)
+          );
+        } else if(lb.sep < rb.sep){
+          return pushdownConcats(
+            new ConcatCog(
+              new BTreeCog(lb.sep,
+                lb.lhs,
+                new ConcatCog(
+                  lb.rhs,
+                  new BTreeCog(rb.sep,
+                    new SubArrayCog(null, 0, 0),
+                    rb.rhs
+                  )
+                )
+              ),
+              rb.lhs
+            ), 
+            low,
+            high
+          );
+        } else {
+          return pushdownConcats(
+            new ConcatCog(
+              new BTreeCog(lb.sep,
+                new ConcatCog(
+                  lb.lhs,
+                  new BTreeCog(rb.sep,
+                    rb.lhs,
+                    new SubArrayCog(null, 0, 0)
+                  )
+                ),
+                lb.rhs
+              ),
+              rb.rhs
+            ), 
+            low,
+            high
+          );
+        }
       } else {
         return cog;
       }
