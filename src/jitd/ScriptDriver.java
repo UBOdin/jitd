@@ -12,7 +12,7 @@ import jitd.test.*;
 
 public class ScriptDriver {
   
-  static final long READ_WIDTH = 1000;// 2*1000*1000;
+  public static final long READ_WIDTH = 1000;// 2*1000*1000;
   
   private static Logger log = 
     org.apache.logging.log4j.LogManager.getLogger();
@@ -54,21 +54,33 @@ public class ScriptDriver {
     endTime("Write");
   }
   
+  public long randKey()
+    { return rand.randKey(); }
+  
   public void read()
+    { read(randKey()); }
+  
+  public void read(long start)
+    { read(start, start+READ_WIDTH); }
+  
+  
+  public void read(long start, long end)
   {
     op++;
-    long k = rand.randKey();
-    log.trace("Read for: {}--{}", k, k+READ_WIDTH); 
+    log.info("Read for: {}--{}", start, end); 
     startTime();
-    KeyValueIterator iter = driver.scan(k, k + READ_WIDTH);
+    KeyValueIterator iter = driver.scan(start, end);
     endTime("Read");
     log.trace("Record Count Is: {}", driver.root.length());
 
   }
   
   public void seqRead(int count)
+    { seqRead(count, READ_WIDTH); }
+  
+  public void seqRead(int count, long width)
   {
-    for(int i = 0; i < count; i++) { read(); }
+    for(int i = 0; i < count; i++) { read(randKey(), width); }
   }
   
   public Mode modeForString(String mode){

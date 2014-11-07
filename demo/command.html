@@ -12,6 +12,7 @@ function log(msg){
 }
 
 function param(block, v){
+  console.log("Fetching " + block + "." + v);
   return d3.select('form#'+block).select('input#'+v).property('value')
 }
 function radio(block, v){
@@ -25,29 +26,28 @@ function radio(block, v){
 }
 
 function command(cmd, args){
+  path = cmd;
   if(args == null){
     args = {};
   }
   var sep = "?"
   var i;
   for(i in args){
-    cmd = cmd + sep + args[i] + "=" + param(cmd, args[i]);
+    path = path + sep + args[i] + "=" + param(cmd, args[i]);
     sep = "&";
   }
   log("Processing: " + cmd);
-  d3.json("http://localhost:8010/"+cmd, function(err, result){
-    log("response");
+  d3.json("http://localhost:8010/"+path, function(err, result){
     if(err != null){
       log(err);
     } else {
       if(result.status == "success"){
         log("...done");
       } else {
-        log(result.err);
+        log("Error: " + result.msg);
       }
     }
   });
-  return false;
 }
 </script>
 
@@ -82,14 +82,14 @@ function command(cmd, args){
     <hr/>
   <div>
     <form id="init">
-      <input type="submit" value="Initialize" onclick="command('init', [ 'size' ])" /> with 
+      <input type="submit" value="Initialize" onclick="command('init', [ 'size' ]); return false;" /> with 
       <input type="text" value="1000" id="size" size=10/> random values
     </form>
   </div>
     <hr/>
   <div>
     <form id="write">
-      <input type="submit" value="Write" onclick="command('write', [ 'size' ])" />
+      <input type="submit" value="Write" onclick="command('write', [ 'size' ]); return false;" />
       <input type="text" id="size" value="100" size=5 />
       random values
     </form>
@@ -99,7 +99,14 @@ function command(cmd, args){
     <form id="read">
       <table>
         <tr><td rowspan=2>
-          <input type="submit" value="Read" onclick="console.log(radio('read', 'src')); " /> 
+          <input type="submit" value="Read" onclick="
+          	if(radio('read', 'src')=='rand'){
+              command('read', [ 'width' ]);
+          	} else {
+              command('read', [ 'width', 'key' ]);
+          	}
+          	return false;
+          console.log(radio('read', 'src')); return false;" /> 
           <input type="text" id="width" value="100" size=5 />
           keys from
         <td>
@@ -110,15 +117,17 @@ function command(cmd, args){
           <input type="text" id="key" value="100" size=10 />
         </td></tr>
       </table>
+    </form>
   </div>
     <hr/>
   <div>
-    <form action="http://localhost:8010/readmany" method="get">
-      <input type="submit" value="Perform" />
-      <input type="text" name="count" value="100" size=5 />
+    <form id="readmany">
+      <input type="submit" value="Perform" onclick="command('readmany', ['count', 'width']); return false;" />
+      <input type="text" id="count" value="100" size=5 />
       reads for 
-      <input type="text" name="width" value="100" size=5 />
+      <input type="text" id="width" value="100" size=5 />
       keys each
+    </form>
   </div>
     <hr/>
 </td></tr></table>

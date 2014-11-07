@@ -34,16 +34,16 @@ public class DemoServer {
   public static void success(HttpExchange x)
     throws IOException
   {
-    write(x, "{'status':'success'}");
+    write(x, "{\"status\":\"success\"}");
   }
   
   public static void error(HttpExchange x, String msg)
     throws IOException
   {
     log.error(msg);
-    write(x, "{'status':'error', 'msg':'"+
-              msg.replaceAll("\\\\", "\\\\").replaceAll("'", "\\'")+
-              "'}");
+    write(x, "{\"status\":\"error\", \"msg\":\""+
+              msg.replaceAll("\\\\", "\\\\").replaceAll("\"", "\\\"")+
+              "\"}");
   }
   
   public static void dump(HttpExchange x, Cog cog)
@@ -123,9 +123,33 @@ public class DemoServer {
               case "/dump":
                 dump(x, sd.driver.root);
                 break;
-              case "/read":
-                sd.read();
-                success(x);
+              case "/read": {
+                  long width = ScriptDriver.READ_WIDTH;
+                  if(args.containsKey("width")){ 
+                    width = Integer.parseInt(args.get("width"));
+                  }
+                  long start;
+                  if(args.containsKey("key")){
+                    start = Integer.parseInt(args.get("key"));
+                  } else {
+                    start = sd.randKey();
+                  }
+                  sd.read(start, start+width);
+                  success(x);
+                }
+                break;
+              case "/readmany": 
+                if(!args.containsKey("count")) {
+                  error(x, "Missing 'count' parameter");
+                } else if(!args.containsKey("width")){
+                  error(x, "Missing 'width' parameter");
+                } else {
+                  sd.seqRead(
+                    Integer.parseInt(args.get("count")),
+                    Integer.parseInt(args.get("width"))
+                  );
+                  success(x);
+                }
                 break;
               case "/write":
                 sd.write(args.containsKey("size") 
@@ -144,7 +168,7 @@ public class DemoServer {
                     case "crack": m = new CrackerMode(); break;
                     case "merge": m = new PushdownMergeMode(); break;
                   }
-                  if(m == null){ error(x, "Invalid Mode: '"+args.get("m")+"'"); }
+                  if(m == null){ error(x, "Invalid Mode: \""+args.get("m")+"\""); }
                   else {
                     sd.driver.mode = m;
                     success(x);
