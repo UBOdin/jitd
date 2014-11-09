@@ -4,18 +4,34 @@
 <script type="text/javascript" src="d3.min.js"></script>
 
 <style>
+body {
+  margin: 0px;
+  padding: 0px;
+}
 .chart {
   position: relative;
   margin: auto;
   width: 100%;
-  height: 95%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
   vertical-align: bottom;
-  background-color: lightgrey;
 }
 .chart text {
-  fill: white;
+  fill: #fff;
   font: 10px sans-serif;
-  text-anchor: end;
+  text-anchor: start;
+}
+.axis text {
+  font: 10px sans-serif;
+  stroke: #555;
+  text-anchor: middle;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 </style>
 
@@ -25,18 +41,47 @@ function plot(data) {
   
   var barWidth = 30;
   var height = chart.property("clientHeight");
-  var width = chart.property("clientWidth");
+  var margin = 25;
+  var width = chart.property("clientWidth") - margin;
   
-  var y = d3.scale.linear()
-            .domain([0, d3.max(data, function(d) { return d.v * 1; } )])
-            .range([0, height])
+  chart.text("");
+
+  chart.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(15, "+(height/2)+") rotate(-90 0 0 )")
+            .append("text")
+//              .attr("x", 200)
+//              .attr("y", 200)
+              .text("Time (Milliseconds)");
+  
+  chart = chart.append("g")
+            .attr("transform", "translate(" + margin + ", 0)");
+  
+  var maxY = d3.max(data, function(d) { return d.v * 1; } );
+  maxY = Math.log(maxY) / Math.LN10;
+  maxY = Math.ceil(maxY);
+  maxY = Math.pow(maxY-1, 10);
+  
+  
+  var y = d3.scale.log()
+            .domain([1, maxY])
+            .range([1, height]);
+  var yAxis = d3.svg.axis().scale(
+      y .copy()
+        .domain([height, 1])
+        .nice()
+    ).orient("right")
+     .tickSize(width)
+     .tickFormat("$,.0f");
+  chart.append("g")
+         .attr("class", "y axis")
+         .call(yAxis);
     
   var start = ((width - data.length * barWidth)/2);
   
-  chart.text("");
-  
-  var bar = chart.selectAll("g")
+  var bar = chart.selectAll("bar")
               .data(data)
+              .attr("class", "bar")
               .enter().append("g")
                 .attr("transform", function(d, i) { 
                                       return "translate("+(start + i*barWidth)+",0)";
@@ -54,11 +99,13 @@ function plot(data) {
             }
           });
   
-  bar.append("text")
-        .attr("x", barWidth / 2)
-        .attr("y", height - 5)
-        .attr("dx", ".4em")
-        .text(function(d) { return d.v; });
+  bar.append("g")
+        .attr("transform", 
+              "translate("+(barWidth/2+3)+", "+
+                           (height-10)+")"+
+              "rotate(-90 0 0)")
+        .append("text")
+          .text(function(d) { return d.v; });
   
 }
 

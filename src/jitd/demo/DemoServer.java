@@ -94,6 +94,7 @@ public class DemoServer {
     
     for(ScriptDriver.LogEntry entry : log){
       JSONObject eobj = new JSONObject();
+      if(entries.length() > 30){ entries.remove(0); }
       entries.put(eobj);
       eobj.put("t", entry.type.toString().toLowerCase());
       eobj.put("v", ""+entry.time);
