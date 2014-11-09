@@ -22,7 +22,7 @@ public class ScriptDriver {
   KeyValueIterator.RandomIterator rand = new KeyValueIterator.RandomIterator();
   long timer = 0, start = 0;
   int op = 0;
-  
+
   public ArrayCog array(int size)
   {
     ArrayCog cog = new ArrayCog(size);
@@ -31,12 +31,14 @@ public class ScriptDriver {
   }
   
   public void startTime() { start = System.nanoTime(); }
-  public void endTime(String msg) 
+  public long endTime(LogType type) 
   { 
     long end = System.nanoTime();
     long delta = (end-start)/1000;
     timer += delta;
-    log.info("{} ({}): {} us", msg, op, delta);
+    log.info("{} ({}): {} us", type, op, delta);
+    timeLog.add(new LogEntry(type, delta));
+    return delta;
   }
   
   public void init(int baseSize)
@@ -51,7 +53,7 @@ public class ScriptDriver {
     Cog cog = array(writeSize);
     startTime();
     driver.insert(cog);
-    endTime("Write");
+    endTime(LogType.WRITE);
   }
   
   public long randKey()
@@ -70,7 +72,7 @@ public class ScriptDriver {
     log.info("Read for: {}--{}", start, end); 
     startTime();
     KeyValueIterator iter = driver.scan(start, end);
-    endTime("Read");
+    endTime(LogType.READ);
     log.trace("Record Count Is: {}", driver.root.length());
 
   }
@@ -209,5 +211,22 @@ public class ScriptDriver {
     }
     log.info("Total Time: {}", sd.timer);
   }
+  
+  public void resetLog()
+  {
+    timeLog.clear();
+  }
+  
+  public final List<LogEntry> timeLog = new ArrayList<LogEntry>();
+  
+  public enum LogType { READ, WRITE }
+  
+  public static class LogEntry {
+    public final LogType type;
+    public final long time;
+    public LogEntry(LogType type, long time)
+      { this.type = type; this.time = time; }
+  }
+  
   
 }

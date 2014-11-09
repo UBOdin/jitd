@@ -74,6 +74,34 @@ public class DemoServer {
     return obj;
   }
   
+  public static void dump(HttpExchange x, List<ScriptDriver.LogEntry> log)
+    throws IOException
+  {
+    try {
+      write(x, dump(log).toString());
+    } catch(JSONException e){
+      throw new IOException("Could not create JSON", e);      
+    }
+  }
+  
+  public static JSONObject dump(List<ScriptDriver.LogEntry> log)
+    throws JSONException
+  {
+    JSONObject obj = new JSONObject();
+    obj.put("status", "success");
+    JSONArray entries = new JSONArray();
+    obj.put("data", entries);
+    
+    for(ScriptDriver.LogEntry entry : log){
+      JSONObject eobj = new JSONObject();
+      entries.put(eobj);
+      eobj.put("t", entry.type.toString().toLowerCase());
+      eobj.put("v", ""+entry.time);
+    }
+
+    return obj;
+  }
+  
   public static Map<String,String> getArguments(HttpExchange exchange)
   {
     String query = exchange.getRequestURI().getQuery();
@@ -118,6 +146,7 @@ public class DemoServer {
                             ? Integer.parseInt(args.get("size")) 
                             : 1000
                        );
+                sd.resetLog();
                 success(x);
                 break;
               case "/dump":
@@ -159,23 +188,26 @@ public class DemoServer {
                 success(x);
                 break;
               case "/mode":{
-                if(!args.containsKey("m")){
-                  error(x, "No mode specified");
-                } else {
-                  Mode m = null;
-                  switch(args.get("m")){
-                    case "naive": m = new Mode(); break;
-                    case "crack": m = new CrackerMode(); break;
-                    case "merge": m = new PushdownMergeMode(); break;
+                  if(!args.containsKey("m")){
+                    error(x, "No mode specified");
+                  } else {
+                    Mode m = null;
+                    switch(args.get("m")){
+                      case "naive": m = new Mode(); break;
+                      case "crack": m = new CrackerMode(); break;
+                      case "merge": m = new PushdownMergeMode(); break;
+                    }
+                    log.info("Now using policy: {} ( {} )", args.get("m"), m);
+                    if(m == null){ error(x, "Invalid Mode: \""+args.get("m")+"\""); }
+                    else {
+                      sd.driver.mode = m;
+                      success(x);
+                    }
                   }
-                  log.info("Now using policy: {} ( {} )", args.get("m"), m);
-                  if(m == null){ error(x, "Invalid Mode: \""+args.get("m")+"\""); }
-                  else {
-                    sd.driver.mode = m;
-                    success(x);
-                  }
-                }
-              } break;
+                } break;
+              case "/perf":
+                dump(x, sd.timeLog);
+                break;
                 
               default:
                 error(x, "Unknown operation: "+req.getPath());
