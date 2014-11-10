@@ -20,6 +20,7 @@ cog *pushdown_concats(cog *c, long low, long high) {
       ret->type = COG_BTREE;
       ret->data.btree.lhs = lhs;
       ret->data.btree.rhs = rhs;
+      cleanup(c);
       return ret;
     } else {
       return c;
@@ -49,27 +50,32 @@ cog *pushdown_concats(cog *c, long low, long high) {
       cog *new_rhs = lhs->data.btree.rhs;
       
       if(radix_pos > 0) {
+        cog *array1;
+        buffer buf;
         if(array_cog->type == COG_ARRAY) {
-          cog *array1;
-          array1 = make_array(start, radix_pos, array_cog->data.array.records);
-          new_lhs = make_concat(lhs->data.btree.lhs, array1);
-
+          buf =  array_cog->data.array.records;
         } else {
-          new_lhs = make_concat(lhs->data.btree.lhs, make_array(start, radix_pos, array_cog->data.sortedarray.records));
-        } 
+          buf = array_cog->data.sortedarray.records;
+        }
+        array1 = make_array(start, radix_pos, buf);
+        new_lhs = make_concat(lhs->data.btree.lhs, array1);
       }
 
       if(radix_pos < count){
         cog *array2;
+        buffer buf;
         if(array_cog->type == COG_ARRAY) {
-          array2 = make_array(start+radix_pos, count-radix_pos, array_cog->data.array.records);
-          new_rhs = make_concat(lhs->data.btree.rhs, array2);
+          buf = array_cog->data.array.records;
         } else {
-          new_rhs = make_concat(lhs->data.btree.rhs, array2);
+          buf = array_cog->data.sortedarray.records;
         }
+        array2 = make_array(start+radix_pos, count-radix_pos, buf);
+        buffer_release(buf);
+        new_rhs = make_concat(lhs->data.btree.rhs, array2);
       }
       cog *btree;
       btree = make_btree(new_lhs, new_rhs, lhs->data.btree.sep);
+      cleanup(c);
       return pushdown_concats(btree, low, high); 
     }
     if(lhs != c->data.concat.lhs || rhs != c->data.concat.rhs) {
@@ -117,27 +123,34 @@ cog *crack_one(cog *c, long val) {
         radixPos++;
       }
     }
-    return make_btree(make_array(low, radixPos - low, c->data.array.records), make_array(radixPos, high - radixPos, c->data.array.records), val);
+    cog *array1 = make_array(low, radixPos - low, c->data.array.records);
+    cog *array2 = make_array(radixPos, high - radixPos, c->data.array.records);
+    cleanup(c);
+    return make_btree(array1, array2, val);
   } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
     int lowIdx =0, highIdx = cog_length(c) - 1;
     iterator iter = scan_full_array(c);
-    struct record r;
+    record r = malloc(sizeof(struct record));
     while(iter_has_next(iter)) {
-      iter_next(iter, &r);
-      long key = r.key;
+      iter_next(iter, r);
+      long key = r->key;
       if(key < val) {
-        record_set(&(buf[lowIdx]), key, r.value);
+        record_set(&(buf[lowIdx]), key, r->value);
         lowIdx++;
       } else {
-        record_set(&(buf[highIdx]), key, r.value);
+        record_set(&(buf[highIdx]), key, r->value);
         highIdx--;
       } 
     }
     iter_cleanup(iter);
     cleanup(c);
-    return make_btree(make_array(0, lowIdx, out), make_array(highIdx + 1, out->size - highIdx - 1, out), val);
+    cog *array1 = make_array(0, lowIdx, out);
+    buffer_release(out);
+    cog *array2 = make_array(highIdx + 1, out->size - highIdx - 1, out);
+    buffer_release(out);
+    return make_btree(array1, array2, val);
   }
 }
 
@@ -162,7 +175,9 @@ cog *crack_scan(cog *c, long low, long high) {
       }
     }
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
-      return make_btree(lhs, rhs, c->data.btree.sep);
+      long sep = c->data.btree.sep;
+      free(c);
+      return make_btree(lhs, rhs, sep);
     } else {
       return c;
     }
@@ -188,34 +203,42 @@ cog *crack_scan(cog *c, long low, long high) {
         i--;
       }
     }
-    return make_btree(make_array(lowIdx, lowRadixPos-lowIdx, c->data.array.records), make_btree(make_array(lowRadixPos, highRadixPos-lowRadixPos, c->data.array.records), make_array(highRadixPos, highIdx-highRadixPos, c->data.array.records), high), low);
+    cog *array1 = make_array(lowIdx, lowRadixPos-lowIdx, c->data.array.records);
+    cog *array2 = make_array(lowRadixPos, highRadixPos-lowRadixPos, c->data.array.records);
+    cog *array3 = make_array(highRadixPos, highIdx-highRadixPos, c->data.array.records);
+    cleanup(c);
+    return make_btree(array1, make_btree(array2, array3, high), low);
   } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
     int lowIdx = 0, midIdx = 0, highIdx = out->size - 1;
     iterator iter = scan_full_array(c);
-    struct record r;
+    record r = malloc(sizeof(struct record));
     while(iter_has_next(iter)) {
-      iter_next(iter, &r);
-      long key = r.key;
+      iter_next(iter, r);
+      long key = r->key;
       if(key < low) {
         if(lowIdx < midIdx) {
           record_copy(&(buf[lowIdx]), &(buf[midIdx]));
         }
-        record_set(&(buf[lowIdx]), key, r.value);
+        record_set(&(buf[lowIdx]), key, r->value);
         lowIdx++;
         midIdx++;
       } else if(key < high) {
-        record_set(&(buf[midIdx]), key, r.value);
+        record_set(&(buf[midIdx]), key, r->value);
         midIdx++;
       } else {
-        record_set(&(buf[highIdx]), key, r.value);
+        record_set(&(buf[highIdx]), key, r->value);
         highIdx--;
       }
     }
+    free(r);
     iter_cleanup(iter);
     cleanup(c);
-    return make_btree(make_array(0, lowIdx, out), make_btree(make_array(lowIdx, midIdx - lowIdx, out), make_array(highIdx + 1, out->size - highIdx -1, out), high), low);   
+    cog *array1 = make_array(0, lowIdx, out);
+    cog *array2 = make_array(lowIdx, midIdx - lowIdx, out);
+    cog *array3 = make_array(highIdx + 1, out->size - highIdx -1, out);
+    return make_btree(array1, make_btree(array2, array3, high), low);   
   } 
 }
 
