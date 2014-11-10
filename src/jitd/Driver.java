@@ -36,6 +36,10 @@ public class Driver {
   {
     mode.idle(this);
   }
+  public void dump()
+  {
+    System.out.println(root.toString());
+  }
   
   /////////// EVALUATION CODE /////////////
   
@@ -152,6 +156,6 @@ public class Driver {
       }
     }
     log.info("Total time: {} us", tot / 1000);
-    if(dump) { System.out.println(driver.root.toString()); }
+    if(dump) { driver.dump(); }
   }
 }

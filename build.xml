@@ -58,4 +58,18 @@
     </junit>
   </target>
   
+  <target name="oliver" depends="compile">
+    <junit haltonerror="true"
+           showoutput="true"
+           fork="yes">
+      <jvmarg value="-Dlog4j.configurationFile=log4j2.xml"/>
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <pathelement location="${build}" />
+        <path refid="lib.classpath" />
+      </classpath>
+      <test name="jitd.test.RegressionTest" />
+    </junit>
+  </target>
+  
 </project>

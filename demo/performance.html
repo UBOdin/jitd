@@ -30,7 +30,7 @@ body {
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: #ccc;
   shape-rendering: crispEdges;
 }
 </style>
@@ -72,7 +72,7 @@ function plot(data) {
         .nice()
     ).orient("right")
      .tickSize(width)
-     .tickFormat("$,.0f");
+     .tickFormat(",.0f");
   chart.append("g")
          .attr("class", "y axis")
          .call(yAxis);
