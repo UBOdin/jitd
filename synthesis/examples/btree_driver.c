@@ -3,6 +3,7 @@
 #include <time.h>
 #include "btree.h"
 #include "cracker.h"
+#include "adaptive_merge.h"
 
 #define BUFFER_SIZE 10
 #define KEY_RANGE   1000
@@ -68,7 +69,7 @@ void test3()
       mk_random_array(BUFFER_SIZE),
       mk_random_array(BUFFER_SIZE)
     );
-  test_scan(c, 200, 700);
+  test_scan(c, 100, 200);
   cleanup(c);
 }
 
@@ -79,10 +80,26 @@ void test4() {
             mk_random_array(BUFFER_SIZE)
           );
   c = crack(c, 100, 200);
-  test_scan(c, 100, 200);
   c = crack(c, 400, 700);
   c = crack(c, 800, 900);
   test_scan(c, 1, 1000);
+  cleanup(c);
+}
+
+void test5() {
+  printf("test 5\n");
+  cog *c = make_concat(
+            mk_random_array(BUFFER_SIZE),
+            mk_random_array(BUFFER_SIZE)
+          );
+  iterator iter = malloc(sizeof(iterator));
+  printf("Scan 1\n");
+  c = amerge(c, 100, 200, iter);
+  iter_dump(iter);
+  printf("Scan 2\n");
+  c = amerge(c, 300, 700, iter);
+  iter_dump(iter);
+  iter_cleanup(iter);
   cleanup(c);
 }
 
@@ -97,4 +114,6 @@ int main(int argc, char **argv)
   test3();
   srand(rand_start);
   test4();
+  srand(rand_start);
+  test5();
 }

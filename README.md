@@ -35,11 +35,6 @@ Running performance tests:
 
 Running the visual demo: 
 * ./bin/demo
-* open demo/tree.html
+* open demo/index.html
 
-At the moment, the Visual demo UI is under development.  Commands are issued through web requests
-* `curl http://localhost:8010/init        `# Initialize a 1000 record database
-* `curl http://localhost:8010/mode?[mode] `# Switch to [mode] - Available Modes: 'naive', 'crack', 'merge'
-* `curl http://localhost:8010/read        `# Perform one read
-
-Commands are interpreted by an inline class defined in jitd.demo.DemoServer.main().
+The HTTP interface API is implemented by an inline class defined in jitd.demo.DemoServer.main().

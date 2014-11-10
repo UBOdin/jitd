@@ -7,7 +7,7 @@
 buffer buffer_alloc(int size)
 {
   buffer b = malloc(sizeof(struct buffer) + sizeof(struct record) * size);
-  b->refcount = 1;
+  b->refcount = 0;
   b->size = size;
   return b;
 }
@@ -19,6 +19,7 @@ void buffer_retain(buffer b)
 
 void buffer_release(buffer b)
 {
+  b->refcount--;
   if(b->refcount < 1){
     free(b);
   }
@@ -138,6 +139,10 @@ int iter_has_next(iterator iter)
 {
   return iter->impl->has_next(iter->data);
 }
+void iter_get_next(iterator iter, record r)
+{
+  return iter->impl->get_next(iter->data, r);
+}
 void iter_next(iterator iter, record r)
 {
   iter->impl->next(iter->data, r);
@@ -154,6 +159,113 @@ void iter_dump(iterator iter)
     iter_next(iter, &r);
     printf(" %5ld : %ld\n", r.key, r.value);
   }
+}
+
+iter_list *iter_list_add(iter_list *list, iterator iter) {
+  list->iter = iter;
+  list->next = (struct iter_list*)malloc(sizeof(iter_list));
+  list = list->next;
+  list->iter = NULL;
+  list->next = NULL;
+  return list;
+}
+
+void iter_list_cleanup(iter_list *list) {
+  iter_list *temp;
+  while(list != NULL) {
+    temp = list->next;
+    free(list->iter);
+    free(list);
+    list = temp;
+  }
+}
+
+int iter_list_length(iter_list *list) {
+  int count=0;
+  while(list != NULL && list->iter != NULL) {
+    count++; 
+    list = list->next;
+  }
+  return count;
+}
+
+typedef struct {
+  int curr;
+  int size;
+  iterator iters[0];  
+} merge_iter_data;
+
+
+int merge_iter_has_next(void *vdata) {
+  merge_iter_data *data = vdata;
+  if(data->curr >= 0) { 
+    if(iter_has_next(data->iters[data->curr]) == 0) { 
+          data->iters[data->curr] = NULL; 
+    }
+  }
+  data->curr = -1;
+  int i;
+  for(i = 0; i < data->size && data->iters[i] == NULL; i++){}
+  if(i >= data->size) { 
+    return 0; 
+  }
+  record r = malloc(sizeof(struct record));
+  iter_get_next(data->iters[i], r);
+  long curr_lowest = r->key;
+  data->curr = i;
+  for(i = i + 1; i < data->size; i++){
+    if(data->iters[i] != NULL){
+      iter_get_next(data->iters[i], r);
+      if(r->key < curr_lowest){
+        curr_lowest = r->key;
+        data->curr = i;
+      }
+    }
+  }
+  return 1;
+}
+
+void merge_iter_get_next(void *vdata, record r) {
+  merge_iter_data *data = vdata;
+  iter_get_next(data->iters[data->curr], r);
+}
+
+void merge_iter_next(void *vdata, record r) {
+  merge_iter_data *data = vdata;
+  iter_next(data->iters[data->curr], r);
+}
+
+void merge_iter_cleanup(void *vdata) {
+  merge_iter_data *data = vdata;
+  int i;
+  for(i = 0; i < data->size; i++){
+    iter_cleanup(data->iters[i]);
+  }
+  free(data); 
+}
+
+struct iterator_impl merge_iter_impl = {
+  merge_iter_has_next,
+  merge_iter_get_next,
+  merge_iter_next,
+  merge_iter_cleanup
+};
+
+iterator iter_merge(iter_list *list) {
+  int size = iter_list_length(list);
+  merge_iter_data *data = malloc(sizeof(merge_iter_data) +
+                                  sizeof(struct iterator) * size);
+  iterator iter = malloc(sizeof(struct iterator));
+  iter->data = data;
+  int i;
+  for(i = 0; i < size; i++) {
+    data->iters[i] = list->iter;
+    list = list->next;
+  }
+  data->curr = 0;
+  data->size = size;
+  iter->impl = &merge_iter_impl;
+  return iter;
 }
 
 // ARRAY ITERATOR OPERATIONS
@@ -175,6 +287,11 @@ void array_iter_next(void *vdata, record r)
   record_copy(&(data->b->data[data->curr]), r);
   data->curr++;
 }
+void array_iter_get_next(void *vdata, record r)
+{
+  array_iter_data *data = vdata;
+  record_copy(&(data->b->data[data->curr]), r);
+}
 void array_iter_cleanup(void *vdata)
 {
   array_iter_data *data = vdata;
@@ -184,6 +301,7 @@ void array_iter_cleanup(void *vdata)
 
 struct iterator_impl array_iter_impl = {
   array_iter_has_next,
+  array_iter_get_next,
   array_iter_next,
   array_iter_cleanup
 };
@@ -193,7 +311,9 @@ iterator array_iter_alloc(buffer b, int start, int end)
   array_iter_data *data = malloc(sizeof(array_iter_data));
   iterator iter = malloc(sizeof(struct iterator));
   iter->data = data;
-  buffer_retain(b);
+  if(b != NULL) {
+    buffer_retain(b);
+  }
   data->b = b;
   data->curr = start;
   data->end = end;
@@ -226,6 +346,13 @@ void concat_iter_next(void *vdata, record r)
     data->idx++;
   }
 }
+void concat_iter_get_next(void *vdata, record r)
+{
+  concat_iter_data *data = vdata;
+  if(data->idx < data->cnt){
+    iter_get_next(data->iters[data->idx], r);
+  }
+}
 void concat_iter_cleanup(void *vdata)
 {
   concat_iter_data *data = vdata;
@@ -238,6 +365,7 @@ void concat_iter_cleanup(void *vdata)
 
 struct iterator_impl concat_iter_impl = {
   concat_iter_has_next,
+  concat_iter_get_next,
   concat_iter_next,
   concat_iter_cleanup
 };
@@ -262,16 +390,18 @@ iterator array_binarysearch_scan(long low, long high, int start, int len, buffer
 {
   int start_idx = record_binarysearch(buffer->data, low, start, len);
   int end_idx = record_binarysearch(buffer->data, high, start, len);
+
   while((start_idx < end_idx) && (buffer->data[start_idx].key < low)) {
     start_idx ++;
   }
-  while((start_idx-1 > start) && (buffer->data[start_idx-1].key == low)) {
+  while((start_idx-1 >= start) && (buffer->data[start_idx-1].key >= low)) {
     start_idx --;
   }
   while((end_idx < (start+len)) && (buffer->data[end_idx].key <= high)) {
     end_idx ++;
   }
-  return array_iter_alloc(buffer, start_idx, end_idx);
+  iterator ret = array_iter_alloc(buffer, start_idx, end_idx);
+  return ret;
 }
 iterator array_scan(long low, long high, int start, int len, buffer buffer)
 {
@@ -287,7 +417,13 @@ iterator array_scan(long low, long high, int start, int len, buffer buffer)
     }
   }
   ret = array_iter_alloc(out, 0, tgt);
-  buffer_release(out);
   return ret;
 }
 
+int math_min(int arg1, int arg2) {
+  return arg1 > arg2 ? arg2 : arg1;
+}
+
+int math_max(int arg1, int arg2) {
+  return arg1 > arg2 ? arg1 : arg2;
+}

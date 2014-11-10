@@ -45,6 +45,7 @@ typedef struct buffer {
 // methods to access instances.
 typedef struct iterator_impl {
   int (*has_next)(void *data);
+  void (*get_next)(void *data, record rec);
   void (*next)(void *data, record rec);
   void (*cleanup)(void *data);
 } *iterator_impl;
@@ -53,6 +54,11 @@ typedef struct iterator {
   iterator_impl impl;
   void *data;
 } *iterator;
+ 
+typedef struct iter_list {
+  iterator iter;
+  struct iter_list *next;
+} iter_list;
 
 //////////////////////// ITERATOR METHODS
 // These methods operate over the iterator "interface" defined above.
@@ -72,6 +78,8 @@ int iter_has_next(iterator iter);
 //   iterator iter: The iterator to read from
 //   record r: A pointer to a buffer to read the record into
 void iter_next(iterator iter, record r);
+
+void iter_get_next(iterator iter, record r);
 
 // iter_cleanup(iter)
 //      Release an iterator.  Analogous to `free(iter)`, but also runs 
@@ -93,6 +101,8 @@ void iter_dump(iterator iter);
 //                     then the records in `b`
 iterator iter_concat(iterator a, iterator b);
 
+
+iterator iter_merge(iter_list *list);
 ////////////////////////  BUFFER METHODS 
 // These methods operate over the buffer interface defined above.  You should 
 // use `buffer_alloc`, `buffer_retain`, and `buffer_release` instead of native 
@@ -214,4 +224,14 @@ iterator array_binarysearch_scan(long low, long high, int start, int len, buffer
 iterator array_scan(long low, long high, int start, int len, buffer buffer);
 
 iterator array_iter_alloc(buffer b, int start, int end);
+
+iter_list *iter_list_add(iter_list *list, iterator iter);
+
+void iter_list_cleanup(iter_list *list);
+
+int iter_list_length(iter_list *list); 
+
+int math_min(int arg1, int arg2);
+
+int math_max(int arg1, int arg2);
 #endif //BTREE_LIB_H_SHIELD
