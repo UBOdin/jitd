@@ -123,11 +123,20 @@ public class CogTest {
     232, 69, 55, 181, 105, 176, 237, 170, 127, 174
   };
   
+  public void srand(long seed)
+  {
+    rand = new Random(seed);
+  }
+  
   public long[] randArray(int size)
+  {
+    return randArray(size, 100);
+  }
+  public long[] randArray(int size, long range)
   {
     long[] ret = new long[size];
     for(int i = 0; i < size; i++){
-      ret[i] = Math.abs(rand.nextLong()) % 200 + 50;
+      ret[i] = Math.abs(rand.nextLong()) % (range+100) + 50;
     }
     return ret;
   }
