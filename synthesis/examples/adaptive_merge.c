@@ -32,70 +32,70 @@ cog *partition_cog(cog *c) {
     ret = make_sortedarray(0, 0, NULL);
   }
   cleanup(c);
+  iter_cleanup(iter);
   return ret;
 }
 
-list *gather_partitions(list *l, cog *c) {
-  struct list *l1;
+list *gather_partitions(list *list, cog *c) {
   if(c->type == COG_CONCAT) {
-    l1 = gather_partitions(l, c->data.concat.lhs);
-    l1 = gather_partitions(l1, c->data.concat.rhs);
+    list = gather_partitions(list, c->data.concat.lhs);
+    list = gather_partitions(list, c->data.concat.rhs);
   } else {
     if(c->type == COG_ARRAY) {
-      l1 = gather_partitions(l, partition_cog(c));
+      list = gather_partitions(list, partition_cog(c));
     } else {
-      l->cog = c;      
-      l->next = create_list();
-      l1 = l->next;
-      l1->cog = NULL;
-      l1->next = NULL;
+      list->cog = c;      
+      list->next = create_list();
+      list = list->next;
+      list->cog = NULL;
+      list->next = NULL;
     }
   }
-  return l1; 
+  return list; 
 }
 
-cog *amerge(cog *c, long low, long high, iterator iter) {
+double_struct *amerge(cog *c, long low, long high) {
+  double_struct *ret;
   if(c->type == COG_CONCAT) {
-    return merge_partitions(c, low, high, iter);
+    return merge_partitions(c, low, high);
   } else if(c->type == COG_BTREE) {
-    cog *cog1;
     if(high <= c->data.btree.sep) {
-      cog1 = amerge(c->data.btree.lhs, low, high, iter);
-      if(cog1 != c->data.btree.lhs) {
-        c = make_btree(cog1, c->data.btree.rhs, c->data.btree.sep);
+      ret = amerge(c->data.btree.lhs, low, high);
+      if(ret->cog != c->data.btree.lhs) {
+        ret->cog = make_btree(ret->cog, c->data.btree.rhs, c->data.btree.sep);
       }
-      return c;
+      free(c);
+      return ret;
     } else if(low >= c->data.btree.sep) {
-      cog1 = amerge(c->data.btree.rhs, low, high, iter);
-      if(cog1 != c->data.btree.rhs) {
-        c = make_btree(c->data.btree.lhs, cog1, c->data.btree.sep);
+      ret = amerge(c->data.btree.rhs, low, high);
+      if(ret->cog != c->data.btree.rhs) {
+        ret->cog = make_btree(c->data.btree.lhs, ret->cog, c->data.btree.sep);
+        free(c);
       } else {
-        c = cog1;
+        ret->cog = c;
       }
-      return c;
+      return ret;
     } else {
-      cog1 = amerge(c->data.btree.lhs, low, c->data.btree.sep, iter);
-      iterator iter1 = malloc(sizeof(iterator));
-      cog *cog2 =  amerge(c->data.btree.rhs, c->data.btree.sep, high, iter1);
-      if(cog1 != c->data.btree.lhs || cog2 != c->data.btree.rhs) {
-        c = make_btree(cog1, cog2, c->data.btree.sep);
+      ret = amerge(c->data.btree.lhs, low, c->data.btree.sep);
+      double_struct *ret2 =  amerge(c->data.btree.rhs, c->data.btree.sep, high);
+      if(ret->cog != c->data.btree.lhs || ret2->cog != c->data.btree.rhs) {
+        ret->cog = make_btree(ret->cog, ret2->cog, c->data.btree.sep);
+      } else {
+        ret->cog = c;
       }
-      iterator temp_iter = iter_concat(iter, iter1);
-      iter->impl = temp_iter->impl;
-      iter->data = temp_iter->data;
-      return c;
+      return ret;
     }
   } else if(c->type == COG_SORTEDARRAY) {
-    iterator temp_iter = scan(c, low, high);
-    iter->impl = temp_iter->impl;
-    iter->data = temp_iter->data;
-    return c;
+    ret = create_double_struct();
+    ret->iter = scan(c, low, high);
+    ret->cog = c;
+    return ret;
   } else {
-    return amerge(partition_cog(c), low, high, iter);
+    return amerge(partition_cog(c), low, high);
   }
 }
 
-cog *merge_partitions(cog *c, long low, long high, iterator iter) {
+double_struct *merge_partitions(cog *c, long low, long high) {
   list *list = create_list();
   int has_merge_work;
   gather_partitions(list, c);
@@ -132,11 +132,12 @@ cog *merge_partitions(cog *c, long low, long high, iterator iter) {
         left_replacement = make_concat(left_replacement, components->lhs);
       }
     }
-  //  cleanup_extracted_components(components);
+    free(components);
   }
   cleanup_list(list);
-  cleanup(c1);
+  free(c1);
   if(has_merge_work != 0) {
+    double_struct *ret = create_double_struct();
     merge_iter = iter_merge(head_list);
     record r = malloc(sizeof(struct record));
     while(1) {
@@ -160,10 +161,7 @@ cog *merge_partitions(cog *c, long low, long high, iterator iter) {
     if(root == NULL) {
       root = make_btree(left_replacement, right_replacement, high);
     } else {
-      iterator temp_iter = scan(root, low, high);
-      iter->impl = temp_iter->impl;
-      iter->data = temp_iter->data;
-      free(temp_iter);
+      ret->iter = scan(root, low, high);
       if(cog_length(left_replacement) != 0) {
         root = make_btree(left_replacement, root, cog_min(root));
       }
@@ -172,25 +170,31 @@ cog *merge_partitions(cog *c, long low, long high, iterator iter) {
       }
     }
     free(r);
+    free(stack);
     iter_list_cleanup(head_list);
-    return root;
+    iter_cleanup(merge_iter);
+    free(c);
+    ret->cog = root;
+    return ret;
   } else {
-    cog *root;
-    root = amerge(list->cog, low, high, iter);
+    double_struct *ret;
+    ret = amerge(list->cog, low, high);
     if(left_replacement != NULL) {
-      root = make_concat(root, left_replacement);
+      ret->cog = make_concat(ret->cog, left_replacement);
     }
     if(right_replacement != NULL) {
-      root = make_concat(root, right_replacement);
+      ret->cog = make_concat(ret->cog, right_replacement);
     }
-    return root;
+    return ret;
   }
 }
 
 extracted_components *extract_partitions(cog *c, long low, long high) {
-  iterator iter = malloc(sizeof(iterator));
-  c = amerge(c, low, high, iter);
-  iter_cleanup(iter);
+  double_struct *ret_struct;
+  ret_struct = amerge(c, low, high);
+  c = ret_struct->cog;
+  iter_cleanup(ret_struct->iter);
+  free(ret_struct);
   extracted_components *ret; 
   if(c->type == COG_BTREE) {
     if(c->data.btree.sep <= low) {
@@ -214,6 +218,7 @@ extracted_components *extract_partitions(cog *c, long low, long high) {
         ret->high_key = math_max(ret->high_key, ret2->high_key);
       }
     }
+    
     return ret;
   } else if(c->type == COG_SORTEDARRAY) {
     int start = c->data.sortedarray.start;
@@ -234,8 +239,8 @@ extracted_components *extract_partitions(cog *c, long low, long high) {
     cog *rhs = high_index < len ? make_sortedarray(high_index, start + len - high_index, b) : NULL;
     iterator iter = low_index < high_index ? scan(c, low, high) : NULL;
     long low_key = iter == NULL ? MAX_VALUE :  buffer_key(b, low_index);
-    long high_key = iter == NULL ? MIN_VALUE : buffer_key(b, high_index);
-   
+    long high_key = iter == NULL ? MIN_VALUE : buffer_key(b, high_index - 1);
+    
     return make_extracted_components(lhs, rhs, low_key, high_key, iter);
   } else {
     return NULL;    

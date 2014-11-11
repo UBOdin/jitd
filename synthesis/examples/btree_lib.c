@@ -19,9 +19,11 @@ void buffer_retain(buffer b)
 
 void buffer_release(buffer b)
 {
-  b->refcount--;
-  if(b->refcount < 1){
-    free(b);
+  if(b != NULL) {
+    b->refcount--;
+    if(b->refcount < 1){
+      free(b);
+    }
   }
 }
 
@@ -174,7 +176,6 @@ void iter_list_cleanup(iter_list *list) {
   iter_list *temp;
   while(list != NULL) {
     temp = list->next;
-    free(list->iter);
     free(list);
     list = temp;
   }
@@ -199,7 +200,8 @@ typedef struct {
 int merge_iter_has_next(void *vdata) {
   merge_iter_data *data = vdata;
   if(data->curr >= 0) { 
-    if(iter_has_next(data->iters[data->curr]) == 0) { 
+    if(iter_has_next(data->iters[data->curr]) == 0) {
+          iter_cleanup(data->iters[data->curr]); 
           data->iters[data->curr] = NULL; 
     }
   }
@@ -222,6 +224,7 @@ int merge_iter_has_next(void *vdata) {
       }
     }
   }
+  free(r);
   return 1;
 }
 
@@ -237,10 +240,6 @@ void merge_iter_next(void *vdata, record r) {
 
 void merge_iter_cleanup(void *vdata) {
   merge_iter_data *data = vdata;
-  int i;
-  for(i = 0; i < data->size; i++){
-    iter_cleanup(data->iters[i]);
-  }
   free(data); 
 }
 

@@ -70,7 +70,6 @@ cog *pushdown_concats(cog *c, long low, long high) {
           buf = array_cog->data.sortedarray.records;
         }
         array2 = make_array(start+radix_pos, count-radix_pos, buf);
-        buffer_release(buf);
         new_rhs = make_concat(lhs->data.btree.rhs, array2);
       }
       cog *btree;
@@ -103,7 +102,8 @@ cog *crack_one(cog *c, long val) {
       rhs = crack_one(rhs, val);
     }
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
-      return make_btree(lhs, rhs, c->data.btree.sep);
+      long val = c->data.btree.sep;
+      return make_btree(lhs, rhs, val);
     } else {
       return c;
     }
@@ -145,11 +145,9 @@ cog *crack_one(cog *c, long val) {
       } 
     }
     iter_cleanup(iter);
-    cleanup(c);
     cog *array1 = make_array(0, lowIdx, out);
-    buffer_release(out);
     cog *array2 = make_array(highIdx + 1, out->size - highIdx - 1, out);
-    buffer_release(out);
+    cleanup(c);
     return make_btree(array1, array2, val);
   }
 }

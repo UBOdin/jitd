@@ -7,9 +7,9 @@ cog *partition_cog(cog *cog);
 
 list *gather_partitions(list *list, cog *cog);
 
-cog *amerge(cog *cog, long low, long high, iterator iter);
+double_struct *amerge(cog *cog, long low, long high);
 
-cog *merge_partitions(cog *cog, long low, long high, iterator iter);
+double_struct *merge_partitions(cog *cog, long low, long high);
 
 extracted_components *extract_partitions(cog *cog, long low, long high);
 

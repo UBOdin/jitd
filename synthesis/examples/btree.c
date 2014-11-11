@@ -198,7 +198,9 @@ void cleanup_list(list *list) {
   struct list *temp;
   while(list != NULL) {
     temp = list->next;
-    free(list->cog);
+    if(list->cog != NULL) {
+      cleanup(list->cog);
+    }
     free(list);
     list = temp;
   }
@@ -247,6 +249,7 @@ struct cog *array_load(iterator iter,int len) {
       record_set(&(buf[i]), r->key, r->value);
     }
   }
+  return make_array(0, len, out);
 }
 
 int cog_min(struct cog *c) {
@@ -282,8 +285,10 @@ void push_stack(struct triple *t, stack_triple **top) {
 }
 
 triple *pop_stack(stack_triple **top) {
+  stack_triple *temp = *top;
   triple *t = (*top)->triple;
   *top = (*top)->next;
+  free(temp);
   return t;
 }
 
@@ -301,6 +306,11 @@ int peek_depth(stack_triple **top) {
 
 triple *create_triple() {
   triple *new = malloc(sizeof(struct triple));
+  return new;
+}
+
+double_struct *create_double_struct() {
+  double_struct *new = malloc(sizeof(double_struct));
   return new;
 }
 
@@ -327,7 +337,10 @@ cog *fold(stack_triple **stack) {
     triple *prev = pop_stack(stack);
     head->cog = make_btree(prev->cog, head->cog, head->key);
     head->key = prev->key;
+    free(prev);
   }
-  return head->cog;
+  cog *c = head->cog;
+  free(head);
+  return c;
 }
 

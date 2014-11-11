@@ -92,15 +92,19 @@ void test5() {
             mk_random_array(BUFFER_SIZE),
             mk_random_array(BUFFER_SIZE)
           );
-  iterator iter = malloc(sizeof(iterator));
+  double_struct *ret;
   printf("Scan 1\n");
-  c = amerge(c, 100, 200, iter);
-  iter_dump(iter);
+  ret = amerge(c, 100, 200);
+  iter_dump(ret->iter);
+  iter_cleanup(ret->iter);
+  c = ret->cog;
+  free(ret);
   printf("Scan 2\n");
-  c = amerge(c, 300, 700, iter);
-  iter_dump(iter);
-  iter_cleanup(iter);
-  cleanup(c);
+  ret = amerge(c, 300, 700);
+  iter_dump(ret->iter);
+  cleanup(ret->cog);
+  iter_cleanup(ret->iter);
+  free(ret);
 }
 
 int main(int argc, char **argv)

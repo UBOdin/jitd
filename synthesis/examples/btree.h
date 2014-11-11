@@ -43,6 +43,10 @@ typedef struct stack_triple {
   struct stack_triple *next;
 } stack_triple;
 
+typedef struct double_struct {
+  struct cog *cog;
+  iterator iter;
+} double_struct;
 
 void free_cog(cog *c);
 
@@ -81,6 +85,10 @@ cog *array_load(iterator iter, int len);
 int cog_min(struct cog *c);
 
 stack_triple *create_stack();
+
+double_struct *create_double_struct();
+
+triple *pop_stack(stack_triple **stack);
 
 void fold_append(stack_triple **stack, struct cog *c, long key);
 
