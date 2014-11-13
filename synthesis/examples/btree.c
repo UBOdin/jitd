@@ -5,6 +5,19 @@
 
 void free_cog(cog *c) { free(c); }
 
+void clean(cog *c) {
+  switch(c->type) {
+    case COG_CONCAT:
+    case COG_BTREE:
+      free_cog(c);
+      break;
+    case COG_ARRAY:
+    case COG_SORTEDARRAY:
+      cleanup(c);
+      break;
+  }
+}
+
 void cleanup(cog *c){
   switch(c->type){
     case COG_CONCAT:
@@ -196,14 +209,17 @@ list *create_list() {
 
 void cleanup_list(list *list) {
   struct list *temp;
+  int count=0;
   while(list != NULL) {
     temp = list->next;
     if(list->cog != NULL) {
+      count++;
       cleanup(list->cog);
     }
     free(list);
     list = temp;
   }
+  printf("Free Count %d\n", count);
 }
 
 int list_has_next(list *list) {
@@ -234,7 +250,7 @@ int get_length(list *list) {
 void convert_to_sortedarray(struct cog *cog) {
   cog->type = COG_SORTEDARRAY;
   cog->data.sortedarray.records = cog->data.array.records;
-  cog->data.sortedarray.start = cog->data.array.start;
+  cog->data.sortedarray.start = 0;
   cog->data.sortedarray.len = cog->data.sortedarray.len;
 }
 
@@ -249,23 +265,29 @@ struct cog *array_load(iterator iter,int len) {
       record_set(&(buf[i]), r->key, r->value);
     }
   }
+  free(r);
   return make_array(0, len, out);
 }
 
-int cog_min(struct cog *c) {
-  int min;
+long cog_min(struct cog *c) {
+  long min;
   switch(c->type) {
   case COG_CONCAT:
     min =  math_min(cog_min(c->data.concat.lhs), cog_min(c->data.concat.rhs));
     break;
   case COG_BTREE:
     min = cog_min(c->data.btree.lhs);
+    if(min ==  MAX_VALUE) {
+      min = cog_min(c->data.btree.rhs);
+    }
+    break;
   case COG_SORTEDARRAY:
     if(c->data.sortedarray.records == NULL) {
       min = MAX_VALUE;
     } else {
       min = buffer_key(c->data.sortedarray.records, c->data.sortedarray.start);
     }
+    break;
   }
   return min;
 }
@@ -284,16 +306,14 @@ void push_stack(struct triple *t, stack_triple **top) {
   *top = new;
 }
 
-triple *pop_stack(stack_triple **top) {
+stack_triple *pop_stack(stack_triple **top) {
   stack_triple *temp = *top;
-  triple *t = (*top)->triple;
   *top = (*top)->next;
-  free(temp);
-  return t;
+  return temp;
 }
 
 int stack_empty(stack_triple **top) {
-  if(*top == NULL) {
+  if((*top)->triple == NULL) {
     return 1;
   } else {
     return 0;
@@ -306,6 +326,7 @@ int peek_depth(stack_triple **top) {
 
 triple *create_triple() {
   triple *new = malloc(sizeof(struct triple));
+  new->cog == NULL;
   return new;
 }
 
@@ -314,16 +335,21 @@ double_struct *create_double_struct() {
   return new;
 }
 
+void cleanup_stack(stack_triple *stack) {
+  free(stack->triple);
+  free(stack);
+}
+
 void fold_append(stack_triple **stack, struct cog *c, long low) {
   int depth = 0;
-  while(stack_empty(stack) !=0 && depth == peek_depth(stack)) {
-    triple *t = pop_stack(stack);
-    c = make_btree(t->cog, c, low);
-    low = t->key;
+  while(stack_empty(stack) !=1 && depth == peek_depth(stack)) {
+    stack_triple *temp_stack = pop_stack(stack);
+    c = make_btree(temp_stack->triple->cog, c, low);
+    low = temp_stack->triple->key;
     depth++;
+    cleanup_stack(temp_stack);
   }
-  triple *entry;
-  entry = create_triple();
+  triple *entry = create_triple();
   entry->cog = c;
   entry->depth = depth;
   entry->key = low;
@@ -332,15 +358,15 @@ void fold_append(stack_triple **stack, struct cog *c, long low) {
 
 cog *fold(stack_triple **stack) {
   if(stack_empty(stack)) return NULL;
-  triple *head = pop_stack(stack);
-  while(stack_empty(stack) != 0) {
-    triple *prev = pop_stack(stack);
-    head->cog = make_btree(prev->cog, head->cog, head->key);
-    head->key = prev->key;
-    free(prev);
+  stack_triple *head = pop_stack(stack);
+  while(stack_empty(stack) != 1) {
+    stack_triple *prev = pop_stack(stack);
+    head->triple->cog = make_btree(prev->triple->cog, head->triple->cog, head->triple->key);
+    head->triple->key = prev->triple->key;
+    cleanup_stack(prev);
   }
-  cog *c = head->cog;
-  free(head);
+  cog *c = head->triple->cog;
+  cleanup_stack(head);
   return c;
 }
 

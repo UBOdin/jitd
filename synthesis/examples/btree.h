@@ -1,6 +1,7 @@
 #include "btree_lib.h"
-#define MAX_VALUE 100000
-#define MIN_VALUE -100000
+#include <limits.h>
+#define MAX_VALUE LONG_MIN 
+#define MIN_VALUE LONG_MAX
 
 #ifndef BTREE_H_SHIELD
 #define BTREE_H_SHIELD
@@ -68,6 +69,8 @@ iterator scan_full_array(struct cog *cog);
 
 int cog_length(struct cog *cog);
 
+void clean(cog *c);
+
 void cleanup(cog *c);
 
 list *create_list();
@@ -82,13 +85,13 @@ void convert_to_sortedarrays(struct cog *cog);
 
 cog *array_load(iterator iter, int len);
 
-int cog_min(struct cog *c);
+long cog_min(struct cog *c);
 
 stack_triple *create_stack();
 
 double_struct *create_double_struct();
 
-triple *pop_stack(stack_triple **stack);
+stack_triple *pop_stack(stack_triple **stack);
 
 void fold_append(stack_triple **stack, struct cog *c, long key);
 
