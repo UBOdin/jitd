@@ -4,6 +4,8 @@ ME=$(dirname $0)/..
 
 JARFILES=$(echo $ME/lib/*.jar | tr ' ' ':')
 CLASSPATH=$ME/build:$JARFILES:$ME
-java -Xmx100g \
-     -XX:NewSize=40g \
-     -cp $CLASSPATH jitd.ScriptDriver $* | tee results/$(basename $1 .sim).out
+java -cp $CLASSPATH jitd.ScriptDriver $* | tee results/$(basename $1 .sim).out
+
+#-Xmx100g \
+#-XX:NewSize=40g \
+     
