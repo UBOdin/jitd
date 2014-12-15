@@ -5,8 +5,21 @@
 tree = null;
 vis = null;
 m = [20, 120, 20, 120];
-w = document.width - 60 - m[1] - m[3];
-h = document.height - 60 - m[0] - m[2];
+w = 630;
+h = 460;
+if (document.body && document.body.offsetWidth)
+  w = document.body.offsetWidth;
+  h = document.body.offsetHeight;
+if (document.compatMode=='CSS1Compat' &&
+    document.documentElement &&
+    document.documentElement.offsetWidth )
+  w = document.documentElement.offsetWidth;
+  g = document.documentElement.offsetHeight;
+if (window.innerWidth && window.innerHeight)
+  w = window.innerWidth;
+  g = window.innerHeight;
+h = h - 60 - m[0] - m[2];
+w = w - 60 - m[1] - m[3];
 i = 0;
 root = null;
 diagonal = d3.svg.diagonal()

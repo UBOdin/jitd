@@ -133,6 +133,7 @@ public class DemoServer {
           if (requestMethod.equalsIgnoreCase("GET")) {
             Headers responseHeaders = x.getResponseHeaders();
             responseHeaders.set("Content-Type", "application/json");
+            responseHeaders.set("Access-Control-Allow-Origin", "*");
             x.sendResponseHeaders(200, 0);
       
             OutputStream responseBody = x.getResponseBody();
