@@ -6,7 +6,7 @@ type type_t =
   | TBoolean
   | TInt
   | TFloat
-  | TCog of string option
+  | TCog of string
 
 type var_t = string
 
@@ -24,26 +24,15 @@ type bin_op_t =
 
 type cmp_op_t = Eq | Neq | Lt | Lte | Gt | Gte
 
-type cmp_t =
-  | And  of cmp_t list
-  | Or   of cmp_t list
-  | Cmp  of cmp_op_t * expr_t * expr_t
-  | IsA  of expr_t * string
-   
-and expr_t =
-  | BinOp     of bin_op_t * expr_t list
-  | Var       of var_t * (string * string) list
+type t =
+  | And       of t list
+  | Or        of t list
+  | Not       of t
+  | Cmp       of cmp_op_t * t * t
+  | BinOp     of bin_op_t * t * t
   | Const     of const_t
-
-type cog_constructor_t =
-  | MkCog   of string * cog_constructor_t list
-  | MkExpr  of expr_t
-  | MkApply of cog_constructor_t * string * expr_t list
-
-type t = 
-  | Case  of (expr_t * t) list
-  | Bind  of var_t * expr_t * t 
-  | Build of cog_constructor_t
+  | IsA       of type_t
+  | Get       of t * string
 
 let or_list  = function  Or(x) -> x | x -> [x]
 let and_list = function And(x) -> x | x -> [x]
