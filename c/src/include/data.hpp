@@ -2,7 +2,8 @@
 #ifndef _DATA_HPP_SHIELD
 #define _DATA_HPP_SHIELD
 
-#include <atomic>
+#include <memory>
+#include <vector>
 
 typedef long int Key;
 typedef void *Value;
@@ -10,9 +11,9 @@ typedef void *Value;
 struct Record {
   Key   key;
   Value value;
-}
+};
 
-typedef shared_ptr<vector<Record>> Buffer;
+typedef std::shared_ptr< std::vector<Record> > Buffer;
 
 
 #endif // _DATA_HPP_SHIELD

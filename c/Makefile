@@ -1,26 +1,15 @@
 
-FILES = btree
+INCLUDE_PATH = src/include
 
-test: $(FILES)
-	@for i in $(FILES); do echo ====== Testing $$i ======; ./$$i; done
+GPP = g++ -I ${INCLUDE_PATH} -g
 
-$(FILES) : % : %_lib.o cracker.o adaptive_merge.o %.o %_driver.c
-	gcc -g -o $@ $(*).o $(*)_lib.o cracker.o adaptive_merge.o $(*)_driver.c
+driver : src/driver.cpp 
+	${GPP} -o $@ $<
 
-%.c : %.ds ../jitd 
-	../jitd $< > $@
+%.o : %.cpp
+	${GPP} -c -o %@ $<
 
-cracker.o : cracker.c
-	gcc -g -c -o cracker.o cracker.c
-
-adaptive_merge.o : adaptive_merge.c
-	gcc -g -c -o adaptive_merge.o adaptive_merge.c
-
-%.o : %.c
-	gcc -g -c -o $@ $<
-
-clean:
-	rm -f $(FILES)
-	rm -rf *.{dSYM,o}
+test : driver
+	./driver
 
 .PHONY: test clean
