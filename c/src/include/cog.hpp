@@ -3,7 +3,10 @@
 
 #include <memory>
 //#include <atomic>
+#include <iostream>
+
 #include "data.hpp"
+#include "iterator.hpp"
 
 class Cog;
 typedef std::shared_ptr<Cog> CogPtr;
@@ -16,6 +19,10 @@ class CogHandleBase {
   
     CogPtr get() { return ref /*.load()*/;  }
     void swap(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
+    
+    Iterator iterator();
+    void printDebug();
+    void printDebug(int depth);
 };
 
 typedef std::shared_ptr<CogHandleBase> CogHandle;
@@ -32,13 +39,25 @@ class Cog {
   public:
     Cog(CogType type): type(type) {}
   
-    virtual void *iterator();
+    virtual Iterator iterator() { 
+      std::cerr << "An Iterator is Unimplemented" << std::endl;
+      exit(-1);
+    }
     
     void printDebug() { printDebug(0); }
-    virtual void printDebug(int depth);
+    void prefix(int depth){ while(depth > 0){ std::cout << "  "; depth--; } }
+    virtual void printDebug(int depth) {
+      prefix(depth);
+      std::cout << "???" << std::endl;
+    }
     
     CogType type;
 };
+
+#define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
+
+
+///////////// Cog-Specific Class Headers /////////////
 
 class ConcatCog : public Cog 
 {
@@ -49,7 +68,7 @@ class ConcatCog : public Cog
     CogHandle getLHS(){ return lhs; }
     CogHandle getRHS(){ return rhs; }
     
-    void *iterator();
+    Iterator iterator();
     void printDebug(int depth);
     
   private:
@@ -68,7 +87,7 @@ class BTreeCog : public Cog
     CogHandle getLHS(){ return lhs; }
     CogHandle getRHS(){ return rhs; }
     
-    void *iterator();
+    Iterator iterator();
     void printDebug(int depth);
     
   private:
@@ -81,40 +100,39 @@ class BTreeCog : public Cog
 class ArrayCog : public Cog 
 {
   public:
-    ArrayCog(Buffer buffer, unsigned int start, unsigned int end) :
-      Cog(COG_ARRAY), buffer(buffer), start(start), end(end) {}
+    ArrayCog(Buffer buffer, unsigned int start, unsigned int len) :
+      Cog(COG_ARRAY), buffer(buffer), start(start), len(len) {}
   
     Buffer getBuffer(){ return buffer; }
     unsigned int getStart(){ return start; }
-    unsigned int getEnd(){ return end; }
+    unsigned int getLen(){ return len; }
     
-    void *iterator();
+    Iterator iterator();
     void printDebug(int depth);
     
   private:
     Buffer buffer;
     unsigned int start;
-    unsigned int end;
+    unsigned int len;
 };
 
 class SortedArrayCog : public Cog 
 {
   public:
-    SortedArrayCog(Buffer buffer, unsigned int start, unsigned int end) :
-      Cog(COG_SORTED_ARRAY), buffer(buffer), start(start), end(end) {}
+    SortedArrayCog(Buffer buffer, unsigned int start, unsigned int len) :
+      Cog(COG_SORTED_ARRAY), buffer(buffer), start(start), len(len) {}
   
     Buffer getBuffer(){ return buffer; }
     unsigned int getStart(){ return start; }
-    unsigned int getEnd(){ return end; }
+    unsigned int getLen(){ return len; }
     
-    void *iterator();
+    Iterator iterator();
     void printDebug(int depth);
     
   private:
     Buffer buffer;
     unsigned int start;
-    unsigned int end;
+    unsigned int len;
 };
-
 
 #endif //_COG_H_SHIELD

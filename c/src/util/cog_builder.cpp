@@ -11,13 +11,15 @@
 
 using namespace std;
 
-CogHandle build_random_array(int len){
+CogHandle build_random_array(int len)
+{
   int i;
   Buffer buff(new vector<Record>(len));
   for(i = 0; i < len; i++){
-    (*buff)[i].key = rand(100000);
+    (*buff)[i].key = rand() % 1000000;
     (*buff)[i].value = &buff + i;
-  } 
+  }
+  return MakeHandle(new ArrayCog(buff, 0, len));
 }
 
 
@@ -46,11 +48,18 @@ CogHandle build_cog(istream &input)
         exit(-1);
       }
       
+    } else if(string("concat") == type) {
+      CogHandle a = ret.top(); ret.pop();
+      CogHandle b = ret.top(); ret.pop();
+      
+      ret.push(MakeHandle(new ConcatCog(a, b)));
     } else {
       cerr << "Invalid Cog Type: " << type << endl;
       exit(-1);
     }
-    cout << type << "; " << endl;
   }
   
+  CogHandle handle = ret.top();
+  ret.pop();
+  return handle;
 }

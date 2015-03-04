@@ -7,10 +7,14 @@
 
 using namespace std;
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   ifstream src;
-  src.open("test/array1.cog", std::ios_base::in);
+  int i;
+  for(i = 1; i < argc; i++){
+    src.open(argv[i], std::ios_base::in);
   
-  CogHandle ret = build_cog(src);
-  
+    CogHandle ret = build_cog(src);
+    ret->printDebug();
+  }
 }
