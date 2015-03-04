@@ -4,6 +4,6 @@
 #include <istream>
 #include "cog.hpp"
 
-CogHandle build_cog(basic_istream);
+CogHandle build_cog(std::istream &input);
 
 #endif // _COG_BUILDER_H_SHIELD

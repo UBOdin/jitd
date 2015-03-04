@@ -6,18 +6,19 @@
 #include "data.hpp"
 
 class Cog;
+typedef std::shared_ptr<Cog> CogPtr;
 
-class CogHandle {
-  /* atomic< */ std::shared_ptr<Cog> /* > */ ref;
+class CogHandleBase {
+  /* atomic< */ CogPtr /* > */ ref;
   
   public:
-    CogHandle(std::shared_ptr<Cog> init) : ref(init) {}
+    CogHandleBase(CogPtr init) : ref(init) {}
   
-    std::shared_ptr<Cog> get() { return ref /*.load()*/;  }
-    void swap(std::shared_ptr<Cog> &nref) { ref /*.store( */ = nref /*)*/; }
+    CogPtr get() { return ref /*.load()*/;  }
+    void swap(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
 };
 
-typedef std::shared_ptr<CogHandle> CogHandlePtr;
+typedef std::shared_ptr<CogHandleBase> CogHandle;
 
 typedef enum {
   COG_CONCAT,
@@ -42,44 +43,38 @@ class Cog {
 class ConcatCog : public Cog 
 {
   public:
-    ConcatCog (
-      CogHandlePtr &lhs, 
-      CogHandlePtr &rhs
-    ) :
+    ConcatCog (CogHandle &lhs, CogHandle &rhs) :
       Cog(COG_CONCAT), lhs(lhs), rhs(rhs) {}
   
-    CogHandlePtr getLHS(){ return lhs; }
-    CogHandlePtr getRHS(){ return rhs; }
+    CogHandle getLHS(){ return lhs; }
+    CogHandle getRHS(){ return rhs; }
     
     void *iterator();
     void printDebug(int depth);
     
   private:
-    CogHandlePtr lhs;
-    CogHandlePtr rhs;
+    CogHandle lhs;
+    CogHandle rhs;
 };
 
 // LHS < k <= RHS
 class BTreeCog : public Cog
 {
   public:
-    BTreeCog (
-      CogHandlePtr &lhs, 
-      Key sep, 
-      CogHandlePtr &rhs
-    ) : Cog(COG_BTREE), lhs(lhs), sep(sep), rhs(rhs) {}
+    BTreeCog (CogHandle &lhs, Key sep, CogHandle &rhs) : 
+      Cog(COG_BTREE), lhs(lhs), sep(sep), rhs(rhs) {}
   
     Key getSep(){ return sep; }
-    CogHandlePtr getLHS(){ return lhs; }
-    CogHandlePtr getRHS(){ return rhs; }
+    CogHandle getLHS(){ return lhs; }
+    CogHandle getRHS(){ return rhs; }
     
     void *iterator();
     void printDebug(int depth);
     
   private:
     Key sep;
-    CogHandlePtr lhs;
-    CogHandlePtr rhs;
+    CogHandle lhs;
+    CogHandle rhs;
   
 };
 
