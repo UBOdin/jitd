@@ -5,6 +5,7 @@
 #include <string>
 #include <stack>
 #include <cstdlib>
+#include <algorithm>
 
 #include "cog.hpp"
 #include "cog_builder.hpp"
@@ -14,24 +15,42 @@ using namespace std;
 Buffer build_buffer(int len)
 {
   int i;
-  Buffer buff(new array<Record>(len));
+  Buffer buff(new vector<Record>(len));
   for(i = 0; i < len; i++){
     (*buff)[i].key = rand() % 1000000;
-    (*buff)[i].value = &buff + i;
+    (*buff)[i].value = (Value)0xDEADBEEF;
   }
   return buff;
 }
 
+Buffer load_buffer(istream &input)
+{
+  vector<Record> temp;
+  Record r;
+  r.value = (Value)0xDEADBEEF;
+  while(!input.eof()){
+    input >> r.key;
+    temp.push_back(r);
+  }
+  return Buffer(new vector<Record>(temp));
+}
+
+CogHandle array_for_buffer(Buffer buff)
+{
+  return MakeHandle(new ArrayCog(buff, buff->begin(), buff->end()));
+}
+
+
 CogHandle build_random_array(int len)
 {
-  return MakeHandle(new ArrayCog(build_buffer(len), 0, len));
+  return array_for_buffer(build_buffer(len));
 }
 
 CogHandle build_random_sorted_array(int len)
 {
   Buffer buff = build_buffer(len);
-  sort(buff, 0, len);
-  return MakeHandle(new ArrayCog(buff, 0, len));
+  sort(buff->begin(), buff->end(), CompareRecord());
+  return MakeHandle(new SortedArrayCog(buff, buff->begin(), buff->end()));
 }
 
 CogHandle build_cog(istream &input)
@@ -54,6 +73,8 @@ CogHandle build_cog(istream &input)
         int len;
         toks >> len;
         ret.push(build_random_array(len));        
+      } else if(string("explicit") == fill) {
+        ret.push(array_for_buffer(load_buffer(toks)));
       } else {
         cerr << "Invalid ArrayCog Fill Mode: " << fill << endl;
         exit(-1);
@@ -64,6 +85,14 @@ CogHandle build_cog(istream &input)
       CogHandle b = ret.top(); ret.pop();
       
       ret.push(MakeHandle(new ConcatCog(a, b)));
+    } else if(string("btree") == type) {
+      Key sep;
+      toks >> sep;
+      
+      CogHandle b = ret.top(); ret.pop();
+      CogHandle a = ret.top(); ret.pop();
+
+      ret.push(MakeHandle(new BTreeCog(a, sep, b)));
     } else {
       cerr << "Invalid Cog Type: " << type << endl;
       exit(-1);

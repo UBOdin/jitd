@@ -5,10 +5,10 @@ using namespace std;
 
 Iterator SortedArrayCog::iterator()
 {
-  return NULL;
+  return Iterator(new BufferIterator(buffer, start, end));
 }
 void SortedArrayCog::printDebug(int depth)
 {
   prefix(depth);
-  cout << "SortedArray[" << len << " elements]" << endl;
+  cout << "SortedArray[" << (end-start) << " elements]" << endl;
 }

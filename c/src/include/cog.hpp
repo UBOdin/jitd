@@ -21,6 +21,7 @@ class CogHandleBase {
     void swap(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
     
     Iterator iterator();
+    int size();
     void printDebug();
     void printDebug(int depth);
 };
@@ -40,7 +41,11 @@ class Cog {
     Cog(CogType type): type(type) {}
   
     virtual Iterator iterator() { 
-      std::cerr << "An Iterator is Unimplemented" << std::endl;
+      std::cerr << "Cog.iterator() is unimplemented" << std::endl;
+      exit(-1);
+    }
+    virtual int size(){
+      std::cerr << "Cog.size() is unimplemented" << std::endl;
       exit(-1);
     }
     
@@ -69,6 +74,7 @@ class ConcatCog : public Cog
     CogHandle getRHS(){ return rhs; }
     
     Iterator iterator();
+    int size(){ return lhs->size() + rhs->size(); }
     void printDebug(int depth);
     
   private:
@@ -88,6 +94,7 @@ class BTreeCog : public Cog
     CogHandle getRHS(){ return rhs; }
     
     Iterator iterator();
+    int size(){ return lhs->size() + rhs->size(); }
     void printDebug(int depth);
     
   private:
@@ -100,39 +107,41 @@ class BTreeCog : public Cog
 class ArrayCog : public Cog 
 {
   public:
-    ArrayCog(Buffer buffer, unsigned int start, unsigned int len) :
-      Cog(COG_ARRAY), buffer(buffer), start(start), len(len) {}
+    ArrayCog(Buffer buffer, BufferElement start, BufferElement end) :
+      Cog(COG_ARRAY), buffer(buffer), start(start), end(end) {}
   
     Buffer getBuffer(){ return buffer; }
-    unsigned int getStart(){ return start; }
-    unsigned int getLen(){ return len; }
+    BufferElement getStart(){ return start; }
+    BufferElement getend(){ return end; }
+    int size(){ return end-start; }
     
     Iterator iterator();
     void printDebug(int depth);
     
   private:
     Buffer buffer;
-    unsigned int start;
-    unsigned int len;
+    BufferElement start;
+    BufferElement end;
 };
 
 class SortedArrayCog : public Cog 
 {
   public:
-    SortedArrayCog(Buffer buffer, unsigned int start, unsigned int len) :
-      Cog(COG_SORTED_ARRAY), buffer(buffer), start(start), len(len) {}
+    SortedArrayCog(Buffer buffer, BufferElement start, BufferElement end) :
+      Cog(COG_SORTED_ARRAY), buffer(buffer), start(start), end(end) {}
   
     Buffer getBuffer(){ return buffer; }
-    unsigned int getStart(){ return start; }
-    unsigned int getLen(){ return len; }
+    BufferElement getStart(){ return start; }
+    BufferElement getend(){ return end; }
+    int size(){ return end-start; }
     
     Iterator iterator();
     void printDebug(int depth);
     
   private:
     Buffer buffer;
-    unsigned int start;
-    unsigned int len;
+    BufferElement start;
+    BufferElement end;
 };
 
 #endif //_COG_H_SHIELD

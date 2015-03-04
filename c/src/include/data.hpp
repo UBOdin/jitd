@@ -11,14 +11,16 @@ typedef void *Value;
 struct Record {
   Key   key;
   Value value;
-  
-  bool comp(Record &a, Record &b) { return a.key < b.key; }
-  bool equiv(Record &a, Record &b) { return a.key == b.key; }
 };
 
-typedef std::shared_ptr< std::array<Record> > Buffer;
+typedef std::shared_ptr< std::vector<Record> > Buffer;
+typedef std::vector<Record>::const_iterator BufferElement;
 
-compare
+struct CompareRecord {
+  bool operator()(const Record &r1, const Record &r2){
+    return r1.key < r2.key;
+  }
+};
 
 
 #endif // _DATA_HPP_SHIELD

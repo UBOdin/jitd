@@ -5,7 +5,7 @@ using namespace std;
 
 Iterator ConcatCog::iterator()
 {
-  return NULL;
+  return Iterator(new MergeIterator(lhs->iterator(), rhs->iterator()));
 }
 void ConcatCog::printDebug(int depth)
 {

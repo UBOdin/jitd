@@ -5,7 +5,7 @@ using namespace std;
 
 Iterator BTreeCog::iterator()
 {
-  return NULL;
+  return Iterator(new SeqIterator(lhs->iterator(), sep, rhs->iterator()));
 }
 void BTreeCog::printDebug(int depth)
 {

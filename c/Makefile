@@ -7,6 +7,9 @@ FILES = \
 	src/jitd/cog_concat.o\
 	src/jitd/cog_sortedarray.o\
 	src/jitd/cog_btree.o\
+	src/iterator/buffer_iterator.o\
+	src/iterator/seq_iterator.o\
+	src/iterator/merge_iterator.o\
 	src/util/cog_builder.o
 
 
@@ -24,6 +27,6 @@ build_test : driver
 test : build_test
 
 clean : 
-	find src -name '*.o' | xargs echo rm -f
+	find src -name '*.o' | xargs rm -f
 
 .PHONY: test clean build_test
