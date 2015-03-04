@@ -11,17 +11,28 @@
 
 using namespace std;
 
-CogHandle build_random_array(int len)
+Buffer build_buffer(int len)
 {
   int i;
-  Buffer buff(new vector<Record>(len));
+  Buffer buff(new array<Record>(len));
   for(i = 0; i < len; i++){
     (*buff)[i].key = rand() % 1000000;
     (*buff)[i].value = &buff + i;
   }
-  return MakeHandle(new ArrayCog(buff, 0, len));
+  return buff;
 }
 
+CogHandle build_random_array(int len)
+{
+  return MakeHandle(new ArrayCog(build_buffer(len), 0, len));
+}
+
+CogHandle build_random_sorted_array(int len)
+{
+  Buffer buff = build_buffer(len);
+  sort(buff, 0, len);
+  return MakeHandle(new ArrayCog(buff, 0, len));
+}
 
 CogHandle build_cog(istream &input)
 {

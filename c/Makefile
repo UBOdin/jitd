@@ -5,6 +5,8 @@ FILES = \
 	src/jitd/cog.o\
 	src/jitd/cog_array.o\
 	src/jitd/cog_concat.o\
+	src/jitd/cog_sortedarray.o\
+	src/jitd/cog_btree.o\
 	src/util/cog_builder.o
 
 
