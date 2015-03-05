@@ -3,7 +3,7 @@ Just in Time Datastructures
 
 A just-in-time datastructire is a form of adaptive index that gradually, gracefully transitions between different behaviors and performance characteristics.  A just in time datastructure is built up out of lots of building block components, or Cogs that define both the physical structure and semantic constraints of a fragment of the datastructure.  General-purpose access and manipulation logic allows us to use these building blocks to emulate a wide variety of different classical datastructures, such as B-Trees, Sorted Arrays, Cracked Databases, and Adaptive Merge Trees.  
 
-Read our CIDR paper: http://odin.cse.buffalo.edu/wp-content/uploads/2014/11/main.pdf
+Read our CIDR paper: http://odin.cse.buffalo.edu/?p=162
 
 Java Implementation
 ====
