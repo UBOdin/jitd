@@ -8,8 +8,6 @@
 #include "data.hpp"
 #include "iterator.hpp"
 
-//class Rewrite;
-
 typedef enum {
   COG_CONCAT,
   COG_BTREE,
@@ -31,14 +29,7 @@ class Cog {
     {
       std::cerr << "Cog.size() is unimplemented" << std::endl;
       exit(-1);
-    }
-//    virtual void rewrite_children(Rewrite &rw)
-//    {
-//      std::cerr << "Cog.rewrite_children() is unimplemented" << std::endl;
-//      exit(-1);
-//    }
-    
-    
+    }    
     
     void printDebug() { printDebug(0); }
     void prefix(int depth){ while(depth > 0){ std::cout << "  "; depth--; } }
@@ -63,7 +54,6 @@ class CogHandleBase {
     
     Iterator iterator()                   { return ref->iterator(); }
     int      size()                       { return ref->size(); }
-//    void     rewrite_children(Rewrite &rw){ ref->rewrite_children(rw); }
     CogType  type()                       { return ref->type; }
     void     printDebug()                 { ref->printDebug(); }
     void     printDebug(int depth)        { ref->printDebug(depth); }
@@ -87,7 +77,6 @@ class ConcatCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
-//    void rewrite_children(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
     
     void printDebug(int depth);
     
@@ -109,8 +98,6 @@ class BTreeCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
-//    void rewrite_children(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
-//    void rewrite_children(Rewrite &rw, Key target);
 
     void printDebug(int depth);
     
@@ -128,13 +115,14 @@ class ArrayCog : public Cog
       Cog(COG_ARRAY), buffer(buffer), start(start), end(end) {}
   
     Buffer getBuffer(){ return buffer; }
+    Buffer sortedBuffer();
     BufferElement getStart(){ return start; }
     BufferElement getEnd(){ return end; }
     CogPtr split(Key pivot);
+    CogPtr sortedCog();
 
     int size(){ return end-start; }
     Iterator iterator();
-//    void rewrite_children(Rewrite &rw){ }
 
     void printDebug(int depth);
     
@@ -155,7 +143,6 @@ class SortedArrayCog : public Cog
     BufferElement getEnd(){ return end; }
 
     int size(){ return end-start; }
-//    void rewrite_children(Rewrite &rw){ }
     Iterator iterator();
 
     void printDebug(int depth);

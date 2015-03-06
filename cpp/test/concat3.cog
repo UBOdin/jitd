@@ -1,0 +1,14 @@
+array random 5 100
+array random 5 100
+concat
+dump
+sort_array
+dump
+scan
+array random 10 100
+concat
+dump
+scan
+sort_array
+dump
+scan

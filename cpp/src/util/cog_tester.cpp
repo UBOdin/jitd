@@ -117,7 +117,10 @@ void cog_test(istream &input)
     } else if(string("split_array") == op) {
       Key target;
       toks >> target;
-      SplitArray rw = SplitArray(target);
+      SplitArrays rw(target);
+      rw.apply(stack.top());
+    } else if(string("sort_array") == op) {
+      SortArrays rw;
       rw.apply(stack.top());
     
     ///////////////// OOOPS /////////////////

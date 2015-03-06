@@ -6,11 +6,11 @@
 
 using namespace std;
 
-void SplitArray::apply(CogHandle h)
+void SplitArrays::apply(CogHandle h)
 {
   CogPtr cog = h->get(); // Grab the functional version of this object.
   
-  switch(h->type()){
+  switch(cog->type){
     // Split arrays
     case COG_ARRAY:{
         CogPtr repl = ((ArrayCog *)cog.get())->split(target);
@@ -27,7 +27,7 @@ void SplitArray::apply(CogHandle h)
       
     // Default to recurring down all branches
     default: 
-      recur(h);
+      recur(cog);
       break;
   }
 }

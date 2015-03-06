@@ -4,13 +4,17 @@
 
 using namespace std;
 
+
+Buffer ArrayCog::sortedBuffer()
+{
+  Buffer sorted(new vector<Record>(start, end));
+  sort(sorted->begin(), sorted->end(), CompareRecord());
+  return sorted;
+}
+
 Iterator ArrayCog::iterator()
 {
-  Buffer sorted = Buffer(new vector<Record>(start, end));
-
-  sort(sorted->begin(), sorted->end(), CompareRecord());
-
-  return Iterator(new BufferIterator(sorted));
+  return Iterator(new BufferIterator(sortedBuffer()));
 }
 void ArrayCog::printDebug(int depth)
 {
@@ -35,4 +39,9 @@ CogPtr ArrayCog::split(Key pivot)
   CogHandle lhsH = MakeHandle(lhs);
   CogHandle rhsH = MakeHandle(rhs);
   return CogPtr(new BTreeCog(lhsH, pivot, rhsH));
+}
+CogPtr ArrayCog::sortedCog()
+{
+  Buffer sorted = sortedBuffer();
+  return CogPtr(new SortedArrayCog(sorted, sorted->begin(), sorted->end()));
 }

@@ -1,0 +1,6 @@
+array random 10 100
+dump
+scan
+sort_array
+dump
+scan
