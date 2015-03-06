@@ -1,16 +1,17 @@
 #ifndef _REWRITE_H_SHIELD
 #define _REWRITE_H_SHIELD
 
-class CogHandle;
+#include "cog.hpp"
 
-class Rewrite {
+// rewrite class definition lives in cog.hpp to minimize #include dependency 
+// chicanery.
+
+class SplitArray : public Rewrite {
+  Key target;
+  
   public: 
-    virtual operation()(CogHandle h)
-    {
-      std::cerr << "Rewrite() is unimplemented" << std::endl;
-      exit(-1);
-    }
-}
-
+    SplitArray(Key target): target(target) {}
+    void apply(CogHandle &h);
+};
 
 #endif //_REWRITE_H_SHIELD

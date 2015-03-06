@@ -6,6 +6,7 @@ FILES = \
 	src/jitd/cog_concat.o\
 	src/jitd/cog_sortedarray.o\
 	src/jitd/cog_btree.o\
+	src/rewrite/split_array.cpp\
 	src/iterator/buffer_iterator.o\
 	src/iterator/seq_iterator.o\
 	src/iterator/merge_iterator.o\

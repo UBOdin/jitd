@@ -1,5 +1,6 @@
 #include <iostream>
 #include "cog.hpp"
+#include "rewrite.hpp"
 
 using namespace std;
 
@@ -13,4 +14,9 @@ void BTreeCog::printDebug(int depth)
   cout << "BTree[" << sep << "]" << endl;
   lhs->printDebug(depth+1);
   rhs->printDebug(depth+1);
+}
+void BTreeCog::recur(Rewrite &rw, Key target) 
+{
+  if(sep > target){ rw.apply(lhs); }
+  if(sep < target){ rw.apply(rhs); }
 }

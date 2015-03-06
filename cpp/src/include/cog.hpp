@@ -7,7 +7,8 @@
 
 #include "data.hpp"
 #include "iterator.hpp"
-#include "rewrite.hpp"
+
+class Rewrite;
 
 typedef enum {
   COG_CONCAT,
@@ -58,19 +59,30 @@ class CogHandleBase {
     CogHandleBase(CogPtr init) : ref(init) {}
   
     CogPtr get() { return ref /*.load()*/;  }
-    void swap(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
+    void put(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
     
     Iterator iterator()         { return ref->iterator(); }
     int      size()             { return ref->size(); }
-    void     recur(Rewrite &rw)  { return ref->recur(Rewrite rw); }
-    CogType  type()             { return ref->type(); }
-    void printDebug()           { return ref->printDebug(); }
-    void printDebug(int depth); { return ref->printDebug(depth); }
+    void     recur(Rewrite &rw) {        ref->recur(rw); }
+    CogType  type()             { return ref->type; }
+    void printDebug()           {        ref->printDebug(); }
+    void printDebug(int depth)  {        ref->printDebug(depth); }
 };
 
 typedef std::shared_ptr<CogHandleBase> CogHandle;
 
 #define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
+
+///////////// Rewrite Rule Definition /////////////
+
+class Rewrite {
+  public: 
+    virtual void apply(const CogHandle &h)
+    {
+      std::cerr << "Rewrite() is unimplemented" << std::endl;
+      exit(-1);
+    }
+};
 
 
 ///////////// Cog-Specific Class Headers /////////////
@@ -86,7 +98,7 @@ class ConcatCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
-    void recur(Rewrite &rw){ rw(lhs); rw(rhs); }
+    void recur(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
     
     void printDebug(int depth);
     
@@ -108,7 +120,8 @@ class BTreeCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
-    void recur(Rewrite &rw){ rw(lhs); rw(rhs); }
+    void recur(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
+    void recur(Rewrite &rw, Key target);
 
     void printDebug(int depth);
     
@@ -128,6 +141,7 @@ class ArrayCog : public Cog
     Buffer getBuffer(){ return buffer; }
     BufferElement getStart(){ return start; }
     BufferElement getEnd(){ return end; }
+    CogPtr split(Key pivot);
 
     int size(){ return end-start; }
     Iterator iterator();
