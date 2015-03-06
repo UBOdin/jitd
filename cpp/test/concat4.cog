@@ -1,0 +1,7 @@
+array random 10 500
+array random 20 500
+split_array 250
+concat
+dump
+pushdown_array
+dump

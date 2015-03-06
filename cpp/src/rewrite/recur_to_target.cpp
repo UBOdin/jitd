@@ -8,8 +8,6 @@ using namespace std;
 
 void RecurToTarget::apply(CogHandle h)
 {
-  rw->apply(h);
-
   CogPtr cog = h->get(); // Grab the functional version of this object.
   switch(cog->type){
     // Only recur down the side of BTree Cogs on which target falls
@@ -25,4 +23,6 @@ void RecurToTarget::apply(CogHandle h)
       recur(cog);
       break;
   }
+
+  rw->apply(h);
 }

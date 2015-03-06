@@ -20,13 +20,15 @@ FILES = \
 GPP = g++ -I ${INCLUDE_PATH} -g
 
 driver : ${FILES} src/driver.cpp 
-	${GPP} -o $@ $^
+	@echo "Building Driver"
+	@${GPP} -o $@ $^
 
 %.o : %.cpp
-	${GPP} -c -o $@ $<
+	@echo Compiling $(patsubst src/%,%,$*)
+	@${GPP} -c -o $@ $<
 
 build_test : driver
-	@for i in test/*.cog; do echo ===== Build Cog: $$i =====; ./driver $$i; done
+	@for i in test/*.cog; do echo ===== $$i =====; ./driver $$i; done
 
 test : build_test
 

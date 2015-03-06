@@ -1,0 +1,15 @@
+array random 10 500
+scan
+array random 20 500
+split_array 250
+rec_split_array 175
+rec_split_array 325
+concat
+scan
+dump
+pushdown_array
+dump
+tgt_pushdown_array 100
+dump
+rec_pushdown_array
+dump

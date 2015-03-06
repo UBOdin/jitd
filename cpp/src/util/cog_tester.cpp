@@ -113,6 +113,7 @@ void cog_test(istream &input)
       }
       cout << "---------------" << endl;
       cout << "Total: " << (row-1) << " records" << endl;
+      
     ///////////////// REWRITE OPERATIONS /////////////////
     } else if(string("split_array") == op) {
       Key target;
@@ -126,6 +127,20 @@ void cog_test(istream &input)
       rw.apply(stack.top());
     } else if(string("sort_array") == op) {
       SortArrays rw;
+      rw.apply(stack.top());
+    } else if(string("rec_sort_array") == op) {
+      RecurTopDown rw(new SortArrays());
+      rw.apply(stack.top());
+    } else if(string("pushdown_array") == op) {
+      PushdownArray rw;
+      rw.apply(stack.top());
+    } else if(string("rec_pushdown_array") == op) {
+      RecurTopDown rw(new PushdownArray());
+      rw.apply(stack.top());
+    } else if(string("tgt_pushdown_array") == op) {
+      Key target;
+      toks >> target;
+      RecurToTarget rw(new PushdownArray(), target);
       rw.apply(stack.top());
     
     ///////////////// OOOPS /////////////////
