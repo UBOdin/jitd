@@ -21,9 +21,13 @@ void ArrayCog::printDebug(int depth)
   prefix(depth);
   cout << "Array[" << (end-start) << " elements]" << endl;
 }
-CogPtr ArrayCog::split(Key pivot)
+pair<Buffer,Buffer> ArrayCog::split(Key pivot)
 {
-  pair<Buffer,Buffer> splits = splitBuffer(start, end, pivot);
+  return splitBuffer(start, end, pivot);
+}
+CogPtr ArrayCog::splitCog(Key pivot)
+{
+  pair<Buffer,Buffer> splits = split(pivot);
   CogPtr lhs(
       new ArrayCog(
         splits.first, 

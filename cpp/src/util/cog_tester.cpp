@@ -119,6 +119,11 @@ void cog_test(istream &input)
       toks >> target;
       SplitArrays rw(target);
       rw.apply(stack.top());
+    } else if(string("rec_split_array") == op) {
+      Key target;
+      toks >> target;
+      RecurToTarget rw(new SplitArrays(target), target);
+      rw.apply(stack.top());
     } else if(string("sort_array") == op) {
       SortArrays rw;
       rw.apply(stack.top());

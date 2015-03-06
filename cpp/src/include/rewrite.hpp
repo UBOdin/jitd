@@ -3,6 +3,8 @@
 
 #include "cog.hpp"
 
+///////////// Global Rewrite Content /////////////
+
 class Rewrite {
   public: 
     virtual void apply(CogHandle h);
@@ -35,6 +37,35 @@ class Rewrite {
       }
 };
 
+///////////// Parameterized Recursion Rewrites /////////////
+
+class RecurTopDown : public Rewrite {
+  std::unique_ptr<Rewrite> rw;
+  
+  public:
+    RecurTopDown(Rewrite *rw): rw(rw) {}
+    void apply(CogHandle h) { rw->apply(h); recur(h); }
+};
+
+class RecurBottomUp : public Rewrite {
+  std::unique_ptr<Rewrite> rw;
+  
+  public:
+    RecurBottomUp(Rewrite *rw): rw(rw) {}
+    void apply(CogHandle h) { recur(h); rw->apply(h); }
+};
+
+class RecurToTarget : public Rewrite {
+  std::unique_ptr<Rewrite> rw;
+  Key target;
+  
+  public:
+    RecurToTarget(Rewrite *rw, Key target): rw(rw), target(target) {}
+    void apply(CogHandle h);
+};
+
+///////////// Rewrite-Specific Class Headers /////////////
+
 class SplitArrays : public Rewrite {
   Key target;
   
@@ -46,6 +77,12 @@ class SplitArrays : public Rewrite {
 class SortArrays : public Rewrite {
   public: 
     SortArrays() {}
+    void apply(CogHandle h);
+};
+
+class PushdownArray : public Rewrite {
+  public: 
+    PushdownArray() {}
     void apply(CogHandle h);
 };
 

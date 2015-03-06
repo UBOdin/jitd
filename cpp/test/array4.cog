@@ -4,8 +4,8 @@ scan
 split_array 50
 dump
 scan
-split_array 25
+rec_split_array 25
 dump
-split_array 75
+rec_split_array 75
 dump
 scan

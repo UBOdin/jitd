@@ -8,6 +8,8 @@
 #include "data.hpp"
 #include "iterator.hpp"
 
+///////////// Global Cog Content /////////////
+
 typedef enum {
   COG_CONCAT,
   COG_BTREE,
@@ -50,7 +52,7 @@ class CogHandleBase {
     CogHandleBase(CogPtr init) : ref(init) {}
   
     CogPtr get() { return ref /*.load()*/;  }
-    void put(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
+    void put(CogPtr nref) { ref /*.store( */ = nref /*)*/; }
     
     Iterator iterator()                   { return ref->iterator(); }
     int      size()                       { return ref->size(); }
@@ -69,7 +71,7 @@ typedef std::shared_ptr<CogHandleBase> CogHandle;
 class ConcatCog : public Cog 
 {
   public:
-    ConcatCog (CogHandle &lhs, CogHandle &rhs) :
+    ConcatCog (CogHandle lhs, CogHandle rhs) :
       Cog(COG_CONCAT), lhs(lhs), rhs(rhs) {}
   
     CogHandle getLHS(){ return lhs; }
@@ -89,7 +91,7 @@ class ConcatCog : public Cog
 class BTreeCog : public Cog
 {
   public:
-    BTreeCog (CogHandle &lhs, Key sep, CogHandle &rhs) : 
+    BTreeCog (CogHandle lhs, Key sep, CogHandle rhs) : 
       Cog(COG_BTREE), lhs(lhs), sep(sep), rhs(rhs) {}
   
     Key getSep(){ return sep; }
@@ -116,9 +118,10 @@ class ArrayCog : public Cog
   
     Buffer getBuffer(){ return buffer; }
     Buffer sortedBuffer();
+    std::pair<Buffer,Buffer> split(Key pivot);
     BufferElement getStart(){ return start; }
     BufferElement getEnd(){ return end; }
-    CogPtr split(Key pivot);
+    CogPtr splitCog(Key pivot);
     CogPtr sortedCog();
 
     int size(){ return end-start; }
