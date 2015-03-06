@@ -7,26 +7,7 @@
 
 #include "data.hpp"
 #include "iterator.hpp"
-
-class Cog;
-typedef std::shared_ptr<Cog> CogPtr;
-
-class CogHandleBase {
-  /* atomic< */ CogPtr /* > */ ref;
-  
-  public:
-    CogHandleBase(CogPtr init) : ref(init) {}
-  
-    CogPtr get() { return ref /*.load()*/;  }
-    void swap(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
-    
-    Iterator iterator();
-    int size();
-    void printDebug();
-    void printDebug(int depth);
-};
-
-typedef std::shared_ptr<CogHandleBase> CogHandle;
+#include "rewrite.hpp"
 
 typedef enum {
   COG_CONCAT,
@@ -40,14 +21,23 @@ class Cog {
   public:
     Cog(CogType type): type(type) {}
   
-    virtual Iterator iterator() { 
+    virtual Iterator iterator()
+    { 
       std::cerr << "Cog.iterator() is unimplemented" << std::endl;
       exit(-1);
     }
-    virtual int size(){
+    virtual int size()
+    {
       std::cerr << "Cog.size() is unimplemented" << std::endl;
       exit(-1);
     }
+    virtual void recur(Rewrite &rw)
+    {
+      std::cerr << "Cog.recur() is unimplemented" << std::endl;
+      exit(-1);
+    }
+    
+    
     
     void printDebug() { printDebug(0); }
     void prefix(int depth){ while(depth > 0){ std::cout << "  "; depth--; } }
@@ -58,6 +48,27 @@ class Cog {
     
     CogType type;
 };
+
+typedef std::shared_ptr<Cog> CogPtr;
+
+class CogHandleBase {
+  /* atomic< */ CogPtr /* > */ ref;
+  
+  public:
+    CogHandleBase(CogPtr init) : ref(init) {}
+  
+    CogPtr get() { return ref /*.load()*/;  }
+    void swap(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
+    
+    Iterator iterator()         { return ref->iterator(); }
+    int      size()             { return ref->size(); }
+    void     recur(Rewrite &rw)  { return ref->recur(Rewrite rw); }
+    CogType  type()             { return ref->type(); }
+    void printDebug()           { return ref->printDebug(); }
+    void printDebug(int depth); { return ref->printDebug(depth); }
+};
+
+typedef std::shared_ptr<CogHandleBase> CogHandle;
 
 #define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
 
@@ -75,6 +86,8 @@ class ConcatCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
+    void recur(Rewrite &rw){ rw(lhs); rw(rhs); }
+    
     void printDebug(int depth);
     
   private:
@@ -95,6 +108,8 @@ class BTreeCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
+    void recur(Rewrite &rw){ rw(lhs); rw(rhs); }
+
     void printDebug(int depth);
     
   private:
@@ -112,10 +127,12 @@ class ArrayCog : public Cog
   
     Buffer getBuffer(){ return buffer; }
     BufferElement getStart(){ return start; }
-    BufferElement getend(){ return end; }
+    BufferElement getEnd(){ return end; }
+
     int size(){ return end-start; }
-    
     Iterator iterator();
+    void recur(Rewrite &rw){ }
+
     void printDebug(int depth);
     
   private:
@@ -132,10 +149,12 @@ class SortedArrayCog : public Cog
   
     Buffer getBuffer(){ return buffer; }
     BufferElement getStart(){ return start; }
-    BufferElement getend(){ return end; }
+    BufferElement getEnd(){ return end; }
+
     int size(){ return end-start; }
-    
+    void recur(Rewrite &rw){ }
     Iterator iterator();
+
     void printDebug(int depth);
     
   private:

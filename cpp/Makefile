@@ -2,7 +2,6 @@
 INCLUDE_PATH = src/include
 
 FILES = \
-	src/jitd/cog.o\
 	src/jitd/cog_array.o\
 	src/jitd/cog_concat.o\
 	src/jitd/cog_sortedarray.o\
