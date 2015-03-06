@@ -6,11 +6,12 @@ FILES = \
 	src/jitd/cog_concat.o\
 	src/jitd/cog_sortedarray.o\
 	src/jitd/cog_btree.o\
+	src/rewrite/rewrite.cpp\
 	src/rewrite/split_array.cpp\
 	src/iterator/buffer_iterator.o\
 	src/iterator/seq_iterator.o\
 	src/iterator/merge_iterator.o\
-	src/util/cog_builder.o
+	src/util/cog_tester.o
 
 
 GPP = g++ -I ${INCLUDE_PATH} -g
@@ -29,4 +30,4 @@ test : build_test
 clean : 
 	find src -name '*.o' | xargs rm -f
 
-.PHONY: test clean build_test
+.PHONY: test clean build_test dep

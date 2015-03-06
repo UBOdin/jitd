@@ -8,7 +8,7 @@
 #include "data.hpp"
 #include "iterator.hpp"
 
-class Rewrite;
+//class Rewrite;
 
 typedef enum {
   COG_CONCAT,
@@ -32,11 +32,11 @@ class Cog {
       std::cerr << "Cog.size() is unimplemented" << std::endl;
       exit(-1);
     }
-    virtual void recur(Rewrite &rw)
-    {
-      std::cerr << "Cog.recur() is unimplemented" << std::endl;
-      exit(-1);
-    }
+//    virtual void rewrite_children(Rewrite &rw)
+//    {
+//      std::cerr << "Cog.rewrite_children() is unimplemented" << std::endl;
+//      exit(-1);
+//    }
     
     
     
@@ -61,28 +61,17 @@ class CogHandleBase {
     CogPtr get() { return ref /*.load()*/;  }
     void put(CogPtr &nref) { ref /*.store( */ = nref /*)*/; }
     
-    Iterator iterator()         { return ref->iterator(); }
-    int      size()             { return ref->size(); }
-    void     recur(Rewrite &rw) {        ref->recur(rw); }
-    CogType  type()             { return ref->type; }
-    void printDebug()           {        ref->printDebug(); }
-    void printDebug(int depth)  {        ref->printDebug(depth); }
+    Iterator iterator()                   { return ref->iterator(); }
+    int      size()                       { return ref->size(); }
+//    void     rewrite_children(Rewrite &rw){ ref->rewrite_children(rw); }
+    CogType  type()                       { return ref->type; }
+    void     printDebug()                 { ref->printDebug(); }
+    void     printDebug(int depth)        { ref->printDebug(depth); }
 };
 
 typedef std::shared_ptr<CogHandleBase> CogHandle;
 
 #define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
-
-///////////// Rewrite Rule Definition /////////////
-
-class Rewrite {
-  public: 
-    virtual void apply(const CogHandle &h)
-    {
-      std::cerr << "Rewrite() is unimplemented" << std::endl;
-      exit(-1);
-    }
-};
 
 
 ///////////// Cog-Specific Class Headers /////////////
@@ -98,7 +87,7 @@ class ConcatCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
-    void recur(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
+//    void rewrite_children(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
     
     void printDebug(int depth);
     
@@ -120,8 +109,8 @@ class BTreeCog : public Cog
     
     Iterator iterator();
     int size(){ return lhs->size() + rhs->size(); }
-    void recur(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
-    void recur(Rewrite &rw, Key target);
+//    void rewrite_children(Rewrite &rw){ rw.apply(lhs); rw.apply(rhs); }
+//    void rewrite_children(Rewrite &rw, Key target);
 
     void printDebug(int depth);
     
@@ -145,7 +134,7 @@ class ArrayCog : public Cog
 
     int size(){ return end-start; }
     Iterator iterator();
-    void recur(Rewrite &rw){ }
+//    void rewrite_children(Rewrite &rw){ }
 
     void printDebug(int depth);
     
@@ -166,7 +155,7 @@ class SortedArrayCog : public Cog
     BufferElement getEnd(){ return end; }
 
     int size(){ return end-start; }
-    void recur(Rewrite &rw){ }
+//    void rewrite_children(Rewrite &rw){ }
     Iterator iterator();
 
     void printDebug(int depth);

@@ -1,0 +1,11 @@
+array random 10 100
+dump
+scan
+split_array 50
+dump
+scan
+split_array 25
+dump
+split_array 75
+dump
+scan

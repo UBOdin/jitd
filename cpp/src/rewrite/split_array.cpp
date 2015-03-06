@@ -6,26 +6,28 @@
 
 using namespace std;
 
-void SplitArray::apply(CogHandle &h)
+void SplitArray::apply(CogHandle h)
 {
-  CogPtr c;
+  CogPtr cog = h->get(); // Grab the functional version of this object.
+  
   switch(h->type()){
     // Split arrays
     case COG_ARRAY:{
-      CogPtr cog = h->get();
-      CogPtr repl = ((ArrayCog *)cog.get())->split(target);
-      h->put(repl);
-      break;
-    }
+        CogPtr repl = ((ArrayCog *)cog.get())->split(target);
+        h->put(repl);
+      } break;
     
-    // Only recur down the RHS of BTree Cogs
-    case COG_BTREE:
-      ((BTreeCog *)h->get().get())->recur(*this, target);
-      break;
+    // Only recur down the side of BTree Cogs on which target falls
+    case COG_BTREE: {
+        BTreeCog *bc = (BTreeCog *)cog.get();
+        long sep = bc->getSep();
+        if(sep > target){ apply(bc->getLHS()); }
+        if(sep < target){ apply(bc->getRHS()); }
+      } break;
       
     // Default to recurring down all branches
     default: 
-      h->recur(*this);
+      recur(h);
       break;
   }
 }

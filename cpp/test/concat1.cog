@@ -1,3 +1,6 @@
-array random 10
-array random 10
+array random 10 100
+array random 10 100
 concat
+dump
+size
+scan
