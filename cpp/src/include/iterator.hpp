@@ -2,6 +2,7 @@
 #define _ITERATOR_H_SHIELD
 
 #include "data.hpp"
+#include "cog.hpp"
 
 class IteratorBase {
   public: 
@@ -32,17 +33,26 @@ class BufferIterator : public IteratorBase {
 };
 
 class MergeIterator : public IteratorBase {
-  Iterator lhs, rhs;
+  CogHandle lhs, rhs;
+  Iterator lhsIter, rhsIter;
   bool lhsDone, rhsDone;
   bool lhsBest;
+  RewritePolicy policy;
   
   public: 
-    MergeIterator(Iterator lhs, Iterator rhs) : 
-      lhs(lhs), rhs(rhs), lhsDone(lhs->atEnd()), rhsDone(rhs->atEnd()) 
-        { updateBest(); };
+    MergeIterator(CogHandle lhs, CogHandle rhs, RewritePolicy policy) : 
+      policy(policy) 
+    {
+      policy->beforeIterator(lhs);
+      lhsIter = lhs->iterator(policy);
+      lhsDone = lhsIter->atEnd();
+      policy->beforeIterator(rhs);
+      rhsIter = rhs->iterator(policy);
+      rhsDone = rhsIter->atEnd();
+    }
     
     inline void updateBest() {
-      lhsBest = ((!lhsDone) && (rhsDone || (lhs->key() < rhs->key())));
+      lhsBest = ((!lhsDone) && (rhsDone || (lhsIter->key() < rhsIter->key())));
     }
 
     void next();
@@ -53,14 +63,31 @@ class MergeIterator : public IteratorBase {
 };
 
 class SeqIterator : public IteratorBase {
-  Iterator lhs, rhs;
+  CogHandle lhs, rhs;
+  Iterator lhsIter, rhsIter;
   bool lhsDone, rhsDone;
   Key sep;
+  RewritePolicy policy;
   
   public: 
-    SeqIterator(Iterator lhs, Key sep, Iterator rhs) : 
-      lhs(lhs), rhs(rhs), lhsDone(lhs->atEnd()), rhsDone(rhs->atEnd()), 
-      sep(sep) {};
+    SeqIterator(CogHandle lhs, Key sep, CogHandle rhs, RewritePolicy policy) :
+      policy(policy), sep(sep), lhs(lhs), rhs(rhs), 
+      lhsDone(false), rhsDone(false) {}
+    
+    inline void initLHS() { if(lhsIter.get() == NULL) { 
+      policy->beforeIterator(lhs);
+      lhsIter = lhs->iterator(policy);
+      lhsDone = lhsIter->atEnd();
+    }}
+    inline void initRHS() { if(rhsIter.get() == NULL) { 
+      policy->beforeIterator(rhs);
+      rhsIter = rhs->iterator(policy);
+      rhsDone = rhsIter->atEnd();
+    }}
+    inline void initNeeded() {
+      if(!lhsDone) { initLHS(); }
+      if(lhsDone)  { initRHS(); }
+    }
 
     void next();
     void seek(Key k);

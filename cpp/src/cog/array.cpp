@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "cog.hpp"
+#include "iterator.hpp"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ Buffer ArrayCog::sortedBuffer()
   return sorted;
 }
 
-Iterator ArrayCog::iterator()
+Iterator ArrayCog::iterator(RewritePolicy p)
 {
   return Iterator(new BufferIterator(sortedBuffer()));
 }

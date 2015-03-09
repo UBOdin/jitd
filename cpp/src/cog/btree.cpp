@@ -1,12 +1,12 @@
 #include <iostream>
 #include "cog.hpp"
-#include "rewrite.hpp"
+#include "iterator.hpp"
 
 using namespace std;
 
-Iterator BTreeCog::iterator()
+Iterator BTreeCog::iterator(RewritePolicy p)
 {
-  return Iterator(new SeqIterator(lhs->iterator(), sep, rhs->iterator()));
+  return Iterator(new SeqIterator(lhs, sep, rhs, p));
 }
 void BTreeCog::printDebug(int depth)
 {

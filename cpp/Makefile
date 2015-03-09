@@ -33,6 +33,8 @@ build_test : driver
 test : build_test
 
 clean : 
+	rm -rf *.dSYM
+	rm -f driver
 	find src -name '*.o' | xargs rm -f
 
 .PHONY: test clean build_test dep

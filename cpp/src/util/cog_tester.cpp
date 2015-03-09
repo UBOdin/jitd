@@ -8,8 +8,10 @@
 #include <algorithm>
 
 #include "cog.hpp"
+#include "iterator.hpp"
 #include "cog_tester.hpp"
 #include "rewrite.hpp"
+#include "policy.hpp"
 
 using namespace std;
 
@@ -59,6 +61,7 @@ void cog_test(istream &input)
   shared_ptr<string> curr;
   stack<CogHandle> stack;
   string line;
+  RewritePolicy policy(new RewritePolicyBase()); // dumb empty policy
   
   while(getline(input, line)){
     istringstream toks(line);
@@ -103,7 +106,7 @@ void cog_test(istream &input)
       cout << "gROOT" << endl;
       stack.top()->printDebug(1);
     } else if(string("scan") == op) {
-      Iterator iter = stack.top()->iterator();
+      Iterator iter = stack.top()->iterator(policy);
       int row = 1;
       cout << "---------------" << endl;
       while(!iter->atEnd()){

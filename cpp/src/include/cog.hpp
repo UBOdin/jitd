@@ -6,7 +6,26 @@
 #include <iostream>
 
 #include "data.hpp"
-#include "iterator.hpp"
+class IteratorBase;
+typedef std::shared_ptr<IteratorBase> Iterator;
+
+///////////// Cog Handle Types /////////////
+class CogHandleBase;
+typedef std::shared_ptr<CogHandleBase> CogHandle;
+#define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
+
+///////////// Policies /////////////
+
+class RewritePolicyBase {
+  
+  public: 
+    virtual void beforeInsert  (CogHandle root) {}
+    virtual void afterInsert   (CogHandle root) {}
+    virtual void beforeIterator(CogHandle node) {}
+    virtual void idle          (CogHandle root) {}
+    
+};
+typedef std::shared_ptr<RewritePolicyBase> RewritePolicy;
 
 ///////////// Global Cog Content /////////////
 
@@ -22,7 +41,7 @@ class Cog {
   public:
     Cog(CogType type): type(type) {}
   
-    virtual Iterator iterator()
+    virtual Iterator iterator(RewritePolicy p)
     { 
       std::cerr << "Cog.iterator() is unimplemented" << std::endl;
       exit(-1);
@@ -54,16 +73,13 @@ class CogHandleBase {
     CogPtr get() { return ref /*.load()*/;  }
     void put(CogPtr nref) { ref /*.store( */ = nref /*)*/; }
     
-    Iterator iterator()                   { return ref->iterator(); }
+    Iterator iterator(RewritePolicy p)    { return ref->iterator(p); }
     int      size()                       { return ref->size(); }
     CogType  type()                       { return ref->type; }
     void     printDebug()                 { ref->printDebug(); }
     void     printDebug(int depth)        { ref->printDebug(depth); }
 };
 
-typedef std::shared_ptr<CogHandleBase> CogHandle;
-
-#define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
 
 
 ///////////// Cog-Specific Class Headers /////////////
@@ -77,7 +93,7 @@ class ConcatCog : public Cog
     CogHandle getLHS(){ return lhs; }
     CogHandle getRHS(){ return rhs; }
     
-    Iterator iterator();
+    Iterator iterator(RewritePolicy p);
     int size(){ return lhs->size() + rhs->size(); }
     
     void printDebug(int depth);
@@ -98,7 +114,7 @@ class BTreeCog : public Cog
     CogHandle getLHS(){ return lhs; }
     CogHandle getRHS(){ return rhs; }
     
-    Iterator iterator();
+    Iterator iterator(RewritePolicy p);
     int size(){ return lhs->size() + rhs->size(); }
 
     void printDebug(int depth);
@@ -125,7 +141,7 @@ class ArrayCog : public Cog
     CogPtr sortedCog();
 
     int size(){ return end-start; }
-    Iterator iterator();
+    Iterator iterator(RewritePolicy p);
 
     void printDebug(int depth);
     
@@ -146,7 +162,7 @@ class SortedArrayCog : public Cog
     BufferElement getEnd(){ return end; }
 
     int size(){ return end-start; }
-    Iterator iterator();
+    Iterator iterator(RewritePolicy p);
 
     void printDebug(int depth);
     

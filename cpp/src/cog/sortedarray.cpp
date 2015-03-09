@@ -1,9 +1,10 @@
 #include <iostream>
 #include "cog.hpp"
+#include "iterator.hpp"
 
 using namespace std;
 
-Iterator SortedArrayCog::iterator()
+Iterator SortedArrayCog::iterator(RewritePolicy p)
 {
   return Iterator(new BufferIterator(buffer, start, end));
 }

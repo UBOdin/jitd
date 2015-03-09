@@ -8,24 +8,30 @@ using namespace std;
 
 void SeqIterator::next()
 {
-  if(!lhsDone)     { lhs->next(); lhsDone = lhs->atEnd(); }
-  else if(!rhsDone){ rhs->next(); rhsDone = rhs->atEnd(); }
+  initNeeded();
+  if(!lhsDone)     { lhsIter->next(); lhsDone = lhsIter->atEnd(); }
+  else if(!rhsDone){ rhsIter->next(); rhsDone = rhsIter->atEnd(); }
 }
 void SeqIterator::seek(Key k)
 {
   if(k >= sep) { lhsDone = true; }
-  if(!lhsDone)     { lhs->seek(k); lhsDone = lhs->atEnd(); }
-  else if(!rhsDone){ rhs->seek(k); rhsDone = rhs->atEnd(); }
+  // check key first... may not need to init LHS.
+  initNeeded();
+  if(!lhsDone)     { lhsIter->seek(k); lhsDone = lhsIter->atEnd(); }
+  else if(!rhsDone){ rhsIter->seek(k); rhsDone = rhsIter->atEnd(); }
 }
 bool SeqIterator::atEnd()
 {
+  initNeeded();
   return lhsDone && rhsDone;
 }
 Key SeqIterator::key()
 {
-  return lhsDone ? rhs->key() : lhs->key();
+  initNeeded();
+  return lhsDone ? rhsIter->key() : lhsIter->key();
 }
 Value SeqIterator::value()
 {
-  return lhsDone ? rhs->value() : lhs->value();
+  initNeeded();
+  return lhsDone ? rhsIter->value() : lhsIter->value();
 }

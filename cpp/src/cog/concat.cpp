@@ -1,11 +1,12 @@
 #include <iostream>
 #include "cog.hpp"
+#include "iterator.hpp"
 
 using namespace std;
 
-Iterator ConcatCog::iterator()
+Iterator ConcatCog::iterator(RewritePolicy p)
 {
-  return Iterator(new MergeIterator(lhs->iterator(), rhs->iterator()));
+  return Iterator(new MergeIterator(lhs, rhs, p));
 }
 void ConcatCog::printDebug(int depth)
 {
