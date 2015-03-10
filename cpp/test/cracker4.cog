@@ -1,0 +1,8 @@
+array random 1000000 1000000000
+dump
+policy cracker 1000
+time_scan
+array random 10000 1000000000
+concat
+time_scan
+time_scan

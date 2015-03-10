@@ -6,6 +6,7 @@
 #include <stack>
 #include <cstdlib>
 #include <algorithm>
+#include <sys/time.h>
 
 #include "cog.hpp"
 #include "iterator.hpp"
@@ -117,7 +118,25 @@ void cog_test(istream &input)
         row++;
       }
       cout << "---------------" << endl;
-//      cout << "Total: " << (row-1) << " records" << endl;
+    } else if(string("time_scan") == op) {
+      CogHandle root = stack.top();
+      timeval start, end;
+      gettimeofday(&start, NULL);
+      policy->beforeIterator(root);
+      Iterator iter = root->iterator(policy);
+      int row = 1;
+      while(!iter->atEnd()){ iter->next(); row++; }
+      gettimeofday(&end, NULL);
+      float totalTime = 
+        (end.tv_sec - start.tv_sec) * 1000000.0 +
+        (end.tv_usec - start.tv_usec);
+      cout << "---------------" << endl;
+      cout << "Records Scanned: " << (row-1) << endl;
+      cout << "Time Taken: " << totalTime << " us" << endl;
+      if(row > 1){
+        cout << "Time/Record: " << totalTime/(row-1) << " us" << endl;
+      }
+      cout << "---------------" << endl;
       
     ///////////////// REWRITE OPERATIONS /////////////////
     } else if(string("split_array") == op) {

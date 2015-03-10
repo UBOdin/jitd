@@ -3,6 +3,8 @@
 
 #include "cog.hpp"
 
+// this all should probably be rewritten with bind() or equivalent.
+
 ///////////// Global Rewrite Content /////////////
 
 class Rewrite {

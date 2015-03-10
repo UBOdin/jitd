@@ -1,12 +1,17 @@
 #include <iostream>
 #include "cog.hpp"
 #include "policy.hpp"
+#include "rewrite.hpp"
 
 using namespace std;
 
 string CrackerPolicy::name() { return string("Cracker"); }
 void CrackerPolicy::beforeIterator(CogHandle node)
 {
+  PushdownArray pushdownA;
+  
+  pushdownA.apply(node);
+  
   CogPtr ptr = node->get();
 //  cout << "Before Iterator" << endl;
   if(ptr->type == COG_ARRAY){
