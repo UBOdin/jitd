@@ -9,7 +9,6 @@ FILES = \
 	src/rewrite/rewrite.o\
 	src/rewrite/split_array.o\
 	src/rewrite/sort_array.o\
-	src/rewrite/recur_to_target.o\
 	src/rewrite/pushdown_array.o\
 	src/iterator/buffer_iterator.o\
 	src/iterator/seq_iterator.o\
@@ -18,16 +17,18 @@ FILES = \
 	src/policy/cracker.o\
 	src/util/cog_tester.o
 
+CPP_FLAGS = \
+	-std=c++11 
 
-GPP = g++ -I ${INCLUDE_PATH} -g
+CPP = g++ -I ${INCLUDE_PATH} -g $(CPP_FLAGS)
 
 driver : ${FILES} src/driver.cpp 
 	@echo "Building Driver"
-	@${GPP} -o $@ $^
+	@${CPP} -o $@ $^
 
 %.o : %.cpp
 	@echo Compiling $(patsubst src/%,%,$*)
-	@${GPP} -c -o $@ $<
+	@${CPP} -c -o $@ $<
 
 build_test : driver
 	@for i in test/*.cog; do echo ===== $$i =====; ./driver $$i; done

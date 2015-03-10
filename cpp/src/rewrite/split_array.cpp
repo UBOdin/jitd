@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void SplitArrays::apply(CogHandle h)
+void splitArray(Key target, CogHandle h)
 {
   CogPtr cog = h->get(); // Grab the functional version of this object.
   

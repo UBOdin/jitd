@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void PushdownArray::apply(CogHandle h)
+void pushdownArray(CogHandle h)
 {
   CogPtr cog = h->get(); // Grab the functional version of this object.
   

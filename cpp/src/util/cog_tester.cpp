@@ -142,30 +142,23 @@ void cog_test(istream &input)
     } else if(string("split_array") == op) {
       Key target;
       toks >> target;
-      SplitArrays rw(target);
-      rw.apply(stack.top());
+      splitArray(target, stack.top());
     } else if(string("rec_split_array") == op) {
       Key target;
       toks >> target;
-      RecurToTarget rw(new SplitArrays(target), target);
-      rw.apply(stack.top());
+      recurToTargetTopDown(makeSplitArray(target), target, stack.top());
     } else if(string("sort_array") == op) {
-      SortArrays rw;
-      rw.apply(stack.top());
+      sortArray(stack.top());
     } else if(string("rec_sort_array") == op) {
-      RecurTopDown rw(new SortArrays());
-      rw.apply(stack.top());
+      recurTopDown(sortArray, stack.top());
     } else if(string("pushdown_array") == op) {
-      PushdownArray rw;
-      rw.apply(stack.top());
+      pushdownArray(stack.top());
     } else if(string("rec_pushdown_array") == op) {
-      RecurTopDown rw(new PushdownArray());
-      rw.apply(stack.top());
+      recurTopDown(pushdownArray, stack.top());
     } else if(string("tgt_pushdown_array") == op) {
       Key target;
       toks >> target;
-      RecurToTarget rw(new PushdownArray(), target);
-      rw.apply(stack.top());
+      recurToTarget(pushdownArray, target, stack.top());
 
     ///////////////// POLICY OPERATIONS /////////////////
     } else if(string("policy") == op){
