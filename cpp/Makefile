@@ -1,20 +1,8 @@
 
-INCLUDE_PATH = src/include
+INCLUDE_PATH = src/
 
 FILES = \
-	src/cog/array.o\
-	src/cog/concat.o\
-	src/cog/sortedarray.o\
-	src/cog/btree.o\
-	src/rewrite/rewrite.o\
-	src/rewrite/split_array.o\
-	src/rewrite/sort_array.o\
-	src/rewrite/pushdown_array.o\
-	src/iterator/buffer_iterator.o\
-	src/iterator/seq_iterator.o\
-	src/iterator/merge_iterator.o\
-	src/policy/base.o\
-	src/policy/cracker.o\
+  src/data.o\
 	src/util/cog_tester.o
 
 CPP_FLAGS = \

@@ -13,13 +13,19 @@
 #include "cog_tester.hpp"
 #include "rewrite.hpp"
 #include "policy.hpp"
+#include "policy/cracker.hpp"
 
 using namespace std;
+using namespace std::placeholders;
 
-Buffer build_buffer(int len, int max)
+
+typedef Buffer<Record> RecordBuffer;
+typedef CogHandle<Record> RecordCogHandle;
+
+RecordBuffer build_buffer(int len, int max)
 {
   int i;
-  Buffer buff(new vector<Record>(len));
+  RecordBuffer buff(new vector<Record>(len));
   for(i = 0; i < len; i++){
     (*buff)[i].key = rand() % max;
     (*buff)[i].value = (Value)0xDEADBEEF;
@@ -27,42 +33,42 @@ Buffer build_buffer(int len, int max)
   return buff;
 }
 
-Buffer load_buffer(istream &input)
+RecordBuffer load_buffer(istream &input)
 {
-  vector<Record> temp;
+  RecordBuffer ret(new vector<Record>());
   Record r;
   r.value = (Value)0xDEADBEEF;
   while(!input.eof()){
     input >> r.key;
-    temp.push_back(r);
+    ret->push_back(r);
   }
-  return Buffer(new vector<Record>(temp));
+  return ret;
 }
 
-CogHandle array_for_buffer(Buffer buff)
+RecordCogHandle array_for_buffer(RecordBuffer buff)
 {
-  return MakeHandle(new ArrayCog(buff, buff->begin(), buff->end()));
+  return makeHandle(new ArrayCog<Record>(buff, buff->begin(), buff->end()));
 }
 
 
-CogHandle build_random_array(int len, int max)
+RecordCogHandle build_random_array(int len, int max)
 {
   return array_for_buffer(build_buffer(len, max));
 }
 
-CogHandle build_random_sorted_array(int len, int max)
+RecordCogHandle build_random_sorted_array(int len, int max)
 {
-  Buffer buff = build_buffer(len, max);
-  sort(buff->begin(), buff->end(), CompareRecord());
-  return MakeHandle(new SortedArrayCog(buff, buff->begin(), buff->end()));
+  RecordBuffer buff = build_buffer(len, max);
+  sort(buff->begin(), buff->end());
+  return makeHandle(new SortedArrayCog<Record>(buff, buff->begin(), buff->end()));
 }
 
 void cog_test(istream &input)
 {
   shared_ptr<string> curr;
-  stack<CogHandle> stack;
+  stack<CogHandle<Record> > stack;
   string line;
-  RewritePolicy policy(new RewritePolicyBase()); // dumb empty policy
+  RewritePolicy<Record> policy(new RewritePolicyBase<Record>()); // dumb empty policy
   
   while(getline(input, line)){
     istringstream toks(line);
@@ -87,18 +93,20 @@ void cog_test(istream &input)
       }
       
     } else if(string("concat") == op) {
-      CogHandle a = stack.top(); stack.pop();
-      CogHandle b = stack.top(); stack.pop();
+      CogHandle<Record> a = stack.top(); stack.pop();
+      CogHandle<Record> b = stack.top(); stack.pop();
       
-      stack.push(MakeHandle(new ConcatCog(a, b)));
+      stack.push(makeHandle(new ConcatCog<Record>(a, b)));
+      
     } else if(string("btree") == op) {
-      Key sep;
-      toks >> sep;
+      Record sep;
+      toks >> sep.key;
+      sep.value = NULL;
       
-      CogHandle b = stack.top(); stack.pop();
-      CogHandle a = stack.top(); stack.pop();
+      CogHandle<Record> b = stack.top(); stack.pop();
+      CogHandle<Record> a = stack.top(); stack.pop();
 
-      stack.push(MakeHandle(new BTreeCog(a, sep, b)));
+      stack.push(makeHandle(new BTreeCog<Record>(a, b, sep)));
     
     ///////////////// SIMPLE QUERIES /////////////////
     } else if(string("size") == op) {
@@ -107,23 +115,23 @@ void cog_test(istream &input)
       cout << "gROOT" << endl;
       stack.top()->printDebug(1);
     } else if(string("scan") == op) {
-      CogHandle root = stack.top();
+      CogHandle<Record> root = stack.top();
       policy->beforeIterator(root);
-      Iterator iter = root->iterator(policy);
+      Iterator<Record> iter = root->iterator(policy);
       int row = 1;
       cout << "---------------" << endl;
       while(!iter->atEnd()){
-        cout << row << " -> " << iter->key() << endl;
+        cout << row << " -> " << iter->get()->key << endl;
         iter->next();
         row++;
       }
       cout << "---------------" << endl;
     } else if(string("time_scan") == op) {
-      CogHandle root = stack.top();
+      CogHandle<Record> root = stack.top();
       timeval start, end;
       gettimeofday(&start, NULL);
       policy->beforeIterator(root);
-      Iterator iter = root->iterator(policy);
+      Iterator<Record> iter = root->iterator(policy);
       int row = 1;
       while(!iter->atEnd()){ iter->next(); row++; }
       gettimeofday(&end, NULL);
@@ -140,36 +148,56 @@ void cog_test(istream &input)
       
     ///////////////// REWRITE OPERATIONS /////////////////
     } else if(string("split_array") == op) {
-      Key target;
-      toks >> target;
-      splitArray(target, stack.top());
+      Record target;
+      toks >> target.key;
+      target.value = NULL;
+      
+      splitArray<Record>(target, stack.top());
+
     } else if(string("rec_split_array") == op) {
-      Key target;
-      toks >> target;
-      recurToTargetTopDown(makeSplitArray(target), target, stack.top());
+      Record target;
+      toks >> target.key;
+      target.value = NULL;
+      
+      recurToTargetTopDown<Record>(
+        std::bind(splitArray<Record>, target, _1),
+        target, 
+        stack.top()
+      );
+
     } else if(string("sort_array") == op) {
-      sortArray(stack.top());
+
+      sortArray<Record>(stack.top());
+
     } else if(string("rec_sort_array") == op) {
-      recurTopDown(sortArray, stack.top());
+
+      recurTopDown<Record>(sortArray<Record>, stack.top());
+
     } else if(string("pushdown_array") == op) {
-      pushdownArray(stack.top());
+
+      pushdownArray<Record>(stack.top());
+
     } else if(string("rec_pushdown_array") == op) {
-      recurTopDown(pushdownArray, stack.top());
+
+      recurTopDown<Record>(pushdownArray<Record>, stack.top());
+
     } else if(string("tgt_pushdown_array") == op) {
-      Key target;
-      toks >> target;
-      recurToTarget(pushdownArray, target, stack.top());
+      Record target;
+      toks >> target.key;
+      target.value = NULL;
+      
+      recurToTargetTopDown<Record>(pushdownArray<Record>, target, stack.top());
 
     ///////////////// POLICY OPERATIONS /////////////////
     } else if(string("policy") == op){
       string policyName;
       toks >> policyName;
       if(string("naive") == policyName){
-        policy = RewritePolicy(new RewritePolicyBase());
+        policy = RewritePolicy<Record>(new RewritePolicyBase<Record>());
       } else if(string("cracker") == policyName){
         int minSize;
         toks >> minSize;
-        policy = RewritePolicy(new CrackerPolicy(minSize));
+        policy = RewritePolicy<Record>(new CrackerPolicy<Record>(minSize));
       }
       cout << "Now using policy '" << policyName << "' -> '"  
            << policy->name() << "'" << endl;
