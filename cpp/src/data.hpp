@@ -24,6 +24,9 @@ struct Record {
   bool operator<(const Record &other) const {
     return key < other.key;
   }
+  bool operator==(const Record &other) const {
+    return key == other.key;
+  }
 };
 
 std::ostream &operator<<(std::ostream &o, const Record &r);

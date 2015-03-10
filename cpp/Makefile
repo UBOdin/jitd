@@ -5,6 +5,8 @@ FILES = \
   src/data.o\
 	src/util/cog_tester.o
 
+HEADERS = $(shell find src -name '*.hpp')
+
 CPP_FLAGS = \
 	-std=c++11 
 
@@ -27,5 +29,9 @@ clean :
 	rm -rf *.dSYM
 	rm -f driver
 	find src -name '*.o' | xargs rm -f
+
+# ,--- Yes, I know this is a horrible hack.
+# V    I'm too annoyed with C++ to get makedep working.
+src/util/cog_tester.o : ${HEADERS}
 
 .PHONY: test clean build_test dep
