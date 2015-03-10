@@ -3,8 +3,21 @@
 
 #include "data.hpp"
 #include "iterator.hpp"
+#include "policy.hpp"
 
 using namespace std;
+
+MergeIterator::MergeIterator(
+  CogHandle lhs, CogHandle rhs, RewritePolicy policy
+) : policy(policy) 
+{
+  policy->beforeIterator(lhs);
+  lhsIter = lhs->iterator(policy);
+  lhsDone = lhsIter->atEnd();
+  policy->beforeIterator(rhs);
+  rhsIter = rhs->iterator(policy);
+  rhsDone = rhsIter->atEnd();
+}
 
 void MergeIterator::next()
 {

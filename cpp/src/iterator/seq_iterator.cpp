@@ -3,9 +3,29 @@
 
 #include "data.hpp"
 #include "iterator.hpp"
+#include "policy.hpp"
 
 using namespace std;
 
+
+void SeqIterator::initNeeded() { 
+  if(!lhsDone) {
+    if(lhsIter.get() == NULL) { 
+//      cerr << "Initializing LHS" << endl;
+      policy->beforeIterator(lhs);
+      lhsIter = lhs->iterator(policy);
+      lhsDone = lhsIter->atEnd();
+    }
+  }
+  if(lhsDone)  {
+    if(rhsIter.get() == NULL) { 
+//      cerr << "Initializing RHS" << endl;
+      policy->beforeIterator(rhs);
+      rhsIter = rhs->iterator(policy);
+      rhsDone = rhsIter->atEnd();
+    }
+  }
+}
 void SeqIterator::next()
 {
   initNeeded();

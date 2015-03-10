@@ -40,16 +40,7 @@ class MergeIterator : public IteratorBase {
   RewritePolicy policy;
   
   public: 
-    MergeIterator(CogHandle lhs, CogHandle rhs, RewritePolicy policy) : 
-      policy(policy) 
-    {
-      policy->beforeIterator(lhs);
-      lhsIter = lhs->iterator(policy);
-      lhsDone = lhsIter->atEnd();
-      policy->beforeIterator(rhs);
-      rhsIter = rhs->iterator(policy);
-      rhsDone = rhsIter->atEnd();
-    }
+    MergeIterator(CogHandle lhs, CogHandle rhs, RewritePolicy policy);
     
     inline void updateBest() {
       lhsBest = ((!lhsDone) && (rhsDone || (lhsIter->key() < rhsIter->key())));
@@ -74,20 +65,7 @@ class SeqIterator : public IteratorBase {
       policy(policy), sep(sep), lhs(lhs), rhs(rhs), 
       lhsDone(false), rhsDone(false) {}
     
-    inline void initLHS() { if(lhsIter.get() == NULL) { 
-      policy->beforeIterator(lhs);
-      lhsIter = lhs->iterator(policy);
-      lhsDone = lhsIter->atEnd();
-    }}
-    inline void initRHS() { if(rhsIter.get() == NULL) { 
-      policy->beforeIterator(rhs);
-      rhsIter = rhs->iterator(policy);
-      rhsDone = rhsIter->atEnd();
-    }}
-    inline void initNeeded() {
-      if(!lhsDone) { initLHS(); }
-      if(lhsDone)  { initRHS(); }
-    }
+    void initNeeded();
 
     void next();
     void seek(Key k);

@@ -14,6 +14,8 @@ FILES = \
 	src/iterator/buffer_iterator.o\
 	src/iterator/seq_iterator.o\
 	src/iterator/merge_iterator.o\
+	src/policy/base.o\
+	src/policy/cracker.o\
 	src/util/cog_tester.o
 
 

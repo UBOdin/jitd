@@ -106,7 +106,9 @@ void cog_test(istream &input)
       cout << "gROOT" << endl;
       stack.top()->printDebug(1);
     } else if(string("scan") == op) {
-      Iterator iter = stack.top()->iterator(policy);
+      CogHandle root = stack.top();
+      policy->beforeIterator(root);
+      Iterator iter = root->iterator(policy);
       int row = 1;
       cout << "---------------" << endl;
       while(!iter->atEnd()){
@@ -115,7 +117,7 @@ void cog_test(istream &input)
         row++;
       }
       cout << "---------------" << endl;
-      cout << "Total: " << (row-1) << " records" << endl;
+//      cout << "Total: " << (row-1) << " records" << endl;
       
     ///////////////// REWRITE OPERATIONS /////////////////
     } else if(string("split_array") == op) {
@@ -145,6 +147,20 @@ void cog_test(istream &input)
       toks >> target;
       RecurToTarget rw(new PushdownArray(), target);
       rw.apply(stack.top());
+
+    ///////////////// POLICY OPERATIONS /////////////////
+    } else if(string("policy") == op){
+      string policyName;
+      toks >> policyName;
+      if(string("naive") == policyName){
+        policy = RewritePolicy(new RewritePolicyBase());
+      } else if(string("cracker") == policyName){
+        int minSize;
+        toks >> minSize;
+        policy = RewritePolicy(new CrackerPolicy(minSize));
+      }
+      cout << "Now using policy '" << policyName << "' -> '"  
+           << policy->name() << "'" << endl;
     
     ///////////////// OOOPS /////////////////
     } else {

@@ -6,25 +6,12 @@
 #include <iostream>
 
 #include "data.hpp"
+
+///////////// Forward Refs /////////////
+
 class IteratorBase;
 typedef std::shared_ptr<IteratorBase> Iterator;
-
-///////////// Cog Handle Types /////////////
-class CogHandleBase;
-typedef std::shared_ptr<CogHandleBase> CogHandle;
-#define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
-
-///////////// Policies /////////////
-
-class RewritePolicyBase {
-  
-  public: 
-    virtual void beforeInsert  (CogHandle root) {}
-    virtual void afterInsert   (CogHandle root) {}
-    virtual void beforeIterator(CogHandle node) {}
-    virtual void idle          (CogHandle root) {}
-    
-};
+class RewritePolicyBase;
 typedef std::shared_ptr<RewritePolicyBase> RewritePolicy;
 
 ///////////// Global Cog Content /////////////
@@ -80,6 +67,8 @@ class CogHandleBase {
     void     printDebug(int depth)        { ref->printDebug(depth); }
 };
 
+typedef std::shared_ptr<CogHandleBase> CogHandle;
+#define MakeHandle(a) CogHandle(new CogHandleBase(shared_ptr<Cog>(a)))
 
 
 ///////////// Cog-Specific Class Headers /////////////
@@ -135,6 +124,7 @@ class ArrayCog : public Cog
     Buffer getBuffer(){ return buffer; }
     Buffer sortedBuffer();
     std::pair<Buffer,Buffer> split(Key pivot);
+    Key randKey() { return (start+(rand() % (end-start)))->key; }
     BufferElement getStart(){ return start; }
     BufferElement getEnd(){ return end; }
     CogPtr splitCog(Key pivot);

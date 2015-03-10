@@ -1,0 +1,6 @@
+array random 16 100
+dump
+scan
+policy cracker 4
+scan
+dump
