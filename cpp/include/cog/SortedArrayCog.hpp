@@ -12,6 +12,7 @@ class SortedArrayCog : public Cog<Tuple>
     Buffer<Tuple> getBuffer(){ return buffer; }
     BufferElement<Tuple> getStart(){ return start; }
     BufferElement<Tuple> getEnd(){ return end; }
+    inline BufferElement<Tuple> seek(Tuple t){ return lower_bound(start, end, t); }
 
     int size(){ return end-start; }
     Iterator<Tuple> iterator(RewritePolicy<Tuple> p)
@@ -25,8 +26,6 @@ class SortedArrayCog : public Cog<Tuple>
       std::cout << "SortedArray[" << (end-start) << " elements]" << std::endl;
     }
 
-    
-  private:
     Buffer<Tuple> buffer;
     BufferElement<Tuple> start;
     BufferElement<Tuple> end;

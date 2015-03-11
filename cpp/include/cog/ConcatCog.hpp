@@ -19,6 +19,6 @@ class ConcatCog : public Cog<Tuple>
       rhs->printDebug(depth+1);
     }
     
-    const CogHandle<Tuple> lhs;
-    const CogHandle<Tuple> rhs;
+    CogHandle<Tuple> lhs;
+    CogHandle<Tuple> rhs;
 };

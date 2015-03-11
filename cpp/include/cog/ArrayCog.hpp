@@ -3,6 +3,12 @@ class ArrayCog : public Cog<Tuple>
 {
   public:
     ArrayCog(
+      Buffer<Tuple> buffer
+    ) :
+      Cog<Tuple>(COG_ARRAY), buffer(buffer), 
+      start(buffer->begin()), end(buffer->end()) 
+      {}
+    ArrayCog(
       Buffer<Tuple> buffer, 
       BufferElement<Tuple> start, 
       BufferElement<Tuple> end

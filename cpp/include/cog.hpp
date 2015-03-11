@@ -2,7 +2,7 @@
 #define _COG_H_SHIELD
 
 #include <memory>
-//#include <atomic>
+#include <atomic>
 #include <iostream>
 
 #include "data.hpp"
@@ -61,20 +61,28 @@ template <class Tuple>
 
 template <class Tuple>
 class CogHandleBase {
-  /* atomic< */ CogPtr<Tuple> /* > */ ref;
+  CogPtr<Tuple> ref;
   
   public:
     CogHandleBase(CogPtr<Tuple> init) : ref(init) {}
-  
-    CogPtr<Tuple> get() { return ref /*.load()*/;  }
-    void put(CogPtr<Tuple> nref) { ref /*.store( */ = nref /*)*/; }
     
-    Iterator<Tuple> iterator(RewritePolicy<Tuple> p)
-                                          { return ref->iterator(p); }
-    int             size()                { return ref->size(); }
-    CogType         type()                { return ref->type; }
-    void            printDebug()          { ref->printDebug(); }
-    void            printDebug(int depth) { ref->printDebug(depth); }
+    // Obtain a snapshot of the pointer.
+    inline CogPtr<Tuple> get()
+    {
+      return atomic_load(&ref);
+    }
+    // Precondition: `nref` MUST BE equivalent to `ref`.
+    inline void put(CogPtr<Tuple> nref)
+    { 
+      atomic_store(&ref, nref); 
+    }
+    
+    inline Iterator<Tuple> iterator(RewritePolicy<Tuple> p)
+                                                 { return get()->iterator(p); }
+    inline int             size()                { return get()->size(); }
+    inline CogType         type()                { return get()->type; }
+    inline void            printDebug()          { get()->printDebug(); }
+    inline void            printDebug(int depth) { get()->printDebug(depth); }
 };
 
 template <class Tuple>

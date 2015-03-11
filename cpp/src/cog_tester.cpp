@@ -10,7 +10,7 @@
 
 #include "cog.hpp"
 #include "iterator.hpp"
-#include "cog_tester.hpp"
+#include "test.hpp"
 #include "rewrite.hpp"
 #include "policy.hpp"
 #include "policy/cracker.hpp"
@@ -65,7 +65,6 @@ RecordCogHandle build_random_sorted_array(int len, int max)
 
 void cog_test(istream &input)
 {
-  shared_ptr<string> curr;
   stack<CogHandle<Record> > stack;
   string line;
   RewritePolicy<Record> policy(new RewritePolicyBase<Record>()); // dumb empty policy

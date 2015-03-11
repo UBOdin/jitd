@@ -16,7 +16,7 @@ class DeleteCog : public Cog<Tuple>
   
     Iterator<Tuple> iterator(RewritePolicy<Tuple> p)
     {
-      return DeleteIterator<Tuple>(source, deleted, p);
+      return Iterator<Tuple>(new DeleteIterator<Tuple>(source, deleted, p));
     }
     int size()
     {
@@ -24,9 +24,15 @@ class DeleteCog : public Cog<Tuple>
       return source->size() - deleted->size();
     }
 
-    void printDebug(int depth);
+    void printDebug(int depth)
+    {
+      Cog<Tuple>::printPrefix(depth);
+      std::cout << "DELETE" << std::endl;
+      source->printDebug(depth+1);
+      deleted->printDebug(depth+1);
+    }
     
-    const CogHandle<Tuple> source;
-    const CogHandle<Tuple> deleted;
+    CogHandle<Tuple> source;
+    CogHandle<Tuple> deleted;
   
 };

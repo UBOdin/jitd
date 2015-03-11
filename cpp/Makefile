@@ -1,11 +1,12 @@
 
-INCLUDE_PATH = src/
+INCLUDE_PATH = include
 
 FILES = \
   src/data.o\
-	src/util/cog_tester.o
+	src/jitd_tester.o\
+	src/cog_tester.o
 
-HEADERS = $(shell find src -name '*.hpp')
+HEADERS = $(shell find ${INCLUDE_PATH}/ -name '*.hpp')
 
 CPP_FLAGS = \
 	-std=c++11 
@@ -21,7 +22,7 @@ driver : ${FILES} src/driver.cpp
 	@${CPP} -c -o $@ $<
 
 build_test : driver
-	@for i in test/*.cog; do echo ===== $$i =====; ./driver $$i; done
+	@for i in test/*.cog; do echo ===== $$i =====; ./driver -c $$i; done
 
 test : build_test
 
@@ -31,7 +32,7 @@ clean :
 	find src -name '*.o' | xargs rm -f
 
 # ,--- Yes, I know this is a horrible hack.
-# V    I'm too annoyed with C++ to get makedep working.
-src/util/cog_tester.o : ${HEADERS}
+# V    I'm too annoyed with C++ right now to get makedep working.
+src/util/%_tester.o : ${HEADERS}
 
 .PHONY: test clean build_test dep
