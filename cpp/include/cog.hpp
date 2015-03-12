@@ -7,6 +7,28 @@
 
 #include "data.hpp"
 
+//
+// CogPtr/CogHandle
+// 
+// A CogPtr<Tuple> is a concrete *representation* of the bag, although 
+// it may be potentially defined in terms of one or more CogHandle objects.  
+//
+// A CogHandle<Tuple> is an abstract representation of a bag of Tuple objects.  
+// CogHandles are *mostly* functional.  The bag of represented Tuples will 
+// never change.  However, the *representation* of this bag is allowed to 
+// fluctuate.  ->get() is always guaranteed to return an *equivalent* CogPtr,
+// but not necesarilly the same one each time.
+//
+// Cogs kept in memory should be stored as CogHandles.  Cogs being directly
+// acted upon should be stored as CogPtrs.  
+//
+// The templated Tuple object must implement:
+//   operator<()
+//   operator>()
+//   operator==()
+
+
+
 ///////////// Forward Refs /////////////
 
 template <class Tuple> 
@@ -97,10 +119,34 @@ template <class Tuple>
 
 ///////////// Cog-Specific Class Headers /////////////
 
+// ConcatCog
+//
+// Represents a Bag Union of two CogHandles
 #include "cog/ConcatCog.hpp"
+
+// BTreeCog
+// 
+// Represents a partition of two CogHandles.  For a value sep, guarantees
+// that all of the left-hand-side Tuples are lower than sep, and the 
+// right-hand-side Tuples are greater than or equal to sep.
 #include "cog/BTreeCog.hpp"
+
+// DeleteCog
+// 
+// Represents Bag Difference of two CogHandles.  Given source and delete 
+// handles, tuples in the delete handle remove tuples from the source handle
+// on a one-for-one basis.  Assumes that the delete handle represents a subset
+// of the source handle.
 #include "cog/DeleteCog.hpp"
+
+// SortedArrayCog
+//
+// Wraps a Buffer<Tuple> that is guaranteed to be sorted.
 #include "cog/SortedArrayCog.hpp"
+
+// ArrayCog
+//
+// Wraps an arbitrary Buffer<Tuple>
 #include "cog/ArrayCog.hpp"
 
 #endif //_COG_H_SHIELD

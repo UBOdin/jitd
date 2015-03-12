@@ -4,8 +4,12 @@ class BufferIterator : public IteratorBase<Tuple> {
   BufferElement<Tuple> curr, start, end;
   
   public: 
+
+    // BufferIterator assumes that buff is sorted.
     BufferIterator(Buffer<Tuple> buff) : 
       buff(buff), start(buff->begin()), curr(buff->begin()), end(buff->end()) {}
+
+    // BufferIterator assumes that buff is sorted.
     BufferIterator(
       Buffer<Tuple> buff, 
       BufferElement<Tuple> start, 
@@ -27,7 +31,10 @@ class BufferIterator : public IteratorBase<Tuple> {
         high += d;
         d *= 2;
       }
-      curr = lower_bound(curr, high, k);
+      BufferElement<Tuple> temp = lower_bound(curr, high, k);
+
+      // make sure we don't move backwards in the list.
+      if(temp > curr){ curr = temp; }
     }
 
     bool atEnd()
