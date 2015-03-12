@@ -170,7 +170,7 @@ void cog_test(istream &input)
 
     } else if(string("rec_sort_array") == op) {
 
-      recurTopDown<Record>(sortArray<Record>, stack.top());
+      recurTopDown<Record>(ref(sortArray<Record>), stack.top());
 
     } else if(string("pushdown_array") == op) {
 
@@ -178,14 +178,14 @@ void cog_test(istream &input)
 
     } else if(string("rec_pushdown_array") == op) {
 
-      recurTopDown<Record>(pushdownArray<Record>, stack.top());
+      recurTopDown<Record>(ref(pushdownArrayVoid<Record>), stack.top());
 
     } else if(string("tgt_pushdown_array") == op) {
       Record target;
       toks >> target.key;
       target.value = NULL;
       
-      recurToTargetTopDown<Record>(pushdownArray<Record>, target, stack.top());
+      recurToTargetTopDown<Record>(ref(pushdownArrayVoid<Record>), target, stack.top());
 
     ///////////////// POLICY OPERATIONS /////////////////
     } else if(string("policy") == op){

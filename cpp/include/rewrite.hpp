@@ -237,5 +237,7 @@ template <class Tuple>
       return false;
     }
 
+template<class Tuple>
+  void pushdownArrayVoid(CogHandle<Tuple> h) { pushdownArray(h); }
 
 #endif //_REWRITE_H_SHIELD
