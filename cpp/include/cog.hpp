@@ -81,6 +81,8 @@ class Cog {
 template <class Tuple>
   using CogPtr = std::shared_ptr< Cog<Tuple> >;
 
+#define makeHandle(s) CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(s)))
+
 template <class Tuple>
 class CogHandleBase {
   CogPtr<Tuple> ref;
@@ -110,10 +112,6 @@ class CogHandleBase {
 template <class Tuple>
   using CogHandle = std::shared_ptr<CogHandleBase<Tuple> >;
 
-template <class Tuple>
-  inline CogHandle<Tuple> makeHandle(Cog<Tuple> *c){
-    return CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(c)));
-  }
 
 #include "iterator.hpp"
 

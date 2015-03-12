@@ -19,8 +19,8 @@ class JITD {
   
   public:
     JITD() : 
-      root(makeHandle(new ArrayCog<Tuple>(
-        Buffer<Tuple>(new std::vector<Tuple>())))),
+      root(new CogHandleBase<Tuple>(CogPtr<Tuple>(new ArrayCog<Tuple>(
+        Buffer<Tuple>(new std::vector<Tuple>()))))),
       policy(new RewritePolicyBase<Tuple>()) 
       {}
     
@@ -46,13 +46,15 @@ class JITD {
     {
       // Create a template for the new root structure
       ConcatCog<Tuple> *newRootCog = new ConcatCog<Tuple>(
-        CogHandle<Tuple>(NULL),
-        makeHandle(new ArrayCog<Tuple>(records))
+        nullptr,
+        CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(
+          new ArrayCog<Tuple>(records))))
       );
       // newRootCog->lhs is a placeholder for the current root object
       
       // Define a new root handle to swap in
-      CogHandle<Tuple> newRoot = makeHandle(newRootCog);
+      CogHandle<Tuple> newRoot = 
+        CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(newRootCog)));
       
       // As one atomic operation, perform:
       //   newRootCog->lhs = root
@@ -60,17 +62,19 @@ class JITD {
       swapInNewRoot(newRoot, newRootCog->lhs);
       
       // Run post-insertion operations as needed.
-      std::atomic_load(&policy)->afterInsert(newRoot);
+      std::atomic_load(&policy)->afterInsert(root);
     }
     
     // remove() exactly mirrors insert.
     void remove(Buffer<Tuple> records)
     {
       DeleteCog<Tuple> *newRootCog = new DeleteCog<Tuple>(
-        makeHandle(new ArrayCog<Tuple>(records)),
-        CogHandle<Tuple>(NULL)
+        CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(
+          new ArrayCog<Tuple>(records)))),
+        nullptr
       );
-      CogHandle<Tuple> newRoot = makeHandle(newRootCog);
+      CogHandle<Tuple> newRoot = 
+        CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(newRootCog)));
       swapInNewRoot(newRoot, newRootCog->deleted);
       std::atomic_load(&policy)->afterDelete(root);
     }
@@ -101,7 +105,6 @@ class JITD {
     ) {
       bool succeeded = false;
       while(!succeeded){
-        placeholder = root;
         succeeded = std::atomic_compare_exchange_strong(
           &root,        // This value gets atomically replaced...
           &placeholder, // ... if this is currently its value

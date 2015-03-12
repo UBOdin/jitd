@@ -14,14 +14,15 @@ typedef enum {
 int main(int argc, char **argv)
 {
   istream *src;
-  ifstream srcF;
   TestMode mode = JITD_TEST;
   int i;
-  bool interactive; 
+  bool interactive;
+  JITD<Record> jitd;
   
   srand(time(NULL));
 //  sleep(1);
   for(i = 1; i < argc; i++){
+    ifstream srcF;
     if((strlen(argv[i]) > 1) && (argv[i][0] == '-')){
       string flag(argv[i]);
       if(string("-c") == flag){ mode = COG_TEST; }
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
           cog_test(*src);
           break;
         case JITD_TEST:
-          jitd_test(*src, interactive);
+          jitd_test(jitd, *src, interactive);
           break;
       }
     }

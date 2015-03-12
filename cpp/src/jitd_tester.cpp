@@ -50,10 +50,8 @@ double total_time(timeval &start, timeval &end)
 
 #define CASE_1(s) toks >> op; if(string(s) == op)
 #define CASE(s) else if(string(s) == op)
-
-JITD<Record> jitd;
   
-void jitd_test(istream &input, bool interactive)
+void jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
 {
   string line;
   if(interactive) { cout << "jitd> "; cout.flush(); }
@@ -117,14 +115,10 @@ void jitd_test(istream &input, bool interactive)
           }
         } CASE("quiet_next") { // [CNT]
           int cnt, startidx = idx;
-          gettimeofday(&start, NULL);
           for(toks >> cnt; (cnt > 0) && !iter->atEnd(); cnt--){ 
             idx++;
             iter->next();
           }
-          gettimeofday(&end, NULL);
-          cout << "Records Flushed: " << (idx - startidx) << endl;
-          cout << "Flush Time: " << total_time(start, end) << " us" << endl;
         } CASE("seek") { // [TARGET]
           Record target;
           toks >> target.key;
@@ -133,6 +127,11 @@ void jitd_test(istream &input, bool interactive)
           iter->seek(target);
           gettimeofday(&end, NULL);
           cout << "Seek Time: " << total_time(start, end) << " us" << endl;
+        } CASE("quiet_seek") { // [TARGET]
+          Record target;
+          toks >> target.key;
+          target.value = NULL;
+          iter->seek(target);
         }
       }
     } CASE("dump") {

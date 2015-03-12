@@ -47,7 +47,8 @@ RecordBuffer load_buffer(istream &input)
 
 RecordCogHandle array_for_buffer(RecordBuffer buff)
 {
-  return makeHandle(new ArrayCog<Record>(buff, buff->begin(), buff->end()));
+  return CogHandle<Record>(new CogHandleBase<Record>(CogPtr<Record>(
+    new ArrayCog<Record>(buff, buff->begin(), buff->end()))));
 }
 
 
@@ -60,7 +61,8 @@ RecordCogHandle build_random_sorted_array(int len, int max)
 {
   RecordBuffer buff = build_buffer(len, max);
   sort(buff->begin(), buff->end());
-  return makeHandle(new SortedArrayCog<Record>(buff, buff->begin(), buff->end()));
+  return CogHandle<Record>(new CogHandleBase<Record>(CogPtr<Record>(
+          new SortedArrayCog<Record>(buff, buff->begin(), buff->end()))));
 }
 
 void cog_test(istream &input)
@@ -95,7 +97,8 @@ void cog_test(istream &input)
       CogHandle<Record> a = stack.top(); stack.pop();
       CogHandle<Record> b = stack.top(); stack.pop();
       
-      stack.push(makeHandle(new ConcatCog<Record>(a, b)));
+      stack.push(CogHandle<Record>(new CogHandleBase<Record>(CogPtr<Record>(
+                    new ConcatCog<Record>(a, b)))));
       
     } else if(string("btree") == op) {
       Record sep;
@@ -105,7 +108,8 @@ void cog_test(istream &input)
       CogHandle<Record> b = stack.top(); stack.pop();
       CogHandle<Record> a = stack.top(); stack.pop();
 
-      stack.push(makeHandle(new BTreeCog<Record>(a, b, sep)));
+      stack.push(CogHandle<Record>(new CogHandleBase<Record>(CogPtr<Record>(
+                    new BTreeCog<Record>(a, b, sep)))));
     
     ///////////////// SIMPLE QUERIES /////////////////
     } else if(string("size") == op) {
