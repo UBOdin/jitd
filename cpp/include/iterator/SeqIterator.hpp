@@ -14,7 +14,7 @@ class SeqIterator : public IteratorBase<Tuple> {
       RewritePolicy<Tuple> policy
     ) :
       policy(policy), sep(sep), lhs(lhs), rhs(rhs), 
-      lhsDone(false), rhsDone(false) {}
+      lhsDone(lhs->size() < 1), rhsDone(rhs->size() < 1) {}
     
     inline void initNeeded()
     { 
@@ -52,7 +52,6 @@ class SeqIterator : public IteratorBase<Tuple> {
 
     bool atEnd()
     {
-      initNeeded();
       return lhsDone && rhsDone;
     }
     
