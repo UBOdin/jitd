@@ -6,7 +6,7 @@ FILES = \
 	src/jitd_tester.o\
 	src/cog_tester.o
 
-HEADERS = $(shell find ${INCLUDE_PATH}/ -name '*.hpp')
+HEADERS = $(shell find ${INCLUDE_PATH} -name '*.hpp')
 
 CPP_FLAGS = \
 	-std=c++11 
@@ -33,6 +33,10 @@ clean :
 
 # ,--- Yes, I know this is a horrible hack.
 # V    I'm too annoyed with C++ right now to get makedep working.
-src/util/%_tester.o : ${HEADERS}
+src/jitd_tester.o : ${HEADERS}
+src/cog_tester.o : ${HEADERS}
+
+foo: 
+	echo ${HEADERS}
 
 .PHONY: test clean build_test dep

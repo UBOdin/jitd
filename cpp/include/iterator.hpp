@@ -1,5 +1,8 @@
 // Stupid template stupidity hatred burning like the fire of a thousand suns
 // forcing include hackery like some sort of stupid stupidity
+//
+// cog.hpp needs to be processed first, and includes iterator.hpp.  Need to 
+// keep this include outside of the shield because of that.
 #include "cog.hpp"
 
 #ifndef _ITERATOR_H_SHIELD
@@ -59,6 +62,19 @@ class IteratorBase {
     // Return true if there are no further tuples 
     virtual bool atEnd()    
       { std::cerr << "Unimplemented Iterator.atEnd()" << std::endl; exit(-1); }
+    
+    // toBuffer()
+    //
+    // Construct a sorted buffer from this.
+    Buffer<Tuple> toBuffer()
+    {
+      Buffer<Tuple> ret(new std::vector<Tuple>());
+      while(!atEnd()){
+        ret->push_back(get());
+        next();
+      }
+      return ret;
+    }
 
 };
 template <class Tuple>

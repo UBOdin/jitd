@@ -44,6 +44,7 @@ class JITD {
     
     void insert(Buffer<Tuple> records)
     {
+      
       // Create a template for the new root structure
       ConcatCog<Tuple> *newRootCog = new ConcatCog<Tuple>(
         CogHandle<Tuple>(NULL),
@@ -54,13 +55,19 @@ class JITD {
       // Define a new root handle to swap in
       CogHandle<Tuple> newRoot = makeHandle(newRootCog);
       
+      // Sync up the policy
+      RewritePolicy<Tuple> p = std::atomic_load(&policy);
+      
+      // Run pre-insertion operations as needed.
+      p->beforeInsert(root);
+      
       // As one atomic operation, perform:
       //   newRootCog->lhs = root
       //   root = newRoot
       swapInNewRoot(newRoot, newRootCog->lhs);
       
       // Run post-insertion operations as needed.
-      std::atomic_load(&policy)->afterInsert(newRoot);
+      p->afterInsert(newRoot);
     }
     
     // remove() exactly mirrors insert.
@@ -71,8 +78,10 @@ class JITD {
         CogHandle<Tuple>(NULL)
       );
       CogHandle<Tuple> newRoot = makeHandle(newRootCog);
+      RewritePolicy<Tuple> p = std::atomic_load(&policy);
+      p->beforeDelete(root);
       swapInNewRoot(newRoot, newRootCog->deleted);
-      std::atomic_load(&policy)->afterDelete(root);
+      p->afterDelete(newRoot);
     }
     
     void printDebug()
