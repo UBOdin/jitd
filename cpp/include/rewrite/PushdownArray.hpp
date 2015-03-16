@@ -88,16 +88,7 @@ template <class Tuple>
           ));
           return true;
           
-        } else if((lhs->type == COG_SORTED_ARRAY) && 
-                  (rhs->type == COG_SORTED_ARRAY)){
-          h->put(
-            CogPtr<Tuple>(
-              new SortedArrayCog<Tuple>(
-                cog->iterator(
-                  RewritePolicy<Tuple>(new RewritePolicyBase<Tuple>())
-                )->toBuffer())));
-          return true;
-        }
+        } 
 
       } else if(cog->type == COG_DELETE) {
         DeleteCog<Tuple> *delcog = ((DeleteCog<Tuple> *)cog.get());
@@ -182,20 +173,9 @@ template <class Tuple>
           ));
           return true;
           
-        } else if((source->type == COG_SORTED_ARRAY) && 
-                  (deleted->type == COG_SORTED_ARRAY)){
-          h->put(
-            CogPtr<Tuple>(
-              new SortedArrayCog<Tuple>(
-                cog->iterator(
-                  RewritePolicy<Tuple>(new RewritePolicyBase<Tuple>())
-                )->toBuffer())));
-          return true;
-        }
+        } 
         
       } // cog is a delete
       return false;
     } // pushdownArray()
 
-template<class Tuple>
-  void pushdownArrayVoid(CogHandle<Tuple> h) { pushdownArray(h); }

@@ -119,6 +119,7 @@ void cog_test(istream &input)
       stack.top()->printDebug(1);
     } else if(string("scan") == op) {
       CogHandle<Record> root = stack.top();
+      policy->beforeRootIterator(root);
       policy->beforeIterator(root);
       Iterator<Record> iter = root->iterator(policy);
       int row = 1;
@@ -133,6 +134,7 @@ void cog_test(istream &input)
       CogHandle<Record> root = stack.top();
       timeval start, end;
       gettimeofday(&start, NULL);
+      policy->beforeRootIterator(root);
       policy->beforeIterator(root);
       Iterator<Record> iter = root->iterator(policy);
       int row = 1;
@@ -182,14 +184,14 @@ void cog_test(istream &input)
 
     } else if(string("rec_pushdown_array") == op) {
 
-      recurTopDown<Record>(ref(pushdownArrayVoid<Record>), stack.top());
+      recurTopDown<Record>(ref(pushdownArray<Record>), stack.top());
 
     } else if(string("tgt_pushdown_array") == op) {
       Record target;
       toks >> target.key;
       target.value = NULL;
       
-      recurToTargetTopDown<Record>(ref(pushdownArrayVoid<Record>), target, stack.top());
+      recurToTargetTopDown<Record>(ref(pushdownArray<Record>), target, stack.top());
 
     ///////////////// POLICY OPERATIONS /////////////////
     } else if(string("policy") == op){

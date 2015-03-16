@@ -3,6 +3,7 @@ INCLUDE_PATH = include
 
 FILES = \
   src/data.o\
+  src/rwlock.o\
 	src/jitd_tester.o\
 	src/cog_tester.o
 

@@ -36,6 +36,7 @@ class JITD {
       
       // The policy may need to modify the root.  Call it here.
       RewritePolicy<Tuple> p = std::atomic_load(&policy);
+      p->beforeRootIterator(r);
       p->beforeIterator(r);
       
       // And grab an iterator on whatever falls out.
