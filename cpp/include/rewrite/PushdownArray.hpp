@@ -92,8 +92,10 @@ template <class Tuple>
                   (rhs->type == COG_SORTED_ARRAY)){
           h->put(
             CogPtr<Tuple>(
-              new SortedArrayCog(
-                cog->iterator()->toBuffer())));
+              new SortedArrayCog<Tuple>(
+                cog->iterator(
+                  RewritePolicy<Tuple>(new RewritePolicyBase<Tuple>())
+                )->toBuffer())));
           return true;
         }
 
@@ -180,12 +182,14 @@ template <class Tuple>
           ));
           return true;
           
-        } else if((lhs->type == COG_SORTED_ARRAY) && 
-                  (rhs->type == COG_SORTED_ARRAY)){
+        } else if((source->type == COG_SORTED_ARRAY) && 
+                  (deleted->type == COG_SORTED_ARRAY)){
           h->put(
             CogPtr<Tuple>(
-              new SortedArrayCog(
-                cog->iterator()->toBuffer())));
+              new SortedArrayCog<Tuple>(
+                cog->iterator(
+                  RewritePolicy<Tuple>(new RewritePolicyBase<Tuple>())
+                )->toBuffer())));
           return true;
         }
         

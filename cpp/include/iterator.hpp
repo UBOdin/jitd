@@ -70,7 +70,7 @@ class IteratorBase {
     {
       Buffer<Tuple> ret(new std::vector<Tuple>());
       while(!atEnd()){
-        ret->push_back(get());
+        ret->push_back(*get());
         next();
       }
       return ret;
