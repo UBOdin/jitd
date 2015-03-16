@@ -14,9 +14,23 @@ CPP_FLAGS = \
 
 CPP = g++ -I ${INCLUDE_PATH} -g $(CPP_FLAGS)
 
+all: driver workload_gen
+
 driver : ${FILES} src/driver.cpp 
 	@echo "Building Driver"
 	@${CPP} -o $@ $^
+
+workload_gen : src/workload.cpp
+	@echo "Building Workload Generator"
+	@${CPP} -o $@ $^
+
+workload/%.jitd : workload_gen
+	@if [ ! -d workload ] ; then mkdir workload; fi
+	@echo "Building Workload #" $$(basename $@ .jitd)
+	@./workload_gen > $@
+	@du -h $@
+
+workload : $(patsubst %,workload/%.jitd, 1 2 3 4)
 
 %.o : %.cpp
 	@echo Compiling $(patsubst src/%,%,$*)
@@ -37,7 +51,4 @@ clean :
 src/jitd_tester.o : ${HEADERS}
 src/cog_tester.o : ${HEADERS}
 
-foo: 
-	echo ${HEADERS}
-
-.PHONY: test clean build_test dep
+.PHONY: test clean build_test dep workload

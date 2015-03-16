@@ -19,11 +19,13 @@ class MergeIterator : public IteratorBase<Tuple> {
       policy->beforeIterator(rhs);
       rhsIter = rhs->iterator(policy);
       rhsDone = rhsIter->atEnd();
+      updateBest();
     }
     
     inline void updateBest() 
     {
-      lhsBest = ((!lhsDone) && (rhsDone || (lhsIter->get() < rhsIter->get())));
+      lhsBest = ((!lhsDone) && (rhsDone || (*lhsIter->get() < *rhsIter->get())));
+//      std::cerr << "Cmp: " << *lhsIter->get() << " ^^ " << *rhsIter->get() << std::endl;
     }
 
     void next()

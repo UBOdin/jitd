@@ -44,11 +44,22 @@ class DeleteIterator : public IteratorBase<Tuple> {
   
     inline void advanceWhileCurrentTupleIsInvalid()
     {
-      if(!sourceIter->atEnd()){ delIter->seek(*sourceIter->get()); }
-      while(!sourceIter->atEnd() && !sourceIter->atEnd() &&
+      if(!sourceIter->atEnd() && !delIter->atEnd()){ 
+        if(*delIter->get() < *sourceIter->get()){
+          delIter->seek(*sourceIter->get()); 
+        }
+//        std::cerr << "At : " << *sourceIter->get() << "<=>" << *delIter->get() << std::endl;
+      }
+      while(!sourceIter->atEnd() && !delIter->atEnd() &&
             (*sourceIter->get() == *delIter->get())){
         sourceIter->next();
-        delIter->seek(*sourceIter->get());
+        delIter->next();
+        if(*delIter->get() < *sourceIter->get()){
+          delIter->seek(*sourceIter->get());
+        }
+//        if(!sourceIter->atEnd() && !delIter->atEnd()){
+//          std::cerr << "Skip To : " << *sourceIter->get() << "<=>" << *delIter->get() << std::endl;
+//        }
       }
     }
 };

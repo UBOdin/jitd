@@ -75,6 +75,17 @@ class IteratorBase {
       }
       return ret;
     }
+    
+    // flush()
+    //
+    // Debug method: Flush all output to the designated ostream
+    void flush(std::ostream &o)
+    {
+      while(!atEnd()){
+        o << *get() << " ";
+        next();
+      }
+    }
 
 };
 template <class Tuple>

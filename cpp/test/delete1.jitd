@@ -1,0 +1,41 @@
+insert explicit 8 12 54 43 63
+insert explicit 13 8 92 17 23
+insert explicit 9 39 5 53 53
+insert explicit 63 89 68 24 17
+remove explicit 23 63 89 8 17
+insert explicit 86 9 58 51 59
+remove explicit 59 5 86 43 9
+remove explicit 17 12 24 54 92
+insert explicit 70 94 37 49 2
+remove explicit 2 9 94 49 39
+insert explicit 22 88 44 80 8
+insert explicit 13 98 34 57 52
+remove explicit 13 70 51 57 98
+policy cracker 5
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump
+scan flush
+dump

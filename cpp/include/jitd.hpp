@@ -76,22 +76,24 @@ class JITD {
     void remove(Buffer<Tuple> records)
     {
       DeleteCog<Tuple> *newRootCog = new DeleteCog<Tuple>(
+        nullptr,
         CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(
-          new ArrayCog<Tuple>(records)))),
-        nullptr
+          new ArrayCog<Tuple>(records))))
       );
       CogHandle<Tuple> newRoot = 
         CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(newRootCog)));
       RewritePolicy<Tuple> p = std::atomic_load(&policy);
       p->beforeDelete(root);
-      swapInNewRoot(newRoot, newRootCog->deleted);
+      swapInNewRoot(newRoot, newRootCog->source);
       p->afterDelete(newRoot);
     }
     
     void printDebug()
     {
-      std::cout << "gROOT [" << std::atomic_load(&policy)->name() << "]" << std::endl;
-      std::atomic_load(&root)->printDebug(1);
+      CogHandle<Tuple> r = std::atomic_load(&root);
+      std::cout << "gROOT [" << std::atomic_load(&policy)->name()
+                << "; " << r->size() << " elements]" << std::endl;
+      r->printDebug(1);
     }
     
     void setPolicy(RewritePolicy<Tuple> newPolicy)

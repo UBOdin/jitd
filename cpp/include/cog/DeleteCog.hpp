@@ -27,7 +27,7 @@ class DeleteCog : public Cog<Tuple>
     void printDebug(int depth)
     {
       Cog<Tuple>::printPrefix(depth);
-      std::cout << "DELETE" << std::endl;
+      std::cout << "Delete" << std::endl;
       source->printDebug(depth+1);
       deleted->printDebug(depth+1);
     }

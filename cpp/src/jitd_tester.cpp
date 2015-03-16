@@ -59,8 +59,11 @@ void jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
     istringstream toks(line);
     string op;
     
+    CASE_1("--") {
+      // comment, ignore
+      
     ///////////////// MUTATOR OPERATIONS /////////////////
-    CASE_1("insert") {
+    } CASE("insert") {
       jitd.insert(buffer_cmd(toks));
     } CASE("remove") {
       jitd.remove(buffer_cmd(toks));
@@ -77,7 +80,7 @@ void jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
         int minSize;
         toks >> minSize;
         jitd.setPolicy(
-          RewritePolicy<Record>(new CrackerPolicy<Record>(minSize))
+          RewritePolicy<Record>(new CrackerPolicy<Record>(true, 0, true, minSize))
         );
       }
       cout << "Now using policy: " << jitd.getPolicy()->name() << endl;
