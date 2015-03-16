@@ -30,13 +30,13 @@ template <class Tuple>
       if(rebuild){
         Buffer<Tuple> newBuff = cog->iterator(NAIVE_POLICY(Tuple))->toBuffer();
         
-        if(newBuff->size() != cog->size()){
-          std::cerr << "Invalid deletion" << std::endl;
-          std::cerr << "Result: ";
-          cog->iterator(NAIVE_POLICY(Tuple))->flush(std::cerr);
-          std::cerr << std::endl;
-          exit(-1);
-        }
+//        if(newBuff->size() != cog->size()){
+//          std::cerr << "Invalid deletion" << std::endl;
+//          std::cerr << "Result: ";
+//          cog->iterator(NAIVE_POLICY(Tuple))->flush(std::cerr);
+//          std::cerr << std::endl;
+//          exit(-1);
+//        }
         
         h->put(
           CogPtr<Tuple>(
