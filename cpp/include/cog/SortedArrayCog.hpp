@@ -3,6 +3,11 @@ class SortedArrayCog : public Cog<Tuple>
 {
   public:
     SortedArrayCog(
+      Buffer<Tuple> buffer
+    ) :
+      Cog<Tuple>(COG_SORTED_ARRAY), buffer(buffer), 
+      start(buffer->begin()), end(buffer->end()) {}
+    SortedArrayCog(
       Buffer<Tuple> buffer, 
       BufferElement<Tuple> start, 
       BufferElement<Tuple> end

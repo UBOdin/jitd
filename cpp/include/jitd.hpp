@@ -56,13 +56,19 @@ class JITD {
       CogHandle<Tuple> newRoot = 
         CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(newRootCog)));
       
+      // Sync up the policy
+      RewritePolicy<Tuple> p = std::atomic_load(&policy);
+      
+      // Run pre-insertion operations as needed.
+      p->beforeInsert(root);
+      
       // As one atomic operation, perform:
       //   newRootCog->lhs = root
       //   root = newRoot
       swapInNewRoot(newRoot, newRootCog->lhs);
       
       // Run post-insertion operations as needed.
-      std::atomic_load(&policy)->afterInsert(root);
+      p->afterInsert(root);
     }
     
     // remove() exactly mirrors insert.
@@ -75,8 +81,10 @@ class JITD {
       );
       CogHandle<Tuple> newRoot = 
         CogHandle<Tuple>(new CogHandleBase<Tuple>(CogPtr<Tuple>(newRootCog)));
+      RewritePolicy<Tuple> p = std::atomic_load(&policy);
+      p->beforeDelete(root);
       swapInNewRoot(newRoot, newRootCog->deleted);
-      std::atomic_load(&policy)->afterDelete(root);
+      p->afterDelete(newRoot);
     }
     
     void printDebug()
@@ -105,6 +113,7 @@ class JITD {
     ) {
       bool succeeded = false;
       while(!succeeded){
+        placeholder = root;
         succeeded = std::atomic_compare_exchange_strong(
           &root,        // This value gets atomically replaced...
           &placeholder, // ... if this is currently its value
