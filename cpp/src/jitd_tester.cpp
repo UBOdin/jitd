@@ -7,6 +7,7 @@
 #include <stack>
 #include <cstdlib>
 #include <algorithm>
+#include <thread>
 #include <sys/time.h>
 
 #include "jitd.hpp"
@@ -15,6 +16,23 @@
 
 using namespace std;
 using namespace std::placeholders;
+
+double total_time(timeval &start, timeval &end)
+{
+  return (end.tv_sec - start.tv_sec) * 1000000.0 +
+         (end.tv_usec - start.tv_usec); 
+}
+
+void run_test_thread(JITD<Record> *jitd, string file)
+{
+  ifstream in(file);
+  timeval start, end;
+  gettimeofday(&start, NULL);
+  cout << "Start[" << file << "]" << endl;
+  int t = jitd_test(*jitd, in, false);
+  gettimeofday(&end, NULL);
+  cout << "Time[" << file << "]: " << t << " s" << endl;
+}
 
 RecordBuffer buffer_cmd(istream &toks)
 {
@@ -42,18 +60,17 @@ RecordBuffer buffer_cmd(istream &toks)
   }
 }
 
-double total_time(timeval &start, timeval &end)
-{
-  return (end.tv_sec - start.tv_sec) * 1000000.0 +
-         (end.tv_usec - start.tv_usec); 
-}
-
 #define CASE_1(s) toks >> op; if(string(s) == op)
 #define CASE(s) else if(string(s) == op)
   
-void jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
+int jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
 {
   string line;
+  vector<thread> threads;
+  
+  timeval global_start, global_end;
+  gettimeofday(&global_start, NULL);
+  
   if(interactive) { cout << "jitd> "; cout.flush(); }
   while(getline(input, line)){
     istringstream toks(line);
@@ -137,6 +154,55 @@ void jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
           iter->seek(target);
         }
       }
+    } CASE("random_scan") {
+      int time_in_sec, max_key, key_cnt;
+      long int scan_count = 0;
+      timeval start, end;
+      Record target;
+      target.value = NULL;
+      toks >> time_in_sec >> max_key >> key_cnt;
+      gettimeofday(&start, NULL);
+      gettimeofday(&end, NULL);
+      
+      cout << "Scanning for " << time_in_sec << " s in [0,"
+           << max_key << ") -> " << key_cnt << " keys/read" << endl;
+      while(total_time(start, end) < time_in_sec*1000*1000){
+        Iterator<Record> iter = jitd.iterator();
+        target.key = rand() % max_key;
+        iter->seek(target);
+        for(; key_cnt > 0; key_cnt--) { iter->next(); }
+        scan_count++;
+        
+        gettimeofday(&end, NULL);
+      }
+      cout << "Random Scan: " << scan_count << " scans over "
+           << total_time(start, end)/(1000*1000) << " s" << endl 
+           << "Rate: " 
+             << ((1000*1000*scan_count) / total_time(start, end))
+             << " scans/sec" << endl;
+    
+    } CASE("spawn") {
+      string file;
+      toks >> file;
+      threads.emplace_back(run_test_thread, &jitd, file);
+
+    } CASE("run") {
+      string file;
+      toks >> file;
+      run_test_thread(&jitd, file);
+
+    } CASE("time") {
+      timeval end; 
+      gettimeofday(&end, NULL);
+      cout << "Time now: " << total_time(global_start, end)/(1000*1000) << endl;
+    
+    } CASE("sleep") {
+      int ms;
+      toks >> ms;
+      this_thread::sleep_for(chrono::milliseconds(ms));
+      
+    } CASE("size") {
+      cout << jitd.size() << " records" << endl;
     } CASE("dump") {
       jitd.printDebug();
       
@@ -147,4 +213,11 @@ void jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
     }
     if(interactive) { cout << "jitd> "; cout.flush(); }
   }
+  gettimeofday(&global_end, NULL);
+  
+  vector<thread>::iterator th;
+  for(th = threads.begin(); th < threads.end(); ++th){
+    th->join();
+  }
+  return total_time(global_start, global_end) / (1000*1000);
 }

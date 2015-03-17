@@ -1,0 +1,22 @@
+policy cracker 10000
+run workload/1small.jitd
+dump
+scan seek 315 quiet_next 1000
+dump
+scan seek 315 quiet_next 1000
+dump
+scan seek 315 quiet_next 1000
+dump
+scan seek 315 quiet_next 1000
+dump
+scan seek 315 quiet_next 1000
+-- random_scan 10 100000000 1000
+-- random_scan 10 100000000 1000
+dump
+-- random_scan 10 100000000 1000
+-- random_scan 10 100000000 1000
+-- random_scan 10 100000000 1000
+-- random_scan 10 100000000 1000
+-- random_scan 10 100000000 1000
+-- random_scan 10 100000000 1000
+-- size

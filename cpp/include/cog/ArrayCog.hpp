@@ -33,23 +33,30 @@ class ArrayCog : public Cog<Tuple>
       { return start; }
     BufferElement<Tuple> getEnd()
       { return end; }
-    CogPtr<Tuple> splitCog(const Tuple &pivot)
+    inline std::pair<CogPtr<Tuple>,CogPtr<Tuple>> splitCogs(const Tuple &pivot)
     {
       std::pair<Buffer<Tuple>,Buffer<Tuple>> splits = split(pivot);
-      CogPtr<Tuple> lhs(
-          new ArrayCog<Tuple>(
-            splits.first, 
-            splits.first->begin(), 
-            splits.first->end()
-          ));
-      CogPtr<Tuple> rhs(
-          new ArrayCog<Tuple>(
-            splits.second, 
-            splits.second->begin(), 
-            splits.second->end()
-          ));
-      CogHandle<Tuple> lhsH(new CogHandleBase<Tuple>(lhs));
-      CogHandle<Tuple> rhsH(new CogHandleBase<Tuple>(rhs));
+      std::pair<CogPtr<Tuple>,CogPtr<Tuple>> ret(
+        CogPtr<Tuple>(
+            new ArrayCog<Tuple>(
+              splits.first, 
+              splits.first->begin(), 
+              splits.first->end()
+            )),
+        CogPtr<Tuple>(
+            new ArrayCog<Tuple>(
+              splits.second, 
+              splits.second->begin(), 
+              splits.second->end()
+            ))
+      );
+      return ret;
+    }
+    CogPtr<Tuple> splitCog(const Tuple &pivot)
+    {
+      std::pair<CogPtr<Tuple>,CogPtr<Tuple>> splits = splitCogs(pivot);
+      CogHandle<Tuple> lhsH(new CogHandleBase<Tuple>(splits.first));
+      CogHandle<Tuple> rhsH(new CogHandleBase<Tuple>(splits.second));
       return CogPtr<Tuple>(new BTreeCog<Tuple>(lhsH, rhsH, pivot));
     }
     CogPtr<Tuple> sortedCog()

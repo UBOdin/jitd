@@ -16,11 +16,11 @@ class CrackerPolicy : public RewritePolicyBase <Tuple>
   
   public:
     CrackerPolicy() : 
-      minSize(DEFAULT_CRACKER_LEAF_SIZE), pushdownArr(false), 
-      inlineArr(-1), balanceBT(false) {}
+      minSize(DEFAULT_CRACKER_LEAF_SIZE), pushdownArr(true), 
+      inlineArr(DEFAULT_CRACKER_LEAF_SIZE), balanceBT(true) {}
     CrackerPolicy(int minSize) : 
-      minSize(minSize), pushdownArr(false), 
-      inlineArr(-1), balanceBT(false) {}
+      minSize(minSize), pushdownArr(true), 
+      inlineArr(minSize), balanceBT(true) {}
     CrackerPolicy(bool pushdownArr, int inlineArr, bool balanceBT) : 
       minSize(DEFAULT_CRACKER_LEAF_SIZE), pushdownArr(pushdownArr), 
       inlineArr(inlineArr), balanceBT(balanceBT) {}
@@ -29,7 +29,12 @@ class CrackerPolicy : public RewritePolicyBase <Tuple>
       inlineArr(inlineArr), balanceBT(balanceBT) {}
     
     std::string name()
-      { return std::string("Cracker"); }
+      { return std::string("Cracker[ ")+
+               (pushdownArr ? std::string("pushdown ") : std::string("")) +
+               (balanceBT ? std::string("balance ") : std::string("")) +
+               ((inlineArr >= 0) ? std::string("inline ") : std::string("")) +
+               std::string("]");
+      }
     void beforeIterator(CogHandle<Tuple> node)
     {
       if(pushdownArr){ pushdownArray(node); }

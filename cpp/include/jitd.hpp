@@ -96,6 +96,11 @@ class JITD {
       r->printDebug(1);
     }
     
+    int size()
+    {
+      return std::atomic_load(&root)->size();
+    }
+    
     void setPolicy(RewritePolicy<Tuple> newPolicy)
     {
       std::atomic_store(&policy, newPolicy);

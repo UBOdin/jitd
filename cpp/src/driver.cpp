@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 {
   istream *src;
   TestMode mode = JITD_TEST;
-  int i;
+  int i, t = 0;
   bool interactive;
   JITD<Record> jitd;
   
@@ -45,7 +45,8 @@ int main(int argc, char **argv)
           cog_test(*src);
           break;
         case JITD_TEST:
-          jitd_test(jitd, *src, interactive);
+          t = jitd_test(jitd, *src, interactive);
+          cout << "Time[" << argv[i] << "]: " << t << " s" << endl;
           break;
       }
     }

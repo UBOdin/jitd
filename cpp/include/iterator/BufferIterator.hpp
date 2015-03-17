@@ -31,10 +31,10 @@ class BufferIterator : public IteratorBase<Tuple> {
         high += d;
         d *= 2;
       }
-      BufferElement<Tuple> temp = lower_bound(curr, high, k);
-
-      // make sure we don't move backwards in the list.
-      if(temp > curr){ curr = temp; }
+      if(high > end){ high = end; }
+      if(curr < high){
+        BufferElement<Tuple> temp = lower_bound(curr, high, k);
+      }
     }
 
     bool atEnd()

@@ -14,6 +14,6 @@ RecordCogHandle build_random_array(int len, int max);
 RecordCogHandle build_random_sorted_array(int len, int max);
 
 void cog_test(std::istream &input);
-void jitd_test(JITD<Record> &jitd, std::istream &input, bool interactive);
+int jitd_test(JITD<Record> &jitd, std::istream &input, bool interactive);
 
 #endif // _TEST_H_SHIELD

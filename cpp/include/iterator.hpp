@@ -76,6 +76,16 @@ class IteratorBase {
       return ret;
     }
     
+    Buffer<Tuple> toBuffer(Tuple &max)
+    {
+      Buffer<Tuple> ret(new std::vector<Tuple>());
+      while(!atEnd() && (*get() < max)){
+        ret->push_back(*get());
+        next();
+      }
+      return ret;
+    }
+    
     // flush()
     //
     // Debug method: Flush all output to the designated ostream
