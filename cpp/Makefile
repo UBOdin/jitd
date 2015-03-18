@@ -30,7 +30,7 @@ workload/%.jitd : workload_gen
 	@./workload_gen > $@
 	@du -h $@
 
-workload : $(patsubst %,workload/%.jitd, 1 2 3 4)
+workload : $(patsubst %,workload/%.jitd, 1)
 
 %.o : %.cpp
 	@echo Compiling $(patsubst src/%,%,$*)
