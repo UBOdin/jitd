@@ -19,9 +19,7 @@ int main(int argc, char** argv)
   for(op = 0; op < op_count; op++)
   {
     if(op % 100 == 0){ cerr << "." << op; cerr.flush(); }
-    if((values.size() < low_mark) || 
-       ((rand() % diff_mark) < values.size() - low_mark))
-    {
+    if((rand() % diff_mark) > values.size() - low_mark){
       int i;
       cout << "insert explicit";
       for(i = 0; i < batch_size; i++){

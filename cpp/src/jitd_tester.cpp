@@ -23,13 +23,13 @@ double total_time(timeval &start, timeval &end)
          (end.tv_usec - start.tv_usec); 
 }
 
-void run_test_thread(JITD<Record> *jitd, string file)
+void run_test_thread(JITD<Record> *jitd, string file, int per_op_sleep_ms)
 {
   ifstream in(file);
   timeval start, end;
   gettimeofday(&start, NULL);
   cout << "Start[" << file << "]" << endl;
-  int t = jitd_test(*jitd, in, false);
+  int t = jitd_test(*jitd, in, false, per_op_sleep_ms);
   gettimeofday(&end, NULL);
   cout << "Time[" << file << "]: " << t << " s" << endl;
 }
@@ -63,8 +63,12 @@ RecordBuffer buffer_cmd(istream &toks)
 #define CASE_1(s) toks >> op; if(string(s) == op)
 #define CASE(s) else if(string(s) == op)
   
-int jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
-{
+int jitd_test(
+  JITD<Record> &jitd, 
+  istream &input, 
+  bool interactive, 
+  int per_op_sleep_ms
+) {
   string line;
   vector<thread> threads;
   
@@ -97,7 +101,7 @@ int jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
         int minSize;
         toks >> minSize;
         jitd.setPolicy(
-          RewritePolicy<Record>(new CrackerPolicy<Record>(true, 0, true, minSize))
+          RewritePolicy<Record>(new CrackerPolicy<Record>(true, minSize, true, minSize))
         );
       }
       cout << "Now using policy: " << jitd.getPolicy()->name() << endl;
@@ -184,12 +188,18 @@ int jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
     } CASE("spawn") {
       string file;
       toks >> file;
-      threads.emplace_back(run_test_thread, &jitd, file);
+      threads.emplace_back(run_test_thread, &jitd, file, 0);
+
+    } CASE("spawn_slow") {
+      int delay_ms;
+      string file;
+      toks >> delay_ms >> file;
+      threads.emplace_back(run_test_thread, &jitd, file, delay_ms);
 
     } CASE("run") {
       string file;
       toks >> file;
-      run_test_thread(&jitd, file);
+      run_test_thread(&jitd, file, per_op_sleep_ms);
 
     } CASE("time") {
       timeval end; 
@@ -212,6 +222,9 @@ int jitd_test(JITD<Record> &jitd, istream &input, bool interactive)
       exit(-1);
     }
     if(interactive) { cout << "jitd> "; cout.flush(); }
+    if(per_op_sleep_ms > 0){ 
+      this_thread::sleep_for(chrono::milliseconds(per_op_sleep_ms));
+    }
   }
   gettimeofday(&global_end, NULL);
   

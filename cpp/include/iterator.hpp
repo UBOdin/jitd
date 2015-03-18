@@ -86,6 +86,16 @@ class IteratorBase {
       return ret;
     }
     
+    Buffer<Tuple> toBuffer(int cnt)
+    {
+      Buffer<Tuple> ret(new std::vector<Tuple>());
+      while(!atEnd() && (--cnt >= 0)){
+        ret->push_back(*get());
+        next();
+      }
+      return ret;
+    }
+    
     // flush()
     //
     // Debug method: Flush all output to the designated ostream

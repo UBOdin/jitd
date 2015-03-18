@@ -3,7 +3,7 @@
 #define _POLICY_CRACKER_H_SHIELD
 
 #ifndef DEFAULT_CRACKER_LEAF_SIZE
-#define DEFAULT_CRACKER_LEAF_SIZE 10000
+#define DEFAULT_CRACKER_LEAF_SIZE 10001
 #endif
 
 template <class Tuple>
@@ -17,15 +17,15 @@ class CrackerPolicy : public RewritePolicyBase <Tuple>
   public:
     CrackerPolicy() : 
       minSize(DEFAULT_CRACKER_LEAF_SIZE), pushdownArr(true), 
-      inlineArr(DEFAULT_CRACKER_LEAF_SIZE), balanceBT(true) {}
+      inlineArr(DEFAULT_CRACKER_LEAF_SIZE), balanceBT(false) {}
     CrackerPolicy(int minSize) : 
       minSize(minSize), pushdownArr(true), 
-      inlineArr(minSize), balanceBT(true) {}
+      inlineArr(minSize), balanceBT(false) {}
     CrackerPolicy(bool pushdownArr, int inlineArr, bool balanceBT) : 
       minSize(DEFAULT_CRACKER_LEAF_SIZE), pushdownArr(pushdownArr), 
       inlineArr(inlineArr), balanceBT(balanceBT) {}
     CrackerPolicy(bool pushdownArr, int inlineArr, bool balanceBT, int minSize) : 
-      minSize(DEFAULT_CRACKER_LEAF_SIZE), pushdownArr(pushdownArr), 
+      minSize(minSize), pushdownArr(pushdownArr), 
       inlineArr(inlineArr), balanceBT(balanceBT) {}
     
     std::string name()

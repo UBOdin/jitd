@@ -1,10 +1,14 @@
 
 
 template <class Tuple>
-  bool inlineArray(int bt_merge_threshold, CogHandle<Tuple> h)
-    {
+  bool inlineArray(
+    int bt_merge_threshold, 
+    int bt_split_threshold, 
+    CogHandle<Tuple> h
+  ){
       auto cog = h->get();
       bool rebuild = false;
+      
       
       switch(cog->type) {
         case COG_CONCAT: 
@@ -28,22 +32,41 @@ template <class Tuple>
       }
       
       if(rebuild){
-        Buffer<Tuple> newBuff = cog->iterator(NAIVE_POLICY(Tuple))->toBuffer();
-        
-//        if(newBuff->size() != cog->size()){
-//          std::cerr << "Invalid deletion" << std::endl;
-//          std::cerr << "Result: ";
-//          cog->iterator(NAIVE_POLICY(Tuple))->flush(std::cerr);
-//          std::cerr << std::endl;
-//          exit(-1);
-//        }
-        
-        h->put(
-          CogPtr<Tuple>(
-            new SortedArrayCog<Tuple>(newBuff)
-          )
-        );
+        if((bt_split_threshold <= 0) || (cog->size() < bt_split_threshold)){
+          Buffer<Tuple> newBuff = cog->iterator(NAIVE_POLICY(Tuple))->toBuffer();
+          
+          h->put(
+            CogPtr<Tuple>(
+              new SortedArrayCog<Tuple>(newBuff)
+            )
+          );
+        } else {
+          Iterator<Tuple> i = cog->iterator(NAIVE_POLICY(Tuple));
+          Buffer<Tuple> newBuff = i->toBuffer(bt_split_threshold);
+          CogPtr<Tuple> root(
+              new SortedArrayCog<Tuple>(newBuff)
+            );
+          while(!i->atEnd()){
+            BufferElement<Tuple> sep = i->get();
+            newBuff = i->toBuffer(bt_split_threshold);
+            CogPtr<Tuple> oldRoot = root;
+            root = CogPtr<Tuple>(
+              new BTreeCog<Tuple>(
+                CogHandle<Tuple>(new CogHandleBase<Tuple>(oldRoot)),
+                makeHandle(new SortedArrayCog<Tuple>(newBuff)),
+                *sep
+              )
+            );
+          }
+          h->put(root);
+        }
       }
     
       return rebuild;
     }
+
+
+template <class Tuple>
+  bool inlineArray(int bt_target_size, CogHandle<Tuple> h) {
+    return inlineArray(bt_target_size, bt_target_size, h);
+  }

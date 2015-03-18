@@ -45,7 +45,7 @@ int main(int argc, char **argv)
           cog_test(*src);
           break;
         case JITD_TEST:
-          t = jitd_test(jitd, *src, interactive);
+          t = jitd_test(jitd, *src, interactive, 0);
           cout << "Time[" << argv[i] << "]: " << t << " s" << endl;
           break;
       }

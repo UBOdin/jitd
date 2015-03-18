@@ -1,22 +1,17 @@
-policy cracker 10000
-run workload/1small.jitd
+policy cracker 1000000
+spawn_slow 100 workload/1.jitd
+spawn test/scan_for_1_min.jitd
+-- spawn test/scan_for_1_min.jitd
 dump
-scan seek 315 quiet_next 1000
+sleep 10000
 dump
-scan seek 315 quiet_next 1000
+sleep 10000
 dump
-scan seek 315 quiet_next 1000
+sleep 10000
 dump
-scan seek 315 quiet_next 1000
+sleep 10000
 dump
-scan seek 315 quiet_next 1000
--- random_scan 10 100000000 1000
--- random_scan 10 100000000 1000
+sleep 10000
 dump
--- random_scan 10 100000000 1000
--- random_scan 10 100000000 1000
--- random_scan 10 100000000 1000
--- random_scan 10 100000000 1000
--- random_scan 10 100000000 1000
--- random_scan 10 100000000 1000
--- size
+sleep 10000
+dump
