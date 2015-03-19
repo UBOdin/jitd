@@ -37,27 +37,11 @@ void run_update_thread(
   timeval global_start, start, end;
   long int del_step = 0;
   mt19937 ins_rand(seed);
-  mt19937 del_rand[] = {
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed),
-    mt19937(seed)
-  };
+  mt19937 del_rand(seed);
   int i;
   long int tot_cnt = 0;
   long int delta_mark = high_mark - low_mark;
-  
-  // stagger the deletion PRNGs
-  for(i = 1; i < 10; i++){
-    del_rand[i].discard(i);
-  }
-  
+    
   gettimeofday(&global_start, NULL);
   cout << "Start Updates [" << low_mark << "--" << high_mark << "] by " << size
        << "; every " << per_op_sleep_ms << " ms for " << runtime_ms << "ms" << endl;
@@ -77,9 +61,7 @@ void run_update_thread(
       // delete
       RecordBuffer buff = RecordBuffer(new vector<Record>);
       for(i = 0; i < size; i++){
-        buff->emplace_back(del_rand[del_step]() % max_key);
-        del_rand[del_step].discard(10);
-        del_step = (del_step + 1) % 10;
+        buff->emplace_back(del_rand() % max_key);
       }
       jitd->remove(buff);
       tot_cnt -= size;
