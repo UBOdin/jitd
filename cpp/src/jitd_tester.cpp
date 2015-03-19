@@ -13,7 +13,8 @@
 
 #include "jitd.hpp"
 #include "test.hpp"
-#include "policy/cracker.hpp"
+#include "policy/Cracker.hpp"
+#include "policy/Inline.hpp"
 
 using namespace std;
 using namespace std::placeholders;
@@ -157,6 +158,10 @@ int jitd_test(
         toks >> minSize;
         jitd.setPolicy(
           RewritePolicy<Record>(new CrackerPolicy<Record>(true, minSize, true, minSize))
+        );
+      } else if(string("inline") == policyName){
+        jitd.setPolicy(
+          RewritePolicy<Record>(new InlinePolicy<Record>())
         );
       }
       cout << "Now using policy: " << jitd.getPolicy()->name() << endl;
