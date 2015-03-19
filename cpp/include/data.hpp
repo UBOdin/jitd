@@ -18,6 +18,10 @@ struct Record {
   Key   key;
   Value value;
   
+  Record(Key key, Value _value) : key(key) { value = _value; }
+  Record(Key key) : key(key) { value = (void *)0xdeadbeef; }
+  Record() : key(0) { value = NULL; }
+  
   bool operator>(const Record &other) const {
     return key > other.key;
   }

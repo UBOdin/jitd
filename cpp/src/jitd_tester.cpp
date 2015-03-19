@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <thread>
+#include <random>
 #include <sys/time.h>
 
 #include "jitd.hpp"
@@ -21,6 +22,78 @@ double total_time(timeval &start, timeval &end)
 {
   return (end.tv_sec - start.tv_sec) * 1000000.0 +
          (end.tv_usec - start.tv_usec); 
+}
+
+void run_update_thread(
+  JITD<Record> *jitd, 
+  Key max_key,
+  int size, 
+  long int low_mark, 
+  long int high_mark, 
+  int seed, 
+  int per_op_sleep_ms,
+  int runtime_ms
+){
+  timeval global_start, start, end;
+  long int del_step = 0;
+  mt19937 ins_rand(seed);
+  mt19937 del_rand[] = {
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed),
+    mt19937(seed)
+  };
+  int i;
+  long int tot_cnt = 0;
+  long int delta_mark = high_mark - low_mark;
+  
+  // stagger the deletion PRNGs
+  for(i = 1; i < 10; i++){
+    del_rand[i].discard(i);
+  }
+  
+  gettimeofday(&global_start, NULL);
+  cout << "Start Updates [" << low_mark << "--" << high_mark << "] by " << size
+       << "; every " << per_op_sleep_ms << " ms for " << runtime_ms << "ms" << endl;
+  do {
+    
+    gettimeofday(&start, NULL);
+    if((rand() % delta_mark) > (tot_cnt - low_mark)){
+      // insert
+      RecordBuffer buff = RecordBuffer(new vector<Record>);
+      for(i = 0; i < size; i++){
+        buff->emplace_back(ins_rand() % max_key);
+      }
+      jitd->insert(buff);
+      tot_cnt += size;
+      
+    } else {
+      // delete
+      RecordBuffer buff = RecordBuffer(new vector<Record>);
+      for(i = 0; i < size; i++){
+        buff->emplace_back(del_rand[del_step]() % max_key);
+        del_rand[del_step].discard(10);
+        del_step = (del_step + 1) % 10;
+      }
+      jitd->remove(buff);
+      tot_cnt -= size;
+      
+    }
+    
+    gettimeofday(&end, NULL);
+    this_thread::sleep_for(chrono::milliseconds(
+      per_op_sleep_ms - int(total_time(start, end) / 1000)
+    ));
+  } while(total_time(global_start, end) < 1000 * runtime_ms);
+  cout << "End Updates" << endl;
+  
+  
 }
 
 void run_test_thread(JITD<Record> *jitd, string file, int per_op_sleep_ms)
@@ -159,18 +232,18 @@ int jitd_test(
         }
       }
     } CASE("random_scan") {
-      int time_in_sec, max_key, key_cnt;
+      int time_in_ms, max_key, key_cnt;
       long int scan_count = 0;
       timeval start, end;
       Record target;
       target.value = NULL;
-      toks >> time_in_sec >> max_key >> key_cnt;
+      toks >> time_in_ms >> max_key >> key_cnt;
       gettimeofday(&start, NULL);
       gettimeofday(&end, NULL);
       
-      cout << "Scanning for " << time_in_sec << " s in [0,"
+      cout << "Scanning for " << time_in_ms << " s in [0,"
            << max_key << ") -> " << key_cnt << " keys/read" << endl;
-      while(total_time(start, end) < time_in_sec*1000*1000){
+      while(total_time(start, end) < time_in_ms*1000){
         Iterator<Record> iter = jitd.iterator();
         target.key = rand() % max_key;
         iter->seek(target);
@@ -195,6 +268,19 @@ int jitd_test(
       string file;
       toks >> delay_ms >> file;
       threads.emplace_back(run_test_thread, &jitd, file, delay_ms);
+    
+    } CASE("spawn_updates") {
+      Key max_key;
+      int size;
+      long int low_mark;
+      long int high_mark;
+      int seed = 42;
+      int per_op_sleep_ms;
+      int runtime_ms;
+      
+      toks >> max_key >> size >> low_mark >> high_mark >> per_op_sleep_ms >> runtime_ms;
+      
+      threads.emplace_back(run_update_thread, &jitd, max_key, size, low_mark, high_mark, seed, per_op_sleep_ms, runtime_ms);
 
     } CASE("run") {
       string file;
