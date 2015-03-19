@@ -1,15 +1,12 @@
 
 
 FILES = \
-	src/PrettyFormat\
-	src/Var\
-	src/Cog\
-	src/diesel/Diesel
+	src/JITD
 
 LIBS = str
 
-LEXERS = src/diesel/DieselLexer
-PARSERS = src/diesel/DieselParser
+LEXERS  = src/parser/JITDLexer
+PARSERS = src/parser/JITDParser
 
 AUTOGENFILES = \
 	$(patsubst %.mly, %, $(PARSERS))\

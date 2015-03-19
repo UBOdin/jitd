@@ -1,5 +1,5 @@
 {
-open DieselParser;;
+open JITDParser;;
 
 module StrMap = Map.Make(String);;
 
@@ -22,17 +22,21 @@ let keywords = List.fold_left
   (fun map (a,b) -> StrMap.add (String.uppercase a) b map)
   StrMap.empty
   [
-    ( "CASE",     CASE );
-    ( "WHEN",     WHEN );
-    ( "THEN",     THEN );
-    ( "END",      END );
-    ( "LET",      LET );
-    ( "IN",       IN );
-    ( "BUILD",    BUILD );
+    ( "RULE",     RULE );
+    ( "COG",      COG );
+    ( "IS",       IS );
     ( "APPLY",    APPLY );
-    ( "TRUE",     TRUE );
-    ( "FALSE",    FALSE );
-    ( "ISA",      ISA );
+    ( "TO",       TO );
+    ( "DONE",     DONE );
+    ( "LET",      LET );
+    ( "REWRITE",  REWRITE );
+    ( "IF",       IF );
+    ( "THEN",     THEN );
+    ( "ELSE",     ELSE );
+    ( "MATCH",    MATCH );
+    ( "WITH",     WITH );
+    ( "TRUE",     BOOLCONST(true) );
+    ( "FALSE",    BOOLCONST(false) );
   ];;
 }
 
@@ -49,8 +53,8 @@ rule token = parse
   | ','                  { COMMA }
   | "|"                  { PIPE }
   | '_'                  { UNDERSCORE }
-  | "@"                  { AT }
   | ":="                 { ASSIGN }
+  | "=>"                 { IMPLIES }
   | '.'                  { PERIOD }
   | ':'                  { COLON }
   | "=="                 { EQ }
@@ -65,6 +69,7 @@ rule token = parse
   | "-"                  { SUB }
   | "*"                  { MULT }
   | "/"                  { DIV }
+  | "@{"                 { CBLOCK(cblock 0 lexbuf) }
   | (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as s
                          { 
                           if StrMap.mem (String.uppercase s) keywords 
@@ -76,15 +81,15 @@ rule token = parse
                          { FLOATCONST(float_of_string f) }
   | (['0' - '9']+) as i  { INTCONST(int_of_string i) }
   | eof                  { EOF }
-  | _                    { raise (Diesel.ParseError("Unexpected character",
-                                                    lexbuf.Lexing.lex_curr_p)) }
+  | _                    { raise (JITD.ParseError("Unexpected character",
+                                                      lexbuf.Lexing.lex_curr_p)) }
 
 and cblock depth = parse
   | '{'                  { "{"^(cblock (depth+1) lexbuf) }
   | '}'                  { (if depth > 1 then "}"^(cblock (depth-1) lexbuf) else "") }
   | [^'}']+ as s         { s^(cblock depth lexbuf) }
-  | eof                  { raise (Diesel.ParseError("unterminated C block", 
-                                                    lexbuf.Lexing.lex_curr_p)) }
+  | eof                  { raise (JITD.ParseError("unterminated C block", 
+                                                      lexbuf.Lexing.lex_curr_p)) }
 and string_literal = parse
   | "\\\""               { "\""^(string_literal lexbuf) }
   | [^'"']+ as s         { s^(string_literal lexbuf) }

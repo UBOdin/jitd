@@ -1,0 +1,73 @@
+
+cog ArrayCog(buffer buff);
+cog SortedArrayCog(buffer buff);
+cog BTreeCog(cog lhs, cog rhs, record sep);
+cog ConcatCog(cog lhs, cog rhs);
+cog DeleteCog(cog source, cog deleted);
+
+rule Recur(rule op) is
+  | x:ArrayCog       => done
+  | x:SortedArrayCog => done
+  | BTreeCog(lhs, rhs, sep) => {
+      apply op to lhs;
+      apply op to rhs
+    }
+  | ConcatCog(lhs, rhs) => {
+      apply op to lhs;
+      apply op to rhs
+    }
+  | DeleteCog(source, deleted) => {
+      apply op to source;
+      apply op to deleted
+    }
+;
+
+rule RecurToTarget(rule op, record target) is
+  | x:ArrayCog       => done
+  | x:SortedArrayCog => done
+  | BTreeCog(lhs, rhs, sep) => {
+      if( target < sep ) {
+        apply op to lhs
+      } else {
+        apply op to rhs
+      }
+    }
+  | ConcatCog(lhs, rhs) => {
+      apply op to lhs;
+      apply op to rhs
+    }
+  | DeleteCog(source, deleted) => {
+      apply op to source;
+      apply op to deleted
+    }
+;
+
+rule RecurTopDown(rule op) is 
+  | x => {
+    apply op to x;
+    apply Recur(RecurTopDown(op)) to x
+  }
+;
+
+
+rule RecurBottomUp(rule op) is 
+  | x => {
+    apply Recur(RecurBottomUp(op)) to x;
+    apply op to x
+  }
+;
+
+rule RecurToTargetTopDown(rule op, record target) is 
+  | x => {
+    apply op to x;
+    apply RecurToTarget(RecurToTargetTopDown(op, target), target) to x
+  }
+;
+
+rule RecurToTargetBottomUp(rule op, record target) is 
+  | x => {
+    apply RecurToTarget(RecurToTargetBottomUp(op, target), target) to x;
+    apply op to x
+  }
+;
+
