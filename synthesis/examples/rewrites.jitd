@@ -105,7 +105,7 @@ rule SplitOrSortArray(int minSize) is
 ;
 
 policy DumbCracker(int minSize) is
-  on BeginIterator(x) => {
+  on BeginIterator(x) => 
     apply SplitOrSortArray(minSize) to x
-  }
+  
 ;

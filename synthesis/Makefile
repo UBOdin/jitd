@@ -1,7 +1,8 @@
 
 
 FILES = \
-	src/JITD
+	src/JITD \
+	src/Optimizer 
 
 LIBS = str
 
@@ -57,3 +58,7 @@ test: jitd
 
 .PHONY: all clean test
 
+##########
+
+src/parser/JITDLexer.cmo: src/JITD.cmo
+src/parser/JITDParser.cmo: src/JITD.cmo

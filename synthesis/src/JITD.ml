@@ -86,6 +86,27 @@ let rec binop_list (op:bin_op_t): (expr_t -> expr_t list) = function
 let mk_or a b  =  Or((or_list a)  @ (or_list b))
 let mk_and a b = And((and_list a) @ (and_list b))
 
+let get_rule (p:program_t) (name:string): rule_t =
+  List.find (fun (rule_name, _, _) -> name == rule_name) p.rules
+
+let stmt_children (f:stmt_t -> stmt_t list) = function
+  | Apply _             -> []
+  | Let _               -> []
+  | Rewrite _           -> []
+  | IfThenElse(_, t, e) -> [t, e]
+  | Match(_,pat_stmt)   -> List.map snd pat_stmt
+  | Block(stmts)        -> stmts
+  | NoOp                -> []
+
+let rebuild_stmt (old:stmt_t) (new_children:stmt_t list) = function
+  | IfThenElse(c, _, _) -> IfThenElse(c, List.nth new_children 0, 
+                                         List.nth new_children 1)
+  | Match(tgt,pat_stmt) -> Match(tgt, List.map2 (fun old new -> (fst old, snd new))
+                                                pat_stmt new_children)
+  | Block(_)            -> Block(new_children)
+  | x -> x
+
+
 let string_of_var ((ref,t):var_t) = t ^ " " ^ ref
 let string_of_cog ((c,vs):cog_t) = 
   ("cog "^c ^ "(" ^ (String.concat "," (List.map string_of_var vs)) ^ ");")
