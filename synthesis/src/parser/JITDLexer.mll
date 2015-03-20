@@ -23,7 +23,9 @@ let keywords = List.fold_left
   StrMap.empty
   [
     ( "RULE",     RULE );
+    ( "POLICY",   POLICY );
     ( "COG",      COG );
+    ( "ON",       ON );
     ( "IS",       IS );
     ( "APPLY",    APPLY );
     ( "TO",       TO );

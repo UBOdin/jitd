@@ -71,3 +71,41 @@ rule RecurToTargetBottomUp(rule op, record target) is
   }
 ;
 
+rule SplitArray(record target) is
+  | Array(buff) => {
+    let auto buff_pair := @{ buff->split(target) };
+    let buffer a := @{ buff_pair.first };
+    let buffer b := @{ buff_pair.second };
+    rewrite BTree(Array(a), Array(b), target)
+  }
+;
+
+rule SplitArrayRandom is
+  | x => {
+    let record target := @{ buff->randomElement() };
+    apply SplitArray(target) to x
+  }
+;
+
+rule SortArray is
+  | Array(buff) => {
+    let buffer sorted := @{ buff->sort() };
+    rewrite SortedArray(sorted)
+  }
+;
+
+rule SplitOrSortArray(int minSize) is
+  | x:Array => {
+    if ( @{ x->size() } <= minSize ) {
+      apply SortArray to x
+    } else {
+      apply SplitArrayRandom to x
+    }
+  }
+;
+
+policy DumbCracker(int minSize) is
+  on BeginIterator(x) => {
+    apply SplitOrSortArray(minSize) to x
+  }
+;

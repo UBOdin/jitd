@@ -28,7 +28,7 @@ let error ?(loc = symbol_start_pos ()) msg =
 %token <int> INTCONST
 %token <float> FLOATCONST
 %token <bool> BOOLCONST
-%token RULE COG IS APPLY TO DONE LET REWRITE
+%token POLICY RULE COG IS APPLY TO DONE LET REWRITE ON
 %token IF THEN ELSE
 %token MATCH WITH
 
@@ -39,9 +39,11 @@ let error ?(loc = symbol_start_pos ()) msg =
 
 
 program:
-  | cog_defn  EOC program   { JITD.add_cog  $3 $1 }
-  | rule_defn EOC program   { JITD.add_rule $3 $1 }
-  | EOF                     { JITD.mk_program () }
+  | cog_defn    EOC program   { JITD.add_cog    $3 $1 }
+  | rule_defn   EOC program   { JITD.add_rule   $3 $1 }
+  | policy_defn EOC program   { JITD.add_policy $3 $1 }
+  | EOF                       { JITD.empty_program }
+  | error                     { error "Invalid Command" }
   
 cog_defn: 
   | COG ID LPAREN               RPAREN { ($2, []) }
@@ -55,19 +57,46 @@ rule_defn:
   | RULE ID LPAREN var_defn_list RPAREN IS pattern_effect_list
      { ($2, $4, $7) }
 
+policy_defn:
+  | POLICY ID IS event_effect_list
+     { ($2, [], $4) }
+  | POLICY ID LPAREN RPAREN IS event_effect_list
+     { ($2, [], $6) }
+  | POLICY ID LPAREN var_defn_list RPAREN IS event_effect_list
+     { ($2, $4, $7) }
+
 var_defn_list:
   | var_defn COMMA var_defn_list { $1 :: $3 }
   | var_defn                     { [$1] }
 
 var_defn:
-  | ID ID                        { ($1, $2) }
+  | ID ID                        { ($2, String.lowercase $1) }
+  | COG ID                       { ($2, "cog") }
+  | RULE ID                      { ($2, "rule") }
+  | error                        { error "Invalid Variable Definition" }
 
 pattern_effect_list:
   | PIPE pattern_effect pattern_effect_list { $2 :: $3 }
   | PIPE pattern_effect                     { [$2] }
+  | error                                   { error "Invalid Pattern/Effect" }
 
 pattern_effect:
   | pattern IMPLIES statement { ($1, $3) }
+  
+event_effect_list:
+  | ON event_effect event_effect_list { $2 :: $3 }
+  | ON event_effect                   { [$2] }
+  | error                             { error "Invalid Event/Effect" }
+
+event_effect:
+  | ID LPAREN var_ref_list RPAREN IMPLIES statement { (($1,$3), $6) }
+  | ID LPAREN RPAREN IMPLIES statement { (($1,[]), $5) }
+  | ID IMPLIES statement { (($1,[]), $3) }
+
+var_ref_list:
+  | ID COMMA var_ref_list  { $1 :: $3 }
+  | ID                     { [$1] }
+
 
 pattern:
   | ID COLON ID LPAREN pattern_list RPAREN { ((Some($1)), (PCog($3, $5))) }
@@ -77,6 +106,7 @@ pattern:
   | ID LPAREN              RPAREN          { (None, (PCog($1, []))) }
   | ID                                     { ((Some($1)), PAny) }
   | UNDERSCORE                             { (None, PAny) }
+  | error                                  { error "Invalid Pattern" }
 
 pattern_list:
   | pattern COMMA pattern_list  { $1 :: $3 }
@@ -90,13 +120,14 @@ statement:
   | APPLY rule_ref TO expr      { Apply($2, $4) }
   | LET var_defn ASSIGN expr    { Let($2, $4) }
   | REWRITE expr                { Rewrite($2) }
-  | IF expr THEN statement ELSE statement 
-                                { IfThenElse($2, $4, $6) }
+  | IF LPAREN expr RPAREN statement ELSE statement 
+                                { IfThenElse($3, $5, $7) }
   | MATCH expr WITH pattern_effect_list 
                                 { Match($2, $4) }
-  | LBRACK statement_seq RBRACK { Block($2) }
-  | LBRACK               RBRACK { NoOp }
+  | LBRACE statement_seq RBRACE { Block($2) }
+  | LBRACE               RBRACE { NoOp }
   | DONE                        { NoOp }
+  | error                       { error "Invalid Statement" }
 
 
 rule_ref_list:
@@ -150,6 +181,7 @@ base_expr:
   | INTCONST                   { JITD.Const(CInt($1)) }
   | FLOATCONST                 { JITD.Const(CFloat($1)) }
   | BOOLCONST                  { JITD.Const(CBool($1)) }
+  | error                      { error "Invalid Expression" }
 
 expr_list:
   | expr COMMA expr_list { $1 :: $3 }
