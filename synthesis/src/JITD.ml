@@ -34,18 +34,16 @@ type expr_t =
   | Raw       of string
   | Var       of var_ref_t
   | RCog      of string * expr_t list
+  | RRule     of string * expr_t list
 
 and  stmt_t =
-      | Apply of rule_ref_t * expr_t
+      | Apply of expr_t * expr_t
       | Let of var_t * expr_t
       | Rewrite of expr_t
       | IfThenElse of expr_t * stmt_t * stmt_t
       | Match of expr_t * (pattern_t * stmt_t) list
       | Block of stmt_t list
       | NoOp
-and  rule_ref_t =
-      | RuleRef   of string * rule_ref_t list
-      | RuleParam of var_ref_t
 
 
 type rule_t = string * var_t list * (pattern_t * stmt_t) list
@@ -88,24 +86,6 @@ let mk_and a b = And((and_list a) @ (and_list b))
 
 let get_rule (p:program_t) (name:string): rule_t =
   List.find (fun (rule_name, _, _) -> name == rule_name) p.rules
-
-let stmt_children (f:stmt_t -> stmt_t list) = function
-  | Apply _             -> []
-  | Let _               -> []
-  | Rewrite _           -> []
-  | IfThenElse(_, t, e) -> [t, e]
-  | Match(_,pat_stmt)   -> List.map snd pat_stmt
-  | Block(stmts)        -> stmts
-  | NoOp                -> []
-
-let rebuild_stmt (old:stmt_t) (new_children:stmt_t list) = function
-  | IfThenElse(c, _, _) -> IfThenElse(c, List.nth new_children 0, 
-                                         List.nth new_children 1)
-  | Match(tgt,pat_stmt) -> Match(tgt, List.map2 (fun old new -> (fst old, snd new))
-                                                pat_stmt new_children)
-  | Block(_)            -> Block(new_children)
-  | x -> x
-
 
 let string_of_var ((ref,t):var_t) = t ^ " " ^ ref
 let string_of_cog ((c,vs):cog_t) = 
@@ -156,11 +136,12 @@ let rec string_of_expr =
   | Raw(e)       -> "@{"^e^"}"
   | Var(v)       -> v
   | RCog(c,params) -> c^"("^(String.concat ", " (List.map rcr params))^")" 
+  | RRule(name,params) -> name^"("^(String.concat ", " (List.map rcr params))^")" 
 
 let rec string_of_stmt ?(prefix="")= 
   let rcr x = string_of_stmt ~prefix:(prefix^"  ") x in function
   | Apply(rule, tgt) -> 
-      prefix^"apply " ^ (string_of_rule_ref rule) ^ " to " ^ (string_of_expr tgt)
+      prefix^"apply " ^ (string_of_expr rule) ^ " to " ^ (string_of_expr tgt)
   | Let(v, tgt) ->
       prefix^"let " ^(string_of_var v)^ " := " ^ (string_of_expr tgt)
   | Rewrite(expr) ->
@@ -179,10 +160,6 @@ and string_of_match_list ?(prefix="") (pats:((pattern_t * stmt_t) list)) =
     (String.concat "" (List.map (fun (pat, ex) ->
       prefix^"| "^(string_of_pattern pat)^" => \n"^(rcr ex)^"\n"
     ) pats))
-and string_of_rule_ref = function
-  | RuleRef(r, params) -> 
-      r^"("^(String.concat "," (List.map string_of_rule_ref params))^")"
-  | RuleParam(ex)      -> ex
 
 let string_of_rule ((rule, args, pats):rule_t) =
   "rule "^rule^(match args with 

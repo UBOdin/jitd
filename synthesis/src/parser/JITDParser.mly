@@ -135,9 +135,9 @@ rule_ref_list:
   | rule_ref                     { [$1] }
 
 rule_ref:
-  | ID LPAREN RPAREN               { RuleRef($1, []) }
-  | ID LPAREN rule_ref_list RPAREN { RuleRef($1, $3) }
-  | ID                             { RuleParam($1) }
+  | ID LPAREN RPAREN               { RRule($1, []) }
+  | ID LPAREN rule_ref_list RPAREN { RRule($1, $3) }
+  | expr                           { $1 }
 
 expr: 
   | cmp_or  { $1 }
