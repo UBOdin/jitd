@@ -39,6 +39,7 @@ let keywords = List.fold_left
     ( "WITH",     WITH );
     ( "TRUE",     BOOLCONST(true) );
     ( "FALSE",    BOOLCONST(false) );
+    ( "IN",       IN );
   ];;
 }
 

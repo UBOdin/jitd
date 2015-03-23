@@ -51,10 +51,6 @@ clean:
 	rm -f $(patsubst %,%/*.cmx,$(DIRS))
 	rm -f $(patsubst %,%/*.cmi,$(DIRS))
 	rm -f $(patsubst %,%/*.cmxi,$(DIRS))
-	make -C examples clean
-	
-test: jitd
-	@make -C examples test
 
 .PHONY: all clean test
 

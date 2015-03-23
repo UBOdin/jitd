@@ -28,7 +28,7 @@ let error ?(loc = symbol_start_pos ()) msg =
 %token <int> INTCONST
 %token <float> FLOATCONST
 %token <bool> BOOLCONST
-%token POLICY RULE COG IS APPLY TO DONE LET REWRITE ON
+%token POLICY RULE COG IS APPLY TO DONE LET REWRITE ON IN
 %token IF THEN ELSE
 %token MATCH WITH
 
@@ -118,7 +118,7 @@ statement_seq:
 
 statement:
   | APPLY rule_ref TO expr      { Apply($2, $4) }
-  | LET var_defn ASSIGN expr    { Let($2, $4) }
+  | LET var_defn ASSIGN expr IN statement { Let($2, $4, $6) }
   | REWRITE expr                { Rewrite($2) }
   | IF LPAREN expr RPAREN statement ELSE statement 
                                 { IfThenElse($3, $5, $7) }

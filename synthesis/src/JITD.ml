@@ -38,7 +38,7 @@ type expr_t =
 
 and  stmt_t =
       | Apply of expr_t * expr_t
-      | Let of var_t * expr_t
+      | Let of var_t * expr_t * stmt_t
       | Rewrite of expr_t
       | IfThenElse of expr_t * stmt_t * stmt_t
       | Match of expr_t * (pattern_t * stmt_t) list
@@ -85,7 +85,7 @@ let mk_or a b  =  Or((or_list a)  @ (or_list b))
 let mk_and a b = And((and_list a) @ (and_list b))
 
 let get_rule (p:program_t) (name:string): rule_t =
-  List.find (fun (rule_name, _, _) -> name == rule_name) p.rules
+  List.find (fun (rule_name, _, _) -> (compare name rule_name) == 0) p.rules
 
 let string_of_var ((ref,t):var_t) = t ^ " " ^ ref
 let string_of_cog ((c,vs):cog_t) = 
@@ -142,15 +142,16 @@ let rec string_of_stmt ?(prefix="")=
   let rcr x = string_of_stmt ~prefix:(prefix^"  ") x in function
   | Apply(rule, tgt) -> 
       prefix^"apply " ^ (string_of_expr rule) ^ " to " ^ (string_of_expr tgt)
-  | Let(v, tgt) ->
-      prefix^"let " ^(string_of_var v)^ " := " ^ (string_of_expr tgt)
+  | Let(v, tgt, body) ->
+      prefix^"let " ^(string_of_var v)^ " := " ^ (string_of_expr tgt) ^" in \n" ^
+        (rcr body)
   | Rewrite(expr) ->
       prefix^"rewrite " ^ (string_of_expr expr)
   | IfThenElse(cond, t, e) ->
       prefix^"if("^(string_of_expr cond)^")\n"^(rcr t)^"\n"^prefix^"else\n"^(rcr e)
   | Match(tgt, pats) ->
       prefix^"match "^(string_of_expr tgt)^" with {\n"^
-      (string_of_match_list ~prefix:(prefix^"  ") pats)^"\n}"
+      (string_of_match_list ~prefix:(prefix^"  ") pats)^"\n"^prefix^"}"
   | Block(exps) -> 
     prefix^"{\n"^
     (String.concat ";\n" (List.map rcr exps))^"\n"^prefix^"}"

@@ -34,4 +34,21 @@ let prog =
   )
 ;;
 
-print_endline (string_of_program prog);;
+
+let policies = 
+  try 
+    List.map (Optimizer.optimize_policy prog) prog.JITD.policies;
+  with 
+    | Optimizer.StmtError(msg, stmt) -> (
+      print_endline (msg^": ");
+      print_endline (JITD.string_of_stmt ~prefix:"  " stmt);
+      exit (-1)
+    )
+    | Optimizer.ExprError(msg, stmt) -> (
+      print_endline (msg^": "^(JITD.string_of_expr stmt));
+      exit (-1)
+    )
+  
+;;
+
+List.iter print_endline (List.map string_of_policy policies)
