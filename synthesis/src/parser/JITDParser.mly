@@ -16,10 +16,11 @@ let error ?(loc = symbol_start_pos ()) msg =
 %token UNDERSCORE
 %token PERIOD
 %token COLON
-%token ASSIGN IMPLIES
+%token ASSIGN DOUBLEARROW SINGLEARROW
 %token LPAREN RPAREN
 %token LBRACK RBRACK
 %token LBRACE RBRACE
+%token UNDERSCORE
 %token <string> ID
 %token ADD SUB MULT DIV
 %token EQ NEQ LT LTE GT GTE AND OR
@@ -28,7 +29,7 @@ let error ?(loc = symbol_start_pos ()) msg =
 %token <int> INTCONST
 %token <float> FLOATCONST
 %token <bool> BOOLCONST
-%token POLICY RULE COG IS APPLY TO DONE LET REWRITE ON IN
+%token POLICY RULE COG IS APPLY TO DONE LET REWRITE ON IN AS
 %token IF THEN ELSE
 %token MATCH WITH
 
@@ -40,7 +41,7 @@ let error ?(loc = symbol_start_pos ()) msg =
 
 program:
   | cog_defn    EOC program   { JITD.add_cog    $3 $1 }
-  | rule_defn   EOC program   { JITD.add_rule   $3 $1 }
+  | fn_defn     EOC program   { JITD.add_fn     $3 $1 }
   | policy_defn EOC program   { JITD.add_policy $3 $1 }
   | EOF                       { JITD.empty_program }
   | error                     { error "Invalid Command" }
@@ -49,13 +50,18 @@ cog_defn:
   | COG ID LPAREN               RPAREN { ($2, []) }
   | COG ID LPAREN var_defn_list RPAREN { ($2, $4) }
 
+fn_defn:
+  | rule_defn { let (name, args, pats) = $1 in 
+                  (name, args, Match((Var(JITD.default_rule_target)), pats)) 
+              }
+
 rule_defn:
   | RULE ID IS pattern_effect_list
-     { ($2, [], $4) }
+     { ($2, [JITD.default_rule_target_defn], $4) }
   | RULE ID LPAREN RPAREN IS pattern_effect_list
-     { ($2, [], $6) }
+     { ($2, [JITD.default_rule_target_defn], $6) }
   | RULE ID LPAREN var_defn_list RPAREN IS pattern_effect_list
-     { ($2, $4, $7) }
+     { ($2, JITD.default_rule_target_defn::$4, $7) }
 
 policy_defn:
   | POLICY ID IS event_effect_list
@@ -81,7 +87,7 @@ pattern_effect_list:
   | error                                   { error "Invalid Pattern/Effect" }
 
 pattern_effect:
-  | pattern IMPLIES statement { ($1, $3) }
+  | pattern DOUBLEARROW statement { ($1, $3) }
   
 event_effect_list:
   | ON event_effect event_effect_list { $2 :: $3 }
@@ -89,13 +95,17 @@ event_effect_list:
   | error                             { error "Invalid Event/Effect" }
 
 event_effect:
-  | ID LPAREN var_ref_list RPAREN IMPLIES statement { (($1,$3), $6) }
-  | ID LPAREN RPAREN IMPLIES statement { (($1,[]), $5) }
-  | ID IMPLIES statement { (($1,[]), $3) }
+  | ID LPAREN var_ref_list RPAREN DOUBLEARROW statement { (($1,$3), $6) }
+  | ID LPAREN RPAREN DOUBLEARROW statement { (($1,[]), $5) }
+  | ID DOUBLEARROW statement { (($1,[]), $3) }
 
 var_ref_list:
-  | ID COMMA var_ref_list  { $1 :: $3 }
-  | ID                     { [$1] }
+  | var_ref COMMA var_ref_list  { $1 :: $3 }
+  | var_ref                     { [$1] }
+
+var_ref: 
+  | UNDERSCORE             { JITD.default_rule_target }
+  | ID                     { $1 }
 
 
 pattern:
@@ -117,9 +127,9 @@ statement_seq:
   | statement                   { [$1] }
 
 statement:
-  | APPLY rule_ref TO expr      { Apply($2, $4) }
+  | APPLY base_expr TO expr     { Apply($2, $4) }
   | LET var_defn ASSIGN expr IN statement { Let($2, $4, $6) }
-  | REWRITE expr                { Rewrite($2) }
+  | REWRITE var_ref AS base_expr{ Rewrite($2, $4) }
   | IF LPAREN expr RPAREN statement ELSE statement 
                                 { IfThenElse($3, $5, $7) }
   | MATCH expr WITH pattern_effect_list 
@@ -128,16 +138,6 @@ statement:
   | LBRACE               RBRACE { NoOp }
   | DONE                        { NoOp }
   | error                       { error "Invalid Statement" }
-
-
-rule_ref_list:
-  | rule_ref COMMA rule_ref_list { $1 :: $3 }
-  | rule_ref                     { [$1] }
-
-rule_ref:
-  | ID LPAREN RPAREN               { RRule($1, []) }
-  | ID LPAREN rule_ref_list RPAREN { RRule($1, $3) }
-  | expr                           { $1 }
 
 expr: 
   | cmp_or  { $1 }
@@ -174,8 +174,9 @@ bin_op:
 
 base_expr:
   | LPAREN expr RPAREN         { $2 }
-  | ID LPAREN expr_list RPAREN { JITD.RCog($1, $3) }
-  | ID                         { JITD.Var($1) }
+  | ID LPAREN           RPAREN { JITD.Function($1, []) }
+  | ID LPAREN expr_list RPAREN { JITD.Function($1, $3) }
+  | var_ref                    { JITD.Var($1) }
   | CBLOCK                     { JITD.Raw($1) }
   | STRINGCONST                { JITD.Const(CString($1)) }
   | INTCONST                   { JITD.Const(CInt($1)) }

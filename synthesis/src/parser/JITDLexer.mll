@@ -40,6 +40,7 @@ let keywords = List.fold_left
     ( "TRUE",     BOOLCONST(true) );
     ( "FALSE",    BOOLCONST(false) );
     ( "IN",       IN );
+    ( "AS",       AS );
   ];;
 }
 
@@ -57,7 +58,8 @@ rule token = parse
   | "|"                  { PIPE }
   | '_'                  { UNDERSCORE }
   | ":="                 { ASSIGN }
-  | "=>"                 { IMPLIES }
+  | "=>"                 { DOUBLEARROW }
+  | "->"                 { SINGLEARROW }
   | '.'                  { PERIOD }
   | ':'                  { COLON }
   | "=="                 { EQ }
@@ -72,6 +74,7 @@ rule token = parse
   | "-"                  { SUB }
   | "*"                  { MULT }
   | "/"                  { DIV }
+  | "_"                  { UNDERSCORE }
   | "@{"                 { CBLOCK(cblock 0 lexbuf) }
   | (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as s
                          { 
