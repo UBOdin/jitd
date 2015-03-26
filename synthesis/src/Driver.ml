@@ -1,11 +1,23 @@
 
 open JITD
 
+type output_format_t =
+  | FORMAT_JITDSL 
+  | FORMAT_CPP
+
+
 let source_files:string list ref = ref [];;
+let output_format = ref FORMAT_CPP;;
 
 let arg_spec = Arg.align [ 
   ( "-ignored", Arg.Unit(fun () -> print_endline "this option is ignored"), 
     "This option is ignored"
+  );
+  ( "-o", Arg.Symbol(["jitd"; "cpp"], function
+     | "jitd" -> output_format := FORMAT_JITDSL
+     | "cpp"  -> output_format := FORMAT_CPP
+     | _      -> raise Not_found
+    ), "Set the output format"
   )
 ];;
 
@@ -51,4 +63,10 @@ let policies =
   
 ;;
 
-List.iter print_endline (List.map string_of_policy policies)
+match !output_format with 
+  | FORMAT_JITDSL ->
+    List.iter print_endline (List.map string_of_policy policies)
+  | FORMAT_CPP ->
+    List.iter (fun policy ->
+      print_endline (PrettyFormat.render (CGen.cpp_of_policy prog policy))
+    ) policies

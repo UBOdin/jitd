@@ -1,0 +1,12 @@
+src/JITD.cmo :
+src/JITD.cmx :
+src/Optimizer.cmo : src/JITD.cmo
+src/Optimizer.cmx : src/JITD.cmx
+src/PrettyFormat.cmo :
+src/PrettyFormat.cmx :
+src/CGen.cmo : src/PrettyFormat.cmo src/JITD.cmo
+src/CGen.cmx : src/PrettyFormat.cmx src/JITD.cmx
+src/parser/JITDParser.cmo : src/JITD.cmo src/parser/JITDParser.cmi
+src/parser/JITDParser.cmx : src/JITD.cmx src/parser/JITDParser.cmi
+src/parser/JITDLexer.cmo : src/parser/JITDParser.cmi src/JITD.cmo
+src/parser/JITDLexer.cmx : src/parser/JITDParser.cmx src/JITD.cmx

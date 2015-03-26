@@ -1,42 +1,42 @@
 
-cog ArrayCog(buffer buff);
-cog SortedArrayCog(buffer buff);
-cog BTreeCog(cog lhs, cog rhs, record sep);
-cog ConcatCog(cog lhs, cog rhs);
-cog DeleteCog(cog source, cog deleted);
+cog Array(buffer buff);
+cog SortedArray(buffer buff);
+cog BTree(cog lhs, cog rhs, record sep);
+cog Concat(cog lhs, cog rhs);
+cog Delete(cog source, cog deleted);
 
 rule Recur(rule op) is
-  | x:ArrayCog       => done
-  | x:SortedArrayCog => done
-  | BTreeCog(lhs, rhs, sep) => {
+  | x:Array       => done
+  | x:SortedArray => done
+  | BTree(lhs, rhs, sep) => {
       apply op to lhs;
       apply op to rhs
     }
-  | ConcatCog(lhs, rhs) => {
+  | Concat(lhs, rhs) => {
       apply op to lhs;
       apply op to rhs
     }
-  | DeleteCog(source, deleted) => {
+  | Delete(source, deleted) => {
       apply op to source;
       apply op to deleted
     }
 ;
 
 rule RecurToTarget(rule op, record target) is
-  | x:ArrayCog       => done
-  | x:SortedArrayCog => done
-  | BTreeCog(lhs, rhs, sep) => {
+  | x:Array       => done
+  | x:SortedArray => done
+  | BTree(lhs, rhs, sep) => {
       if( target < sep ) {
         apply op to lhs
       } else {
         apply op to rhs
       }
     }
-  | ConcatCog(lhs, rhs) => {
+  | Concat(lhs, rhs) => {
       apply op to lhs;
       apply op to rhs
     }
-  | DeleteCog(source, deleted) => {
+  | Delete(source, deleted) => {
       apply op to source;
       apply op to deleted
     }

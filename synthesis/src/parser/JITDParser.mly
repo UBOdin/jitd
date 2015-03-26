@@ -111,7 +111,7 @@ var_ref:
 pattern:
   | ID COLON ID LPAREN pattern_list RPAREN { ((Some($1)), (PCog($3, $5))) }
   | ID COLON ID LPAREN              RPAREN { ((Some($1)), (PCog($3, []))) }
-  | ID COLON ID                            { ((Some($1)), (PLeaf($3))) }
+  | ID COLON ID                            { ((Some($1)), (PCog($3, []))) }
   | ID LPAREN pattern_list RPAREN          { (None, (PCog($1, $3))) }
   | ID LPAREN              RPAREN          { (None, (PCog($1, []))) }
   | ID                                     { ((Some($1)), PAny) }

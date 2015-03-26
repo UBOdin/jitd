@@ -220,55 +220,28 @@ let rec find_pattern_overlap (source_pattern:pattern_t)
         in
           ( List.flatten bindings, List.flatten unmatched_todos )
 
-      | ( (PLeaf(source_type)),
-          (PLeaf(target_type)) ) when source_type = target_type ->
-          ([], [])
-  
       | ( PAny, PAny ) ->
           ([], [])
   
       (***** Source is more specific -- Done *****)
-      | ( (PCog(source_cog, _)),
-          (PLeaf(target_cog)) ) when source_cog = target_cog 
-                                  || target_cog = JITD.cog_type -> 
-          ([],[])
           
       | ( (PCog(source_cog, _)),
            PAny ) -> 
           ([],[])
 
       | ( (PTuple _),
-          (PLeaf(target_type)) ) when target_type = JITD.tuple_type ->
-          ([],[])
-
-      | ( (PTuple _),
            PAny ) -> 
           ([],[])
 
-      | ( (PLeaf _), PAny ) -> 
-          ([],[])
-
       (***** Target is more specific -- Defer *****)
-      | ( (PLeaf(source_cog)),
-          (PCog(target_cog, target_args)) ) when source_cog = target_cog 
-                                              || source_cog = JITD.cog_type -> 
-          ([],[lazy_source_label(), target_pattern])
 
       | (  PAny,
           (PCog(target_cog, _))) -> 
           ([],[lazy_source_label(), target_pattern])
 
-      | ( (PLeaf(source_type)),
-          (PTuple(target_elems)) ) when source_type = JITD.tuple_type ->
-          ([],[lazy_source_label(), target_pattern])
-
       | (  PAny,
           (PTuple(target_elems)) ) ->
           ([],[lazy_source_label(), target_pattern])
-
-      | ( PAny, (PLeaf _) ) -> 
-          ([],[lazy_source_label(), target_pattern])
-      
       
       (***** Mismatch *****)
       | _ -> raise (NotAPatternMatch(source_pattern, target_pattern))

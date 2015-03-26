@@ -8,7 +8,6 @@ type pattern_t = (var_ref_t option * unlabeled_pattern_t)
 and  unlabeled_pattern_t =
       | PCog of string * pattern_t list
       | PTuple of pattern_t list
-      | PLeaf of type_t
       | PAny
 
 type const_t =
@@ -61,7 +60,7 @@ type program_t = {
 
 let cog_type = "cog"
 let tuple_type = "tuple"
-let default_rule_target = "__target"
+let default_rule_target = "__context_root"
 let default_rule_target_defn = (default_rule_target, cog_type)
 
 exception ParseError of string * Lexing.position
@@ -91,13 +90,15 @@ let mk_or a b  =  Or((or_list a)  @ (or_list b))
 let mk_and a b = And((and_list a) @ (and_list b))
 
 let lookup_fn (p:program_t) (name:string): fn_t =
-  List.find (fun (rule_name, _, _) -> (compare name rule_name) == 0) p.fns
+  List.find (fun (n,_,_) -> n = name) p.fns
+
+let lookup_cog (p:program_t) (name:string): cog_t =
+  List.find (fun (n,_) -> n = name) p.cogs
 
 let type_of_pattern ((_,pat):pattern_t) = 
   match pat with 
     | PCog(_, _) -> cog_type
     | PTuple _   -> tuple_type
-    | PLeaf(t)   -> t
     | PAny       -> "auto"
 ;;
 
@@ -107,15 +108,16 @@ let string_of_cog ((c,vs):cog_t) =
 let rec string_of_pattern (x:pattern_t) = 
   match x with 
     | (None,PAny) -> "_"
-    | (None,PLeaf(t)) -> t
     | (Some(s), PAny) -> s
-    | (Some(s),PLeaf(t)) -> s^":"^t
-    | (s,PCog(c, sub_patterns)) ->
-        (match s with Some(s) -> s^":" | None -> "")^
+    | (s,t) -> 
+      (match s with Some(s) -> s^":" | None -> "")^
+      (match t with 
+      | PCog(c, sub_patterns) ->
         c^"("^(String.concat "," (List.map string_of_pattern sub_patterns))^")"
-    | (s,PTuple(sub_patterns)) ->
-        (match s with Some(s) -> s^":" | None -> "")^
+      | PTuple(sub_patterns) ->
         "<"^(String.concat "," (List.map string_of_pattern sub_patterns))^">"
+      | PAny -> "_"
+      )
 
 let string_of_cmp_op = function
   | Eq  -> "=="

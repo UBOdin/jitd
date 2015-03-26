@@ -2,7 +2,9 @@
 
 FILES = \
 	src/JITD \
-	src/Optimizer 
+	src/Optimizer \
+	src/PrettyFormat \
+	src/CGen 
 
 LIBS = str
 
@@ -52,9 +54,15 @@ clean:
 	rm -f $(patsubst %,%/*.cmi,$(DIRS))
 	rm -f $(patsubst %,%/*.cmxi,$(DIRS))
 
-.PHONY: all clean test
+##########
+
+dep: makefile.dep
+
+makefile.dep: $(patsubst %, %.ml, $(AUTOGENFILES))
+	ocamldep $(patsubst %, -I %, $(DIRS)) $(patsubst %, %.ml, $(FILES)) > makefile.dep
+
+include makefile.dep
 
 ##########
 
-src/parser/JITDLexer.cmo: src/JITD.cmo
-src/parser/JITDParser.cmo: src/JITD.cmo
+.PHONY: all clean test dep
