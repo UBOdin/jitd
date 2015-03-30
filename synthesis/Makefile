@@ -3,6 +3,7 @@
 FILES = \
 	src/JITD \
 	src/Optimizer \
+	src/rewrites/Handlize \
 	src/PrettyFormat \
 	src/CGen 
 
