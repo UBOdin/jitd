@@ -102,6 +102,9 @@ let type_of_pattern ((_,pat):pattern_t) =
     | PAny       -> "auto"
 ;;
 
+let vars_of_stmt (stmt:stmt_t)
+;;
+
 let string_of_var ((ref,t):var_t) = t ^ " " ^ ref
 let string_of_cog ((c,vs):cog_t) = 
   ("cog "^c ^ "(" ^ (String.concat "," (List.map string_of_var vs)) ^ ");")
