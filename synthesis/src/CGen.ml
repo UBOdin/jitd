@@ -4,10 +4,31 @@ open PrettyFormat
 exception InvalidMatchPair of expr_t * pattern_t
 exception Unsupported of string
 exception UndefinedCogType of string * pattern_t 
-let cpp_of_type = function
-  | t -> t
+let cpp_of_type (prog:program_t) = function
+  | "cog" -> "CogHandle"
+  | "cog_body" -> "CogPtr"
+  | "record" -> "Record"
+  | t ->
+    begin try 
+      let _ = lookup_cog prog t
+      in t^"Cog"
+    with Not_found -> 
+      t
+    end
+;;
+let cpp_of_type_ptr (prog:program_t) x = (cpp_of_type prog x)^" *"
+;;
+let cpp_of_function (prog:program_t) (fn:string): string =
+    begin try 
+      let _ = lookup_cog prog fn
+      in fn^"Cog"
+    with Not_found -> 
+      fn
+    end
+;;
 
-let cpp_of_var ((name, t):var_t) = raw ((cpp_of_type t)^" "^name)
+let cpp_of_var (prog:program_t) ((name, t):var_t) = 
+  raw ((cpp_of_type prog t)^" "^name)
 ;;
 
 let rec cpp_of_expr (prog:program_t) (expr:expr_t): PrettyFormat.format = 
@@ -24,7 +45,7 @@ let rec cpp_of_expr (prog:program_t) (expr:expr_t): PrettyFormat.format =
   | Raw(r)   -> raw (r)
   | Var(v)   -> raw (v)
   | Tuple _  -> raise (Unsupported("Realizing a tuple"))
-  | Function(fname, fargs) -> paren (fname^"(") 
+  | Function(fname, fargs) -> paren ((cpp_of_function prog fname)^"(") 
                                     (list ", " (List.map rcr fargs))
                                     ")"
 
@@ -54,40 +75,68 @@ let rec cpp_match_conditions (match_tgt:expr_t) (match_pattern:pattern_t):
   | (_, PAny) -> []
 ;;
 
-let rec cpp_match_bindings (prog:program_t) (tgt:expr_t) ((pattern):pattern_t):
-            (JITD.var_t * expr_t) list = 
+let rec cpp_match_bindings (prog:program_t) (continuation:stmt_t)  
+                           (tgt:expr_t) (pattern:pattern_t): stmt_t =
   let rcr = cpp_match_bindings prog in
   let get_cog = lookup_cog prog in
-  ( match (fst pattern) with
-      | None -> []
+  let build_binding (body, new_tgt, new_tgt_type) = 
+    match (fst pattern) with
+      | None -> body
       | Some(label) ->
-        [(label, type_of_pattern pattern), tgt]
-  )@(
+        Let((label, new_tgt_type), new_tgt, body)
+  in build_binding (
     match (snd pattern) with 
       | PCog(cog_name, cog_args) ->
         begin match tgt with 
-          | Function(_, tgt_args) -> 
-              List.flatten (List.map2 (cpp_match_bindings prog) tgt_args cog_args)
+          | Function(cog_type, tgt_args) -> 
+              (
+                List.fold_left2 rcr continuation tgt_args cog_args,
+                tgt, 
+                cpp_of_type_ptr prog cog_type
+              )
           | _ -> 
               let (_, cog) = 
                 begin try get_cog cog_name 
                 with Not_found -> 
                   raise (UndefinedCogType(cog_name, pattern))
                 end
-              in List.flatten (List.map2 (fun cog_arg cog_var ->
-                cpp_match_bindings prog
-                  (JITD.Raw("("^(render (cpp_of_expr prog tgt))^")->"^(fst cog_var)))
-                  cog_arg
-              ) cog_args cog)
+              in 
+              let tgt_var_type = cpp_of_type_ptr prog cog_name in
+              let typed_tgt_var = "__matched_"^cog_name^"_cog" in
+                (
+                  (Let((typed_tgt_var, tgt_var_type), 
+                    (Function("("^(cpp_of_type_ptr prog cog_name)^")", [tgt])),
+                    List.fold_left2 (fun body cog_arg cog_var ->
+                      
+                      let new_tgt = 
+                        BinOp(PtrElementOf, Var(typed_tgt_var), Var(fst cog_var))
+                      in
+                        rcr body new_tgt cog_arg
+                      
+                    ) continuation cog_args cog
+                  )),
+                  (Var(typed_tgt_var)),
+                  tgt_var_type
+                )
+                  
         end
       | PTuple(tuple_elems) -> 
         begin match tgt with 
           | Tuple(tgt_args) -> 
-              List.flatten (List.map2 rcr tgt_args tuple_elems)
+              ( 
+                List.fold_left2 rcr continuation tgt_args tuple_elems,
+                tgt,
+                cpp_of_type prog "tuple"
+              )
           | Var(v) -> raise (Unsupported("tuple variable match"))
           | _ -> raise (InvalidMatchPair(tgt, pattern))
         end
-      | PAny -> []
+      | PAny -> 
+              (
+                continuation,
+                tgt,
+                cpp_of_type prog (type_of_pattern pattern)
+              )
     )   
 ;;  
   
@@ -103,7 +152,7 @@ let rec cpp_of_stmt (prog:program_t) (stmt:stmt_t) =
   | Let(v, value, body) ->
     paren "{"
       (lines [
-        block "" (cpp_of_var v) "=" "" (cpp_of_expr prog value) ";";
+        block "" (cpp_of_var prog v) "=" "" (cpp_of_expr prog value) ";";
         rcr body;
       ])
       "}"
@@ -125,9 +174,7 @@ let rec cpp_of_stmt (prog:program_t) (stmt:stmt_t) =
     lines (List.mapi (fun i (match_pat, match_effect) ->
       let conds = (cpp_match_conditions match_tgt match_pat) in
       let effects = 
-        rcr (List.fold_left (fun body (tgt_var, tgt_val) ->
-                Let(tgt_var, tgt_val, body)
-              ) match_effect (cpp_match_bindings prog match_tgt match_pat))
+        rcr (cpp_match_bindings prog match_effect match_tgt match_pat)
       in
       
       block ((if i == 0 then "" else "else ")^" if (") 
@@ -145,8 +192,29 @@ let cpp_of_event (prog:program_t) (((event, args):evt_t), (effect:stmt_t)) =
   paren ("void "^event^"(CogHandle "^default_rule_target^") {") 
         (cpp_of_stmt prog handlized_effect)
         "}"
-  
-
 
 let cpp_of_policy  (prog:program_t) ((name, args, events):policy_t) =
-  lines (List.map (cpp_of_event prog) events)
+
+  paren ("class "^name^" : RewriteRule {") (
+    lines (
+      [
+        raw "public: ";
+        raw "";
+        block (name^"(")
+              (list ", " (List.map (cpp_of_var prog) args))
+              ")" ":"
+              (list ", " (List.map (fun (arg, _) ->
+                raw (arg^"("^arg^")")
+              ) args))
+              "{}";
+        raw "";
+      ]
+      @(List.map (cpp_of_event prog) events)@
+      [
+        raw "";
+        raw "private: ";
+        raw "";
+      ]
+      @(List.map (fun arg -> paren "" (cpp_of_var prog arg) ";") args)
+    )
+  ) "}"
