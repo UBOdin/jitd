@@ -2,6 +2,8 @@ src/JITD.cmo :
 src/JITD.cmx :
 src/Optimizer.cmo : src/JITD.cmo
 src/Optimizer.cmx : src/JITD.cmx
+src/rewrites/Handlize.cmo :
+src/rewrites/Handlize.cmx :
 src/PrettyFormat.cmo :
 src/PrettyFormat.cmx :
 src/CGen.cmo : src/PrettyFormat.cmo src/JITD.cmo

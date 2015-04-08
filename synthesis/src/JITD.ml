@@ -21,6 +21,8 @@ type bin_op_t =
   | Multiply
   | Subtract
   | Divide
+  | ElementOf
+  | PtrElementOf
 
 type cmp_op_t = Eq | Neq | Lt | Lte | Gt | Gte
 
@@ -59,6 +61,7 @@ type program_t = {
 }
 
 let cog_type = "cog"
+let cog_body_type = "cog_body"
 let tuple_type = "tuple"
 let default_rule_target = "__context_root"
 let default_rule_target_defn = (default_rule_target, cog_type)
@@ -102,7 +105,48 @@ let type_of_pattern ((_,pat):pattern_t) =
     | PAny       -> "auto"
 ;;
 
-let vars_of_stmt (stmt:stmt_t)
+let rec vars_bound_by_pattern ((label, body):pattern_t) =
+  (match label with Some(s) -> [s] | None -> []) @
+  (match body with
+    | (PCog(_, children) | PTuple(children)) -> 
+        List.flatten (List.map vars_bound_by_pattern children)
+    | PAny -> []
+  )
+;;
+
+let rec vars_used_in_expr = function
+  | (And(l) | Or(l) | Tuple(l) | Function(_, l)) 
+                -> List.flatten (List.map vars_used_in_expr l)
+  | Not(e)      -> vars_used_in_expr e
+  | (Cmp(_,a,b) | BinOp(_,a,b)) 
+                -> (vars_used_in_expr a) @ (vars_used_in_expr b)
+  | (Const _ | Raw _)
+                -> []
+  | Var(v)      -> [v]
+;;
+
+let rec vars_used_in_stmt = function
+  | Apply(effect, tgt) ->
+      (vars_used_in_expr effect) @ (vars_used_in_expr tgt)
+  | Let((tgt,_), tgt_value, body) ->
+      (vars_used_in_expr tgt_value) @
+      (List.filter (fun v -> v <> tgt) (vars_used_in_stmt body))
+  | Rewrite(tgt, expr) ->
+      tgt :: (vars_used_in_expr expr)
+  | IfThenElse(cond, then_clause, else_clause) -> 
+      (vars_used_in_expr cond) @
+      (vars_used_in_stmt then_clause) @
+      (vars_used_in_stmt else_clause)
+  | Match(e,pats) -> 
+      (vars_used_in_expr e) @ (
+        List.flatten (List.map (fun (pat, stmt) -> 
+          let pat_vars = vars_bound_by_pattern pat in
+          let stmt_vars = vars_used_in_stmt stmt in
+            List.filter (fun v -> not (List.mem v pat_vars)) stmt_vars
+        ) pats)
+      )
+  | Block(l) -> List.flatten (List.map vars_used_in_stmt l)
+  | NoOp -> []
 ;;
 
 let string_of_var ((ref,t):var_t) = t ^ " " ^ ref
@@ -135,6 +179,8 @@ let string_of_bin_op = function
   | Multiply -> "*"
   | Subtract -> "-"
   | Divide   -> "/"
+  | ElementOf -> "."
+  | PtrElementOf -> "->"
 
 let string_of_const = function
   | CInt(i)      -> string_of_int i

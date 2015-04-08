@@ -141,8 +141,9 @@ let rec cpp_of_stmt (prog:program_t) (stmt:stmt_t) =
 ;;    
 
 let cpp_of_event (prog:program_t) (((event, args):evt_t), (effect:stmt_t)) = 
+  let handlized_effect = Handlize.rewrite prog effect in
   paren ("void "^event^"(CogHandle "^default_rule_target^") {") 
-        (cpp_of_stmt prog effect)
+        (cpp_of_stmt prog handlized_effect)
         "}"
   
 

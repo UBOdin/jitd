@@ -1,8 +1,8 @@
--- policy cracker 1000000
-policy inline
+policy cracker 1000000
+-- policy inline
 -- spawn_slow 100 workload/1.jitd
 -- 
 -- ---------- key_range batch_size ____record_cnt____ ms_per ms_tot
-spawn_updates 100000000 2000000    10000000  40000000 6000   120000
+spawn_updates 100000000 1000000    10000000  30000000 4000   60000
 run test/scan_for_1_min.jitd
 run test/scan_for_1_min.jitd

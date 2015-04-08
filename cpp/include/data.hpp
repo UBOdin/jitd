@@ -22,13 +22,13 @@ struct Record {
   Record(Key key) : key(key) { value = (void *)0xdeadbeef; }
   Record() : key(0) { value = NULL; }
   
-  bool operator>(const Record &other) const {
+  inline bool operator>(const Record &other) const {
     return key > other.key;
   }
-  bool operator<(const Record &other) const {
+  inline bool operator<(const Record &other) const {
     return key < other.key;
   }
-  bool operator==(const Record &other) const {
+  inline bool operator==(const Record &other) const {
     return key == other.key;
   }
 };

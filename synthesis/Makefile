@@ -4,6 +4,7 @@ FILES = \
 	src/JITD \
 	src/Optimizer \
 	src/rewrites/Handlize \
+	src/rewrites/ExpandMatches \
 	src/PrettyFormat \
 	src/CGen 
 

@@ -167,10 +167,12 @@ bin_expr:
   | base_expr                 { $1 }
 
 bin_op:
-  | ADD   { JITD.Add }
-  | SUB   { JITD.Subtract } 
-  | MULT  { JITD.Multiply } 
-  | DIV   { JITD.Divide }
+  | ADD         { JITD.Add }
+  | SUB         { JITD.Subtract } 
+  | MULT        { JITD.Multiply } 
+  | DIV         { JITD.Divide }
+  | SINGLEARROW { JITD.PtrElementOf }
+  | PERIOD      { JITD.ElementOf }
 
 base_expr:
   | LPAREN expr RPAREN         { $2 }

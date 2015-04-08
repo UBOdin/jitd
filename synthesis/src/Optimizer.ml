@@ -100,6 +100,7 @@ let rec inline_stmt_vars ?(strict=true) (scope: expr_t StringMap.t) (stmt:stmt_t
           if strict then
             raise (ExprError("No such variable", Var(v)))
           else
+            print_endline ("Var: "^v);
             Var(v)
       )
     | x -> x
@@ -115,7 +116,8 @@ let rec inline_stmt_vars ?(strict=true) (scope: expr_t StringMap.t) (stmt:stmt_t
         )
     | Rewrite(tgt, expr)    -> Rewrite(tgt, rcr_e expr)
     | IfThenElse(c,t,e) -> IfThenElse(rcr_e c, rcr_s t, rcr_s e)
-    | Match(tgt, pats) -> Match(tgt, List.map (fun (p,s) -> (p, rcr_s s)) pats)
+    | Match(tgt, pats) -> 
+        Match(rcr_e tgt, List.map (fun (p,s) -> (p, rcr_s s)) pats)
     | Block(stmts) -> Block(List.map rcr_s stmts)
     | NoOp -> NoOp
   )
