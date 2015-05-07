@@ -100,7 +100,6 @@ let rec inline_stmt_vars ?(strict=true) (scope: expr_t StringMap.t) (stmt:stmt_t
           if strict then
             raise (ExprError("No such variable", Var(v)))
           else
-            print_endline ("Var: "^v);
             Var(v)
       )
     | x -> x

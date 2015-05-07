@@ -7,7 +7,7 @@ exception UndefinedCogType of string * pattern_t
 let cpp_of_type (prog:program_t) = function
   | "cog" -> "CogHandle"
   | "cog_body" -> "CogPtr"
-  | "record" -> "Record"
+  | "record" -> "Record" 
   | t ->
     begin try 
       let _ = lookup_cog prog t
@@ -193,9 +193,12 @@ let cpp_of_event (prog:program_t) (((event, args):evt_t), (effect:stmt_t)) =
         (cpp_of_stmt prog handlized_effect)
         "}"
 
+let cpp_of_include_file (f:string) = 
+  raw ("#include \""^f^"\"")
+
 let cpp_of_policy  (prog:program_t) ((name, args, events):policy_t) =
 
-  paren ("class "^name^" : RewriteRule {") (
+  paren ("class "^name^" : RewritePolicyBase {") (
     lines (
       [
         raw "public: ";
@@ -218,3 +221,4 @@ let cpp_of_policy  (prog:program_t) ((name, args, events):policy_t) =
       @(List.map (fun arg -> paren "" (cpp_of_var prog arg) ";") args)
     )
   ) "}"
+  

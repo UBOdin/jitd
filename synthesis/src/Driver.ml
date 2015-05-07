@@ -8,20 +8,21 @@ type output_format_t =
 
 let source_files:string list ref = ref [];;
 let output_format = ref FORMAT_CPP;;
+let include_files = ref [];;
 
 let arg_spec = Arg.align [ 
-  ( "-ignored", Arg.Unit(fun () -> print_endline "this option is ignored"), 
-    "This option is ignored"
-  );
   ( "-o", Arg.Symbol(["jitd"; "cpp"], function
      | "jitd" -> output_format := FORMAT_JITDSL
      | "cpp"  -> output_format := FORMAT_CPP
      | _      -> raise Not_found
     ), "Set the output format"
   );
-  ( "-j", Arg.Unit(function () ->  output_format := FORMAT_JITDSL
-    ), "JITD debugging mode"
-  )
+  ( "-j", Arg.Unit(function () ->  output_format := FORMAT_JITDSL),
+    "JITD debugging mode"
+  );
+  ( "-i", Arg.String(fun f -> include_files := f :: !include_files),
+    "Append an include file"
+  );
 ];;
 
 Arg.parse 
@@ -78,5 +79,10 @@ match !output_format with
     List.iter print_endline (List.map string_of_policy policies)
   | FORMAT_CPP ->
     List.iter (fun policy ->
-      print_endline (PrettyFormat.render (CGen.cpp_of_policy prog policy))
+      print_endline (PrettyFormat.render 
+        (PrettyFormat.lines 
+          ((List.map CGen.cpp_of_include_file !include_files) @
+            [ (CGen.cpp_of_policy prog policy) ])
+        )
+      )
     ) policies

@@ -1,0 +1,110 @@
+
+cog Array(buffer buff);
+cog SortedArray(buffer buff);
+cog BTree(cog lhs, cog rhs, record sep);
+cog Concat(cog lhs, cog rhs);
+cog Delete(cog source, cog deleted);
+
+rule Recur(rule op) is
+  | x:Array       => done
+  | x:SortedArray => done
+  | BTree(lhs, rhs, sep) => {
+      apply op to lhs;
+      apply op to rhs
+    }
+  | Concat(lhs, rhs) => {
+      apply op to lhs;
+      apply op to rhs
+    }
+  | Delete(source, deleted) => {
+      apply op to source;
+      apply op to deleted
+    }
+;
+
+rule RecurToTarget(rule op, record target) is
+  | x:Array       => done
+  | x:SortedArray => done
+  | BTree(lhs, rhs, sep) => {
+      if( target < sep ) {
+        apply op to lhs
+      } else {
+        apply op to rhs
+      }
+    }
+  | Concat(lhs, rhs) => {
+      apply op to lhs;
+      apply op to rhs
+    }
+  | Delete(source, deleted) => {
+      apply op to source;
+      apply op to deleted
+    }
+;
+
+rule RecurTopDown(rule op) is 
+  | x => {
+    apply op to x;
+    apply Recur(RecurTopDown(op)) to _
+  }
+;
+
+
+rule RecurBottomUp(rule op) is 
+  | x => {
+    apply Recur(RecurBottomUp(op)) to _;
+    apply op to _
+  }
+;
+
+rule RecurToTargetTopDown(rule op, record target) is 
+  | x => {
+    apply op to _;
+    apply RecurToTarget(RecurToTargetTopDown(op, target), target) to _
+  }
+;
+
+rule RecurToTargetBottomUp(rule op, record target) is 
+  | x => {
+    apply RecurToTarget(RecurToTargetBottomUp(op, target), target) to _;
+    apply op to _
+  }
+;
+
+rule SplitArray(record target) is
+  | Array(buff) => {
+    let auto buff_pair := buff->split(target) in
+    rewrite _ as BTree(Array( buff_pair.first ), 
+                       Array( buff_pair.second ), target)
+  }
+;
+
+rule SplitArrayRandom is
+  | x:Array(buff) => {
+    let record target := buff->randomElement() in
+    apply SplitArray(target) to _
+  }
+;
+
+rule SortArray is
+  | Array(buff) => {
+    let buffer sorted := buff->sort() in
+    rewrite _ as SortedArray(sorted)
+  }
+;
+
+rule SplitOrSortArray(int minSize) is
+  | x:Array(buff) => {
+    if ( x->size() <= minSize ) {
+      apply SortArray() to _
+    } else {
+      apply SplitArrayRandom() to _
+    }
+  }
+;
+
+policy DumbCracker(int minSize) is
+  on BeginIterator => 
+    apply SplitOrSortArray(minSize) to _
+  
+;

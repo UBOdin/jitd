@@ -7,7 +7,8 @@ FILES = \
 	src/jitd_tester.o\
 	src/cog_tester.o
 
-HEADERS = $(shell find ${INCLUDE_PATH} -name '*.hpp')
+HEADERS = $(shell find ${INCLUDE_PATH} -name '*.hpp') \
+          $(patsubst %.jitd, %.hpp, $(shell find ${INCLUDE_PATH} -name '*.jitd'))
 
 ifeq ($(shell uname), Darwin)
 CPP_FLAGS = \
@@ -43,6 +44,10 @@ build_test : driver
 
 test : build_test
 
+%.hpp : %.jitd ../synthesis/jitd
+	@echo "Rendering" $(patsubst %.jitd,%,$<)
+	@../synthesis/jitd $< > $@
+
 clean : 
 	rm -rf *.dSYM
 	rm -f driver
@@ -53,4 +58,4 @@ clean :
 src/jitd_tester.o : ${HEADERS}
 src/cog_tester.o : ${HEADERS}
 
-.PHONY: test clean build_test dep workload
+.PHONY: test clean build_test dep workload jitd

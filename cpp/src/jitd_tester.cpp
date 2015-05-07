@@ -15,6 +15,7 @@
 #include "test.hpp"
 #include "policy/Cracker.hpp"
 #include "policy/Inline.hpp"
+#include "policy/DumbCracker.hpp"
 
 using namespace std;
 using namespace std::placeholders;
