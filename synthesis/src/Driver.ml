@@ -10,18 +10,32 @@ let source_files:string list ref = ref [];;
 let output_format = ref FORMAT_CPP;;
 let include_files = ref [];;
 
+let optimizer_features =  ref Optimizer.default_opt_modes;;
+let optimizer_feature_levels = [
+  [ ];
+  Optimizer.default_opt_modes;
+];;
+
+
 let arg_spec = Arg.align [ 
   ( "-o", Arg.Symbol(["jitd"; "cpp"], function
      | "jitd" -> output_format := FORMAT_JITDSL
      | "cpp"  -> output_format := FORMAT_CPP
      | _      -> raise Not_found
-    ), "Set the output format"
+    ), " Set the output format"
   );
   ( "-j", Arg.Unit(function () ->  output_format := FORMAT_JITDSL),
-    "JITD debugging mode"
+    " JITD debugging mode"
   );
   ( "-i", Arg.String(fun f -> include_files := f :: !include_files),
-    "Append an include file"
+    " Append an include file"
+  );
+  ( "-O", Arg.Int(fun x -> 
+    optimizer_features := List.nth optimizer_feature_levels (x-1)),
+    "N Set the optimization level (1-2)"
+  );
+  ( "-d", Arg.String(Debug.activate_mode), 
+    "feature Enable the specified debugging feature."
   );
 ];;
 
@@ -57,10 +71,11 @@ let prog =
       
 ;;
 
+let policies = ref prog.JITD.policies;;
 
-let policies = 
+policies := 
   try 
-    List.map (Optimizer.optimize_policy prog) prog.JITD.policies;
+    List.map (Optimizer.optimize_policy ~opt_modes:!optimizer_features prog) prog.JITD.policies;
   with 
     | Optimizer.StmtError(msg, stmt) -> (
       print_endline (msg^": ");
@@ -71,12 +86,13 @@ let policies =
       print_endline (msg^": "^(JITD.string_of_expr stmt));
       exit (-1)
     )
-  
 ;;
 
 match !output_format with 
-  | FORMAT_JITDSL ->
-    List.iter print_endline (List.map string_of_policy policies)
+  | FORMAT_JITDSL -> (
+      List.iter print_endline (List.map string_of_fn (prog.JITD.fns));
+      List.iter print_endline (List.map string_of_policy !policies)
+    )
   | FORMAT_CPP ->
     List.iter (fun policy ->
       print_endline (PrettyFormat.render 
@@ -85,4 +101,4 @@ match !output_format with
             [ (CGen.cpp_of_policy prog policy) ])
         )
       )
-    ) policies
+    ) !policies

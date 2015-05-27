@@ -5,6 +5,17 @@ module StringMap = Map.Make(String)
 exception StmtError of string * stmt_t
 exception ExprError of string * expr_t
 
+type opt_mode_t =
+  | OPT_INLINE_APPLY
+  | OPT_INLINE_MATCH
+  | OPT_FLATTEN_MATCH
+;;
+let default_opt_modes = [
+  OPT_INLINE_APPLY;
+  OPT_INLINE_MATCH;
+  OPT_FLATTEN_MATCH;
+];;
+
 let stmt_children = function
   | Apply _             -> []
   | Let(_,_,body)       -> [body]
@@ -375,12 +386,91 @@ let rec inline_matches (stmt:stmt_t) =
   in rewrite_rcr inline_matches rewritten
 ;; 
 
-let optimize_stmt (prog:program_t) (stmt:stmt_t) = 
-  let optimizations = [
-    inline_apply (ref []) prog;
-    inline_matches;
-  ] in
-  
+let rec pattern_match_condition (prog:program_t) (target:expr_t) 
+                                ((_,pattern): pattern_t):
+                                expr_t option =
+  let rcr = pattern_match_condition prog in
+  match (target, pattern) with 
+    | ((Function(tgt_type, tgt_args)), (PCog(pattern_type, pattern_args))) 
+        when tgt_type = pattern_type ->
+          rcr (Tuple(tgt_args)) (None, PTuple(pattern_args))
+    | (_ , (PCog(pattern_type, pattern_args))) ->
+      let root_match = 
+        (Cmp(Eq, Function("__cog_type_symbol", [Const(CString(pattern_type))]),
+                 Function("__type_of_cog", [target])))
+      in
+      begin match rcr 
+          (Tuple(List.map (fun (cog_field:var_t) -> 
+                              (Function("__field_of_cog", [target; Var(fst cog_field)])))
+                    (snd (lookup_cog prog pattern_type))
+          ))
+          (None, PTuple(pattern_args))
+        with None -> Some(root_match) | Some(cond) -> Some(JITD.mk_and root_match cond)
+      end
+    | ((Tuple(tuple_args)), (PTuple(pattern_args))) -> 
+      List.fold_left2 (fun (rest:expr_t option) (pattern_field:pattern_t) (tuple_field:expr_t) ->
+        match rcr tuple_field pattern_field
+          with None -> rest | Some(cond) -> 
+              (match rest with None -> Some(cond)
+                             | Some(rest_cond) -> Some(JITD.mk_and rest_cond cond))
+      ) None pattern_args tuple_args
+    | (_, (PTuple _)) ->
+      raise (ExprError("Unhandled case, unflattened tuple match", target))
+    | (_, PAny) -> None
+;;
+
+let rec pattern_match_bindings (prog:program_t) (target:expr_t) 
+                                ((label,pattern): pattern_t):
+                                (var_ref_t * expr_t) list =
+  let rcr = pattern_match_bindings prog in
+  let base_ret, fast_target = match label with
+    | None              -> ( [],                    target           )
+    | Some(label_value) -> ( [label_value, target], Var(label_value) )
+  in
+  base_ret @ 
+  match (target, pattern) with 
+    | ((Function(tgt_type, tgt_args)), (PCog(pattern_type, pattern_args))) 
+        when tgt_type = pattern_type ->
+          rcr (Tuple(tgt_args)) (None, PTuple(pattern_args))
+    | (_ , (PCog(pattern_type, pattern_args))) ->
+          rcr (Tuple(List.map (fun (cog_field:var_t) -> 
+                                  (Function("__field_of_cog", [target; Var(fst cog_field)])))
+                        (snd (lookup_cog prog pattern_type))
+              ))
+              (None, PTuple(pattern_args))
+    | ((Tuple(tuple_args)), (PTuple(pattern_args))) -> 
+      List.flatten (List.map2 rcr tuple_args pattern_args)
+    | (_, (PTuple _)) ->
+      raise (ExprError("Unhandled case, unflattened tuple match", target))
+    | (_, PAny) -> []
+;;
+
+let rec flatten_matches (prog:program_t) (stmt:stmt_t): stmt_t =
+  let rewritten = match stmt with
+    | Match(tgt, pats) -> 
+        List.fold_right (fun ((tgt_pattern:pattern_t),(tgt_effect:stmt_t)) (continuation:stmt_t) -> 
+          let bindings = pattern_match_bindings prog tgt tgt_pattern in
+          let full_effect = List.fold_right (fun (label, value) effect ->
+              Let((label, "auto"), value, effect);
+            ) bindings tgt_effect
+          in
+          match pattern_match_condition prog tgt tgt_pattern with
+            | None -> NoOp
+            | Some(exact_condition) ->
+                IfThenElse(exact_condition, full_effect, continuation)
+        ) pats NoOp
+    | x -> x
+  in rewrite_rcr (flatten_matches prog) rewritten
+;;
+
+let optimize_stmt (opt_modes:opt_mode_t list) (prog:program_t) (stmt:stmt_t) = 
+  let opt_is_active (x:opt_mode_t) = List.mem x opt_modes in
+  let optimizations = 
+    (if opt_is_active OPT_INLINE_APPLY then [inline_apply (ref []) prog] else [])@
+    (if opt_is_active OPT_INLINE_MATCH then [inline_matches] else [])@
+    (if opt_is_active OPT_FLATTEN_MATCH then [flatten_matches prog] else [])
+  in 
+
   let run_opts stmt =
     List.fold_left (fun stmt op -> op stmt) stmt optimizations
   in
@@ -394,11 +484,11 @@ let optimize_stmt (prog:program_t) (stmt:stmt_t) =
     !curr
 ;;
 
-let optimize_policy (prog:program_t) (policy:policy_t) = 
+let optimize_policy ?(opt_modes = default_opt_modes) (prog:program_t) (policy:policy_t) = 
   let (name, args, events) = policy in
   ( name, args, 
     List.map (fun (evt, stmt) -> 
-      (evt, optimize_stmt prog stmt)
+      (evt, optimize_stmt opt_modes prog stmt)
     ) events
   )
 ;;

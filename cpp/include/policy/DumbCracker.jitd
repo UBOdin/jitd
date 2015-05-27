@@ -1,6 +1,6 @@
 
-cog Array(buffer buff);
-cog SortedArray(buffer buff);
+cog Array(Buffer buffer);
+cog SortedArray(Buffer buffer);
 cog BTree(cog lhs, cog rhs, record sep);
 cog Concat(cog lhs, cog rhs);
 cog Delete(cog source, cog deleted);
@@ -87,9 +87,8 @@ rule SplitArrayRandom is
 ;
 
 rule SortArray is
-  | Array(buff) => {
-    let buffer sorted := buff->sort() in
-    rewrite _ as SortedArray(sorted)
+  | x:Array(_) => {
+    rewrite x as ( x->sortedCog() )
   }
 ;
 

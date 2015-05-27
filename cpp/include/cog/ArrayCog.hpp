@@ -79,7 +79,6 @@ class ArrayCog : public Cog<Tuple>
       std::cout << "Array[" << (end-start) << " elements]" << std::endl;
     }
     
-  private:
     Buffer<Tuple> buffer;
     BufferElement<Tuple> start;
     BufferElement<Tuple> end;

@@ -22,7 +22,6 @@ type bin_op_t =
   | Subtract
   | Divide
   | ElementOf
-  | PtrElementOf
 
 type cmp_op_t = Eq | Neq | Lt | Lte | Gt | Gte
 
@@ -180,7 +179,6 @@ let string_of_bin_op = function
   | Subtract -> "-"
   | Divide   -> "/"
   | ElementOf -> "."
-  | PtrElementOf -> "->"
 
 let string_of_const = function
   | CInt(i)      -> string_of_int i

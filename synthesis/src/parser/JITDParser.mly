@@ -76,7 +76,7 @@ var_defn_list:
   | var_defn                     { [$1] }
 
 var_defn:
-  | ID ID                        { ($2, String.lowercase $1) }
+  | ID ID                        { ($2, $1) }
   | COG ID                       { ($2, "cog") }
   | RULE ID                      { ($2, "rule") }
   | error                        { error "Invalid Variable Definition" }
@@ -163,15 +163,16 @@ cmp_op:
   | GTE   { JITD.Gte }
 
 bin_expr:
-  | base_expr bin_op bin_expr { BinOp($2, $1, $3) }
-  | base_expr                 { $1 }
+  | base_expr bin_op      bin_expr { BinOp($2, $1, $3) }
+  | base_expr SINGLEARROW bin_expr { BinOp(JITD.ElementOf, 
+                                        (JITD.Function("*", [$1])), $3) }
+  | base_expr                      { $1 }
 
 bin_op:
   | ADD         { JITD.Add }
   | SUB         { JITD.Subtract } 
   | MULT        { JITD.Multiply } 
   | DIV         { JITD.Divide }
-  | SINGLEARROW { JITD.PtrElementOf }
   | PERIOD      { JITD.ElementOf }
 
 base_expr:

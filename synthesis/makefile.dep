@@ -1,3 +1,5 @@
+src/Debug.cmo :
+src/Debug.cmx :
 src/JITD.cmo :
 src/JITD.cmx :
 src/Optimizer.cmo : src/JITD.cmo

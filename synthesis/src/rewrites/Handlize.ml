@@ -5,7 +5,7 @@ module StringMap = Map.Make(String)
 let handlize ((var_name,var_type):var_t) (stmt:stmt_t) =
   let var_handle = "__body_of_"^var_name in
   Let(  (var_handle,JITD.cog_body_type), 
-        (BinOp(PtrElementOf, (Var(var_name)), (Function("get", [])))),
+        (BinOp(ElementOf, (Function("*", [Var(var_name)])), (Function("get", [])))),
         (Optimizer.inline_stmt_vars 
             ~strict:false
             (StringMap.singleton var_name (Var(var_handle)))

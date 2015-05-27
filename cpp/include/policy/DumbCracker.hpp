@@ -1,25 +1,23 @@
-class DumbCracker : RewritePolicyBase {
+class DumbCracker : public RewritePolicyBase <Record> {
   public: 
   
   DumbCracker( int minSize ) : minSize(minSize) {}
   
-  void BeginIterator(CogHandle __context_root) {
+  void BeginIterator(CogHandle<Record> __context_root) {
     {
-       CogPtr __body_of___context_root =  __context_root->get(  ) ;
-       if ( (__body_of___context_root->type() == COG_ARRAY) ) 
+       CogPtr<Record> __body_of___context_root = 
+         __context_root->get(  ) ;
+       if ( __body_of___context_root->type == COG_ARRAY ) 
         {
           {
-             ArrayCog * x =  __matched_Array_cog ;
+             ArrayCog<Record> * __matched_Array_cog = 
+               (ArrayCog<Record> *)( __body_of___context_root.get(  ) ) ;
             {
-               ArrayCog * __matched_Array_cog = 
-                 (ArrayCog *)( __body_of___context_root ) ;
+               ArrayCog<Record> * x =  __matched_Array_cog ;
               {
-                 auto buff =  __matched_Array_cog->buff ;
+                 auto buff =  __matched_Array_cog->buffer ;
                 if( x->size(  )<=minSize )
-                 {
-                    buffer sorted =  buff->sort(  ) ;
-                   __context_root->put( SortedArrayCog( sorted ) )
-                 }
+                 x->put( x->sortedCog(  ) )
                 else
                  {
                     Record target =  buff->randomElement(  ) ;
@@ -33,7 +31,6 @@ class DumbCracker : RewritePolicyBase {
                      )
                    }
                  }
-                }
               }
             }
           }

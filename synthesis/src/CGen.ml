@@ -4,14 +4,18 @@ open PrettyFormat
 exception InvalidMatchPair of expr_t * pattern_t
 exception Unsupported of string
 exception UndefinedCogType of string * pattern_t 
+
+let record_type = "Record"
+
+
 let cpp_of_type (prog:program_t) = function
-  | "cog" -> "CogHandle"
-  | "cog_body" -> "CogPtr"
-  | "record" -> "Record" 
+  | "cog" -> "CogHandle<"^record_type^">"
+  | "cog_body" -> "CogPtr<"^record_type^">"
+  | "record" -> record_type 
   | t ->
     begin try 
       let _ = lookup_cog prog t
-      in t^"Cog"
+      in t^"Cog<"^record_type^">"
     with Not_found -> 
       t
     end
@@ -58,7 +62,7 @@ let rec cpp_match_conditions (match_tgt:expr_t) (match_pattern:pattern_t):
   | (_, PCog(cog_name, cog_args)) as cog_pattern ->
     begin match match_tgt with
       | Var(v) -> 
-        [raw ("("^v^"->type() == COG_"^(String.uppercase cog_name)^")")]
+        [raw (v^"->type == COG_"^(String.uppercase cog_name))]
       | Function(f_name, f_args) ->
         if f_name = cog_name 
         then List.flatten (List.map2 rcr f_args cog_args)
@@ -84,12 +88,12 @@ let rec cpp_match_bindings (prog:program_t) (continuation:stmt_t)
       | None -> body
       | Some(label) ->
         Let((label, new_tgt_type), new_tgt, body)
-  in build_binding (
+  in 
     match (snd pattern) with 
       | PCog(cog_name, cog_args) ->
         begin match tgt with 
           | Function(cog_type, tgt_args) -> 
-              (
+              build_binding (
                 List.fold_left2 rcr continuation tgt_args cog_args,
                 tgt, 
                 cpp_of_type_ptr prog cog_type
@@ -103,27 +107,28 @@ let rec cpp_match_bindings (prog:program_t) (continuation:stmt_t)
               in 
               let tgt_var_type = cpp_of_type_ptr prog cog_name in
               let typed_tgt_var = "__matched_"^cog_name^"_cog" in
-                (
-                  (Let((typed_tgt_var, tgt_var_type), 
-                    (Function("("^(cpp_of_type_ptr prog cog_name)^")", [tgt])),
-                    List.fold_left2 (fun body cog_arg cog_var ->
-                      
-                      let new_tgt = 
-                        BinOp(PtrElementOf, Var(typed_tgt_var), Var(fst cog_var))
-                      in
-                        rcr body new_tgt cog_arg
-                      
-                    ) continuation cog_args cog
-                  )),
-                  (Var(typed_tgt_var)),
-                  tgt_var_type
-                )
-                  
+                (Let((typed_tgt_var, tgt_var_type), 
+                  (Function("("^(cpp_of_type_ptr prog cog_name)^")", [
+                      BinOp(ElementOf, tgt, (Function("get", [])))])),
+                  (build_binding (
+                      (List.fold_left2 (fun body cog_arg cog_var ->
+                        let new_tgt = 
+                          BinOp(ElementOf, (Function("*", [Var(typed_tgt_var)])), Var(fst cog_var))
+                        in
+                          rcr body new_tgt cog_arg
+                        
+                      ) continuation cog_args cog)
+                    ,
+                    (Var(typed_tgt_var)),
+                    tgt_var_type
+                  ))
+                ))
+
         end
       | PTuple(tuple_elems) -> 
         begin match tgt with 
           | Tuple(tgt_args) -> 
-              ( 
+              build_binding ( 
                 List.fold_left2 rcr continuation tgt_args tuple_elems,
                 tgt,
                 cpp_of_type prog "tuple"
@@ -132,12 +137,12 @@ let rec cpp_match_bindings (prog:program_t) (continuation:stmt_t)
           | _ -> raise (InvalidMatchPair(tgt, pattern))
         end
       | PAny -> 
-              (
+              build_binding (
                 continuation,
                 tgt,
                 cpp_of_type prog (type_of_pattern pattern)
               )
-    )   
+       
 ;;  
   
 
@@ -166,7 +171,6 @@ let rec cpp_of_stmt (prog:program_t) (stmt:stmt_t) =
       indent 1 (rcr t);
       raw "else";
       indent 1 (rcr e);
-      raw "}"
     ]
   
   | Match(match_tgt, match_pats) ->
@@ -189,7 +193,7 @@ let rec cpp_of_stmt (prog:program_t) (stmt:stmt_t) =
 
 let cpp_of_event (prog:program_t) (((event, args):evt_t), (effect:stmt_t)) = 
   let handlized_effect = Handlize.rewrite prog effect in
-  paren ("void "^event^"(CogHandle "^default_rule_target^") {") 
+  paren ("void "^event^"(CogHandle<"^record_type^"> "^default_rule_target^") {") 
         (cpp_of_stmt prog handlized_effect)
         "}"
 
@@ -198,7 +202,7 @@ let cpp_of_include_file (f:string) =
 
 let cpp_of_policy  (prog:program_t) ((name, args, events):policy_t) =
 
-  paren ("class "^name^" : RewritePolicyBase {") (
+  paren ("class "^name^" : public RewritePolicyBase <"^record_type^"> {") (
     lines (
       [
         raw "public: ";
@@ -221,4 +225,14 @@ let cpp_of_policy  (prog:program_t) ((name, args, events):policy_t) =
       @(List.map (fun arg -> paren "" (cpp_of_var prog arg) ";") args)
     )
   ) "}"
+
+let cpp_of_jitd (name:string) (prog:program_t) =
+  let shield_name = "_"^(String.uppercase name)^"_INCLUDE_SHIELD" in
+  lines ([
+    raw ("#ifndef "^shield_name);
+    raw ("#define "^shield_name);
+  ]@(List.map (cpp_of_policy prog) prog.JITD.policies)@[
+    raw ("#endif  //"^shield_name);
+  ])
+
   

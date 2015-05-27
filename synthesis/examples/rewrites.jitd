@@ -1,6 +1,6 @@
 
-cog Array(buffer buff);
-cog SortedArray(buffer buff);
+cog Array(buffer buffer);
+cog SortedArray(buffer buffer);
 cog BTree(cog lhs, cog rhs, record sep);
 cog Concat(cog lhs, cog rhs);
 cog Delete(cog source, cog deleted);
