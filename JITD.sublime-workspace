@@ -1,0 +1,741 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pat",
+				"pattern_match_bindings"
+			],
+			[
+				"opti",
+				"optimizer_features"
+			],
+			[
+				"defau",
+				"default_opt_modes"
+			],
+			[
+				"con",
+				"continuation"
+			],
+			[
+				"pattern",
+				"pattern_match_condition"
+			],
+			[
+				"expr",
+				"expr_t"
+			],
+			[
+				"flatte",
+				"flatten_matches"
+			],
+			[
+				"ac",
+				"active_tags"
+			],
+			[
+				"a",
+				"active_tags"
+			],
+			[
+				"string_of_",
+				"string_of_stmt"
+			],
+			[
+				"op",
+				"optimizer_feature_active"
+			],
+			[
+				"optimiz",
+				"optimizer_feature_levels"
+			],
+			[
+				"rec",
+				"record_type"
+			],
+			[
+				"in",
+				"in"
+			],
+			[
+				"pro",
+				"program_t"
+			],
+			[
+				"test",
+				"test_name"
+			],
+			[
+				"getRi",
+				"getRightExpression"
+			],
+			[
+				"getLeft",
+				"getLeftExpression"
+			],
+			[
+				"Select",
+				"SelectionNode"
+			],
+			[
+				"PlanR",
+				"planRewrite"
+			],
+			[
+				"Hash",
+				"HashJoinNode"
+			],
+			[
+				"table",
+				"tableName"
+			],
+			[
+				"colu",
+				"columnName"
+			],
+			[
+				"Selec",
+				"SelectionNode"
+			],
+			[
+				"Arit",
+				"Arithmetic"
+			],
+			[
+				"Ari",
+				"Arith"
+			],
+			[
+				"ari",
+				"Arith"
+			],
+			[
+				"rhs",
+				"rhs_high"
+			],
+			[
+				"proc",
+				"procHandler"
+			],
+			[
+				"expression",
+				"Expression"
+			],
+			[
+				"comp",
+				"compileForBounds"
+			],
+			[
+				"is",
+				"isProbabilistic"
+			],
+			[
+				"Bool",
+				"BoolPrimitive"
+			],
+			[
+				"S",
+				"SQLException"
+			],
+			[
+				"Boo",
+				"BoolPrimitive"
+			],
+			[
+				"Dis",
+				"DiskOrderedCursorConfig"
+			],
+			[
+				"Ind",
+				"IndexDefinition"
+			],
+			[
+				"de",
+				"defaultIndexesInstalled"
+			],
+			[
+				"inde",
+				"indexFile"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "synthesis/src/parser/JITDParser.mly",
+			"settings":
+			{
+				"buffer_size": 5811,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "synthesis/src/Driver.ml",
+			"settings":
+			{
+				"buffer_size": 2737,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "synthesis/src/Debug.ml",
+			"settings":
+			{
+				"buffer_size": 602,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "synthesis/src/Optimizer.ml",
+			"settings":
+			{
+				"buffer_size": 17431,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "synthesis/src/JITD.ml",
+			"settings":
+			{
+				"buffer_size": 8122,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "synthesis/src/rewrites/Handlize.ml",
+			"settings":
+			{
+				"buffer_size": 652,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "synthesis/src/CGen.ml",
+			"settings":
+			{
+				"buffer_size": 7465,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/Makefile/Make.sublime-build",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+		],
+		"width": 392.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/okennedy/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/okennedy/Documents/JITD/cpp/include/policy/DumbCracker.jitd",
+		"/Users/okennedy/Documents/JITD/Makefile",
+		"/Users/okennedy/Documents/JITD/synthesis/src/JITD.ml",
+		"/Users/okennedy/Desktop/team17/Rakefile",
+		"/Users/okennedy/Library/Application Support/Sublime Text 2/Packages/User/SetPath.py",
+		"/Users/okennedy/Documents/JITD/synthesis/src/CGen.ml",
+		"/Users/okennedy/Documents/JITD/synthesis/examples/rewrites.jitd",
+		"/Users/okennedy/Documents/JITD/cpp/include/policy/DumbCracker.hpp",
+		"/Users/okennedy/Documents/JITD/synthesis/Makefile",
+		"/Users/okennedy/Documents/JITD/cpp/include/cog.hpp",
+		"/Users/okennedy/Documents/JITD/cpp/include/data.hpp",
+		"/Users/okennedy/Documents/JITD/cpp/include/cog/ArrayCog.hpp",
+		"/Users/okennedy/Documents/JITD/cpp/include/policy/Cracker.hpp",
+		"/Users/okennedy/Documents/JITD/.sublime-build",
+		"/Users/okennedy/Documents/JITD/JITD.sublime-project",
+		"/Users/okennedy/Documents/JITD/cpp/Makefile",
+		"/Users/okennedy/Documents/JITD/include/policy/DumbCracker.hpp",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/dbgen/queries/3.sql",
+		"/Users/okennedy/Documents/Administrivia/Letters/2015/Scott-2015-PhD-UB.tex",
+		"/Users/okennedy/Documents/Administrivia/Letters/2015/Scott-2015-PhD.tex",
+		"/Users/okennedy/Desktop/team26/tpch/tpch5.sql",
+		"/Users/okennedy/Desktop/team26/Rakefile",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/dbgen/queries/5.sql",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/dbgen/queries/10.sql",
+		"/Users/okennedy/Desktop/team26/java.hprof.txt",
+		"/Users/okennedy/Desktop/team9/src/edu/buffalo/cse562/Main.java",
+		"/Users/okennedy/Desktop/team9/Rakefile",
+		"/Users/okennedy/Desktop/team9/tpch/tpch5.sql",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/dbgen/queries/1.sql",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/dbgen/queries/6.sql",
+		"/Users/okennedy/Documents/JITD/java/src/jitd/PushdownMergeMode.java",
+		"/Users/okennedy/Desktop/bdb.csv",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/dbgen/queries/12.sql",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/.gitignore",
+		"/Users/okennedy/Library/Mobile Documents/iCloud~com~codeux~irc~textual5/Documents/Chat Logs/Odin (8AD79)/Channels/#xgerine/2015-04-20.txt",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint3/optimizer/Optimizer.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/db",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/build.xml",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/distsrc/edu/buffalo/cse562/Main.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint3/util/ExpressionScan.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint3/util/ExtractSchema.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint1/plan/PlanNode.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint1/SetUtils.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/jsqlparser/src/net/sf/jsqlparser/schema/Column.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint3/optimizer/PushSelections.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint2/eval/HashJoinTupleIterator.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint2/optimizer/PlanRewrite.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint3/optimizer/SpecializeJoins.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/libs/checkpoint-libs/src/edu/buffalo/cse562/checkpoint3/optimizer/PlanRewrite.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/projects/cse562_2014sp_4.rb",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/2015sp/emails/mail.rb",
+		"/Users/okennedy/Documents/Mimir/Src/src/main/scala/mimir/ctables/CTAnalysis.scala",
+		"/Users/okennedy/Library/Application Support/Sublime Text 2/Packages/User/SBT.sublime-build",
+		"/Users/okennedy/Desktop/team2/src/edu/buffalo/cse562/index/IndexDefinition.java",
+		"/Users/okennedy/Documents/CSE562-GradDatabases/Grader/engine/Makefile",
+		"/Users/okennedy/Desktop/team2/src/edu/buffalo/cse562/Schema.java",
+		"/Users/okennedy/Desktop/team2/src/edu/buffalo/cse562/index/IndexManager.java",
+		"/Users/xthemage/.profile"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"single",
+			"refine_match_target",
+			"feature",
+			"tag",
+			"lower",
+			"buffer",
+			"CogPtr",
+			"Record",
+			"300132",
+			"db.",
+			"300142",
+			"\"QUERY\"",
+			"SqlException",
+			"JoinNode",
+			"SqlException",
+			"SQLException",
+			"db.",
+			"134",
+			"case",
+			"schema",
+			"compileMLE\\([^):]*\\)",
+			"schema",
+			"compileMLE",
+			"compileMLE\\([^):]*\\)",
+			"compileDeterministic\\([^):]*\\)",
+			"src.schema",
+			"src",
+			"compile",
+			"_mid",
+			"mid_",
+			"_big",
+			"apply(",
+			"scan",
+			".out.",
+			"editor"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "synthesis/src/parser/JITDParser.mly",
+					"settings":
+					{
+						"buffer_size": 5811,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4166,
+								4166
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCamlyacc.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5376.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "synthesis/src/Driver.ml",
+					"settings":
+					{
+						"buffer_size": 2737,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1939,
+								1939
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCaml.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 736.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "synthesis/src/Debug.ml",
+					"settings":
+					{
+						"buffer_size": 602,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								51,
+								64
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCaml.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "synthesis/src/Optimizer.ml",
+					"settings":
+					{
+						"buffer_size": 17431,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15636,
+								15636
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCaml.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6188.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "synthesis/src/JITD.ml",
+					"settings":
+					{
+						"buffer_size": 8122,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5218,
+								5218
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCaml.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2303.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "synthesis/src/rewrites/Handlize.ml",
+					"settings":
+					{
+						"buffer_size": 652,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								247,
+								247
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCaml.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "synthesis/src/CGen.ml",
+					"settings":
+					{
+						"buffer_size": 7465,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5449,
+								5449
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/OCaml/OCaml.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2093.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.599895198171,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 313.0
+	},
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"cgen",
+				"synthesis/src/CGen.ml"
+			],
+			[
+				"handli",
+				"synthesis/src/rewrites/Handlize.ml"
+			],
+			[
+				"ji",
+				"synthesis/src/JITD.ml"
+			],
+			[
+				"optimizer",
+				"synthesis/src/Optimizer.ml"
+			],
+			[
+				"make",
+				"synthesis/Makefile"
+			],
+			[
+				"data",
+				"cpp/include/data.hpp"
+			],
+			[
+				"cog.",
+				"cpp/include/cog.hpp"
+			],
+			[
+				"arrayco",
+				"cpp/include/cog/ArrayCog.hpp"
+			],
+			[
+				"expressionsc",
+				"checkpoint3/util/ExpressionScan.java"
+			],
+			[
+				"planno",
+				"checkpoint1/plan/PlanNode.java"
+			],
+			[
+				"expre",
+				"main/scala/mimir/algebra/Expression.scala"
+			],
+			[
+				"indexsca",
+				"eval/IndexScanOperator.java"
+			],
+			[
+				"planrew",
+				"optimizer/PlanRewrite.java"
+			],
+			[
+				"optim",
+				"optimizer/Optimizer.java"
+			],
+			[
+				"appl",
+				"optimizer/ApplyIndexes.java"
+			],
+			[
+				"plan",
+				"eval/PlanCompiler.java"
+			],
+			[
+				"heap",
+				"eval/HeapScanOperator.java"
+			],
+			[
+				"indexscan",
+				"eval/IndexScanOperator.java"
+			],
+			[
+				"indexman",
+				"index/IndexManager.java"
+			],
+			[
+				"schem",
+				"Schema.java"
+			],
+			[
+				"index",
+				"index/IndexDefinition.java"
+			],
+			[
+				"indexma",
+				"index/IndexManager.java"
+			],
+			[
+				"mai",
+				"Main.java"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 50.0,
+	"status_bar_visible": true
+}

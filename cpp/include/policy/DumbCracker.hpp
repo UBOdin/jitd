@@ -6,35 +6,43 @@ class DumbCracker : public RewritePolicyBase <Record> {
   void BeginIterator(CogHandle<Record> __context_root) {
     {
        CogPtr<Record> __body_of___context_root = 
-         __context_root->get(  ) ;
-       if ( __body_of___context_root->type == COG_ARRAY ) 
-        {
-          {
-             ArrayCog<Record> * __matched_Array_cog = 
-               (ArrayCog<Record> *)( __body_of___context_root.get(  ) ) ;
+         *( __context_root ).get(  ) ;
+      if(
+        __cog_type_symbol( "Array" )==
+          __type_of_cog( __body_of___context_root )
+      )
+       {
+          auto x =  __body_of___context_root ;
+         {
+            auto buff =  __field_of_cog( __body_of___context_root, buffer ) ;
+           if( *( x ).size(  )<=minSize )
+            x->put( *( x ).sortedCog(  ) )
+           else
             {
-               ArrayCog<Record> * x =  __matched_Array_cog ;
-              {
-                 auto buff =  __matched_Array_cog->buffer ;
-                if( x->size(  )<=minSize )
-                 x->put( x->sortedCog(  ) )
-                else
+               Record target =  *( buff ).randomElement(  ) ;
+              if(
+                __cog_type_symbol( "Array" )==
+                  __type_of_cog( __body_of___context_root )
+              )
+               {
+                  auto buff =  __field_of_cog( __body_of___context_root, buffer ) ;
                  {
-                    Record target =  buff->randomElement(  ) ;
-                   {
-                      auto buff_pair =  buff->split( target ) ;
-                     __context_root->put(
-                       BTreeCog(
-                         ArrayCog( buff_pair.first ), ArrayCog( buff_pair.second ), 
-                           target
-                       )
+                    auto buff_pair =  *( buff ).split( target ) ;
+                   __context_root->put(
+                     BTreeCog(
+                       ArrayCog( buff_pair.first ), ArrayCog( buff_pair.second ), 
+                         target
                      )
-                   }
+                   )
                  }
-              }
+               }
+              else
+               /* no-op */
             }
-          }
-        }
+         }
+       }
+      else
+       /* no-op */
     }
   }
   

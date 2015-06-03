@@ -1,6 +1,7 @@
 
 
 FILES = \
+	src/Debug \
 	src/JITD \
 	src/Optimizer \
 	src/rewrites/Handlize \

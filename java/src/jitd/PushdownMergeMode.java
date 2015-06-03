@@ -17,7 +17,7 @@ public class PushdownMergeMode extends Mode
   private static Logger log = 
     org.apache.logging.log4j.LogManager.getLogger();
   
-  public static final int BLOCK_SIZE = 10*1000*1000;
+  public static final int BLOCK_SIZE = 1000*1000;
   public static final int MERGE_BLOCK_SIZE = 10000;
   boolean firstRun = true;
   
