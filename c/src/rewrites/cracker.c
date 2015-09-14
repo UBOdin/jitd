@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "btree.h"
+#include "cog.h"
+#include "data.h"
 
 cog *pushdown_concats(cog *c, long low, long high) {
   if(c->type == COG_BTREE) {

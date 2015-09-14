@@ -81,7 +81,7 @@ list *get_cog_from_list(list *list, struct cog *cog);
 
 void cleanup_list(list *list);
 
-void convert_to_sortedarrays(struct cog *cog);
+void convert_to_sortedarray(struct cog *cog);
 
 cog *array_load(iterator iter, int len);
 
@@ -92,6 +92,8 @@ stack_triple *create_stack();
 double_struct *create_double_struct();
 
 stack_triple *pop_stack(stack_triple **stack);
+
+void cleanup_stack(stack_triple *stack);
 
 void fold_append(stack_triple **stack, struct cog *c, long key);
 

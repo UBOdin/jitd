@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "btree.h"
+#include "cog.h"
 #include "adaptive_merge.h"
 
 cog *partition_cog(cog *c) {

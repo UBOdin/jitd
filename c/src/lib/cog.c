@@ -187,6 +187,8 @@ iterator scan_full_array( struct cog *cog) {
       ret = array_iter_alloc(out, 0, tgt);
       return ret;
     }
+    fprintf(stderr, "Invalid Cog Type %d\n", cog->type);
+    exit(-1);
 }
 
 // Calculates the length of the Cog.
@@ -288,6 +290,9 @@ long cog_min(struct cog *c) {
       min = buffer_key(c->data.sortedarray.records, c->data.sortedarray.start);
     }
     break;
+  case COG_ARRAY:
+    fprintf(stderr, "Unhandled case: Array min\n");
+    exit(-1);
   }
   return min;
 }
@@ -326,7 +331,7 @@ int peek_depth(stack_triple **top) {
 
 triple *create_triple() {
   triple *new = malloc(sizeof(struct triple));
-  new->cog == NULL;
+  new->cog = NULL;
   return new;
 }
 
