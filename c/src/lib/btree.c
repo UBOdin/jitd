@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "btree.h"
-#include "btree_lib.h"
+#include "cog.h"
+#include "data.h"
 
 void free_cog(cog *c) { free(c); }
 
