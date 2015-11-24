@@ -82,7 +82,10 @@ public class ScriptDriver {
   
   public void seqRead(int count, long width)
   {
-    for(int i = 0; i < count; i++) { read(randKey(), width); }
+    for(int i = 0; i < count; i++) { 
+      long randomKey = randKey();
+      read(randomKey, randomKey+width); 
+    }
   }
   
   public Mode modeForString(String mode){
