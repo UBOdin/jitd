@@ -1,0 +1,69 @@
+import java.util.Scanner;
+
+public class ArrayCog {
+	
+	public static void getkeyvalue(int[]ArrayCog, int key)
+	{
+	for (int i = 0; i < ArrayCog.length; i++)
+	      {
+	           if ( ArrayCog[i] == key ) 
+	           {
+	                 System.out.println("Value for the given key is: " +i);  //Returns the value of key
+	           }
+	           
+	      }
+	System.out.println("No value found for the given key");
+	}
+	
+	//Get key value for Btree
+	public static void getvalueBtree(int[]BtreeCog, int key)
+	{
+	if(key < sep)
+	      {
+	           for (int i=0; i < lhs.length; i++ )
+	        	   if (lhs[i] == key) //Is LHS one value or referred to all elements on left side of tree?
+	           {
+	                 System.out.println("Value for the given key is: " +i);  //Returns the vale of key
+	           }
+	           
+	      }
+	System.out.println("No value found for the given key");
+	
+	else
+	{
+		for (int i=0; i < rhs.length; i++ )
+			if(rhs[i] == key)
+			{
+				System.out.println("Value for the given key is: " +i);
+			}
+	}
+	System.out.println("No value found for the given key");
+	}
+	
+	
+	public static void main(String []args){
+	        
+	// declaring an array of integers
+	int[] ArrayCog;
+	
+	//declaring variable key
+	int key;
+
+	// allocates memory for 10 integers
+	ArrayCog = new int[5];
+	           
+	//Adding elements on to array
+	ArrayCog[0] = 400;
+	ArrayCog[1] = 200;
+	ArrayCog[2] = 300;
+	ArrayCog[3] = 600;
+	ArrayCog[4] = 500;
+	
+	//getting array value based on a key if the array is unsorted
+	System.out.println("Enter a key you want to search:");
+	Scanner user_input = new Scanner(System.in);
+	key = user_input.nextInt(); //only for testing purpose
+	getkeyvalue(ArrayCog, key);
+	getvalueBtree(BtreeCog,key); //Assuming Btree Cog takes care of the declaration of sep, lhs and rhs
+	}
+}
