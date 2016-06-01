@@ -23,6 +23,7 @@ int main(int argc, char** argv)
   {
     //if(op % 10 == 0){ 
       cerr <<endl<< ":" << op; cerr.flush(); 
+	//
 	//}
     long int choice = rand() % diff_mark;
     long int threshold = values.size() - low_mark;
