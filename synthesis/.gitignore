@@ -1,8 +1,0 @@
-*.cmi
-*.cmx
-*.cmxi
-*.cmo
-*Lexer.ml
-*Parser.ml
-*Parser.mli
-jitd
