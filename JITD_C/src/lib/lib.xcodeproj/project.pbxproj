@@ -1,0 +1,152 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		31E96C8C1C7B49F8005F9707 /* .DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = .DS_Store; sourceTree = "<group>"; };
+		31E96C8D1C7B49F8005F9707 /* cog.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cog.c; sourceTree = "<group>"; };
+		31E96C8E1C7B49F8005F9707 /* data.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = data.c; sourceTree = "<group>"; };
+		31E96C8F1C7B49F8005F9707 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
+		31E96C901C7B49F8005F9707 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		31E96C911C7B49F8005F9707 /* policy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = policy.c; sourceTree = "<group>"; };
+		31E96C921C7B49F8005F9707 /* splay.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = splay.c; sourceTree = "<group>"; };
+		31E96C931C7B49F8005F9707 /* util.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = util.c; sourceTree = "<group>"; };
+		31E96C941C7B49F8005F9707 /* zipf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zipf.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		31E96C861C7B49F8005F9707 = {
+			isa = PBXGroup;
+			children = (
+				31E96C8C1C7B49F8005F9707 /* .DS_Store */,
+				31E96C8D1C7B49F8005F9707 /* cog.c */,
+				31E96C8E1C7B49F8005F9707 /* data.c */,
+				31E96C8F1C7B49F8005F9707 /* include */,
+				31E96C901C7B49F8005F9707 /* Makefile */,
+				31E96C911C7B49F8005F9707 /* policy.c */,
+				31E96C921C7B49F8005F9707 /* splay.c */,
+				31E96C931C7B49F8005F9707 /* util.c */,
+				31E96C941C7B49F8005F9707 /* zipf.c */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		31E96C8B1C7B49F8005F9707 /* lib */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 31E96C951C7B49F8005F9707 /* Build configuration list for PBXLegacyTarget "lib" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Users/razie/Desktop/ASTral/policy-design/src/lib";
+			dependencies = (
+			);
+			name = lib;
+			passBuildSettingsInEnvironment = 1;
+			productName = lib;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		31E96C871C7B49F8005F9707 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 31E96C8A1C7B49F8005F9707 /* Build configuration list for PBXProject "lib" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 31E96C861C7B49F8005F9707;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				31E96C8B1C7B49F8005F9707 /* lib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		31E96C881C7B49F8005F9707 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		31E96C891C7B49F8005F9707 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		31E96C961C7B49F8005F9707 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = lib;
+			};
+			name = Debug;
+		};
+		31E96C971C7B49F8005F9707 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = lib;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		31E96C8A1C7B49F8005F9707 /* Build configuration list for PBXProject "lib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31E96C881C7B49F8005F9707 /* Debug */,
+				31E96C891C7B49F8005F9707 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		31E96C951C7B49F8005F9707 /* Build configuration list for PBXLegacyTarget "lib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31E96C961C7B49F8005F9707 /* Debug */,
+				31E96C971C7B49F8005F9707 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 31E96C871C7B49F8005F9707 /* Project object */;
+}
