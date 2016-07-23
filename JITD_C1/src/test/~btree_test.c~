@@ -142,149 +142,149 @@ void test3()
   cleanup(c);
 }
 
-//void test4() 
-//{
-//    printf("test 4\n");
-//    cog *c = make_concat(
-//        mk_random_array(BUFFER_SIZE),
-//        mk_random_array(BUFFER_SIZE)
-//        );
-//    c = crack(c, 100, 200);
-//    c = crack(c, 400, 700);
-//    c = crack(c, 800, 900);
-//    test_scan(c, 1, 1000);
-//    //racleanup(c);
-//}
+void test4() 
+{
+    printf("test 4\n");
+    cog *c = make_concat(
+        mk_random_array(BUFFER_SIZE),
+        mk_random_array(BUFFER_SIZE)
+        );
+    c = crack(c, 100, 200);
+    c = crack(c, 400, 700);
+    c = crack(c, 800, 900);
+    test_scan(c, 1, 1000);
+    //racleanup(c);
+}
 
-//void test5() 
-//{
-//  // Perform the test for adaptive merge
-//  printf("test 5\n");
-//  cog *c = make_concat(
-//      mk_random_array(BUFFER_SIZE),
-//      mk_random_array(BUFFER_SIZE)
-//      );
-//  double_struct *ret;
-//  printf("Scan 1\n");
-//  ret = amerge(c, 100, 200);
-//  iter_dump(ret->iter);
-//  iter_cleanup(ret->iter);
-//  c = ret->cog;
-//  free(ret);
-//  printf("Scan 2\n");
-//  ret = amerge(c, 300, 700);
-//  iter_dump(ret->iter);
-//  cleanup(ret->cog);
-//  iter_cleanup(ret->iter);
-//  free(ret);
-//}
+void test5() 
+{
+  // Perform the test for adaptive merge
+  printf("test 5\n");
+  cog *c = make_concat(
+      mk_random_array(BUFFER_SIZE),
+      mk_random_array(BUFFER_SIZE)
+      );
+  double_struct *ret;
+  printf("Scan 1\n");
+  ret = amerge(c, 100, 200);
+  iter_dump(ret->iter);
+  iter_cleanup(ret->iter);
+  c = ret->cog;
+  free(ret);
+  printf("Scan 2\n");
+  ret = amerge(c, 300, 700);
+  iter_dump(ret->iter);
+  cleanup(ret->cog);
+  iter_cleanup(ret->iter);
+  free(ret);
+}
 
-//void splayTest() 
-//{
-//  printf("Splaying Test:\n");
-//  cog *six = make_btree(NULL, NULL, 6);
-//  cog *eight = make_btree(NULL, NULL, 8);
-//  cog *seven = make_btree(six, eight, 7);
-//  cog *four = make_btree(NULL, NULL, 4);
-//  cog *five = make_btree(four, seven, 5);
-//  cog *two = make_btree(NULL, NULL, 2);
-//  cog *three = make_btree(two, five, 3);
-//  cog *ten = make_btree(NULL, NULL, 10);
-//  cog *nine = make_btree(three, ten, 9);
-//  cog *zero = make_btree(NULL, NULL, 0);
-//  cog *one = make_btree(zero, nine, 1);
-//  cog *twelve = make_btree(NULL, NULL, 12);
-//  cog *eleven = make_btree(one, twelve, 11);
-//  printf("Before splay:\n");
-//  printJITD(eleven,0);
-//  printf("After splay:\n");
-//  splay(eleven, seven);
-//  printJITD(seven, 0);
-//}*/
+void splayTest() 
+{
+  printf("Splaying Test:\n");
+  cog *six = make_btree(NULL, NULL, 6);
+  cog *eight = make_btree(NULL, NULL, 8);
+  cog *seven = make_btree(six, eight, 7);
+  cog *four = make_btree(NULL, NULL, 4);
+  cog *five = make_btree(four, seven, 5);
+  cog *two = make_btree(NULL, NULL, 2);
+  cog *three = make_btree(two, five, 3);
+  cog *ten = make_btree(NULL, NULL, 10);
+  cog *nine = make_btree(three, ten, 9);
+  cog *zero = make_btree(NULL, NULL, 0);
+  cog *one = make_btree(zero, nine, 1);
+  cog *twelve = make_btree(NULL, NULL, 12);
+  cog *eleven = make_btree(one, twelve, 11);
+  printf("Before splay:\n");
+  printJITD(eleven,0);
+  printf("After splay:\n");
+  splay(eleven, seven);
+  printJITD(seven, 0);
+}
 
-//void test6(int reads)
-//{
-//  printf("Test JITD performance without splaying\n");
-//  struct cog *cog;
-//  cog = mk_random_array(1000000);
-//  //cog = timeRun(randomReads, cog, reads, 10000);
-//  //cog = timeRun(randomReads, cog, reads, 250);
-//  //cog = timeRun(randomReads, cog, reads, 1000);
-//  //cog = timeRun(randomReads, cog, reads, 5000);
-//  cog = timeRun(randomReads, cog, reads, 10);
-//}
+void test6(int reads)
+{
+  printf("Test JITD performance without splaying\n");
+  struct cog *cog;
+  cog = mk_random_array(1000000);
+  //cog = timeRun(randomReads, cog, reads, 10000);
+  //cog = timeRun(randomReads, cog, reads, 250);
+  //cog = timeRun(randomReads, cog, reads, 1000);
+  //cog = timeRun(randomReads, cog, reads, 5000);
+  cog = timeRun(randomReads, cog, reads, 10);
+}
 
-//void test7(int reads)
-//{
-//  printf("Test JITD performance with splaying\n");
-//  struct cog *cog;
-//  cog = mk_random_array(1000000);
-//  cog = timeRun(randomReads, cog, reads, 10000);
-//  splay(cog, getMedian(cog));
-//  //cog = timeRun(randomReads, cog, reads, 250);
-//  //splay(cog, getMedian(cog));
-//  //cog = timeRun(randomReads, cog, reads, 1000);
-//  //splay(cog, getMedian(cog));
-//  //cog = timeRun(randomReads, cog, reads, 5000);
-//  //splay(cog, getMedian(cog));
-//  //cog = timeRun(randomReads, cog, reads, 10);
-//  //splay(cog, getMedian(cog));
-//}
+void test7(int reads)
+{
+  printf("Test JITD performance with splaying\n");
+  struct cog *cog;
+  cog = mk_random_array(1000000);
+  cog = timeRun(randomReads, cog, reads, 10000);
+  splay(cog, getMedian(cog));
+  //cog = timeRun(randomReads, cog, reads, 250);
+  //splay(cog, getMedian(cog));
+  //cog = timeRun(randomReads, cog, reads, 1000);
+  //splay(cog, getMedian(cog));
+  //cog = timeRun(randomReads, cog, reads, 5000);
+  //splay(cog, getMedian(cog));
+  //cog = timeRun(randomReads, cog, reads, 10);
+  //splay(cog, getMedian(cog));
+}
 
-//void test8(int reads) 
-//{
-//  printf("Test zipfian performance without splaying\n");
-//  struct cog *cog, *cog_result, *cog_median;
-//  cog = mk_random_array(1000000);
-//  printf("cog = %u\n",cog);
-/  /
-//  // Cog without splaying
-//  cog_result = timeRun(doZipfianReads, cog, reads, 10000);
-//  //cog_result = timeRun(doZipfianReads, cog, reads, 250);
-//  //cog_result = timeRun(doZipfianReads, cog, reads, 1000);
-//  //cog_result = timeRun(doZipfianReads, cog, reads, 5000);
-//  //cog_result = timeRun(doZipfianReads, cog, reads, 10);
+void test8(int reads) 
+{
+  printf("Test zipfian performance without splaying\n");
+  struct cog *cog, *cog_result, *cog_median;
+  cog = mk_random_array(1000000);
+  printf("cog = %u\n",cog);
+ /
+  // Cog without splaying
+  cog_result = timeRun(doZipfianReads, cog, reads, 10000);
+  //cog_result = timeRun(doZipfianReads, cog, reads, 250);
+  //cog_result = timeRun(doZipfianReads, cog, reads, 1000);
+  //cog_result = timeRun(doZipfianReads, cog, reads, 5000);
+  //cog_result = timeRun(doZipfianReads, cog, reads, 10);
 
-//  printf("cog_result=%u\n",cog_result);
-
-
-//  struct cog **inorder_list=inorder(struct cog *cog);
-//  cog_median = getMedian(cog_result);
-
-//  Cog with splaying
-//  timeRun(splayTest, cog, 1000, 1000000);
-//  printJITD(cog_result, 0);
-//}
-
-//void test9(int reads) 
-//{
-//  printf("Test zipfian performance with splaying\n");
-//  struct cog *cog,*cog_result,*cog_median;
-//  cog = mk_random_array(1000000);
-
-//  // Cog without splaying
-//  cog_result = timeRun(zipfianReads_splay, cog, reads, 10000);
-//  struct cog **inorder_list=inorder(struct cog *cog);
-//  cog_median = getMedian(cog_result);
-//  cog_result = timeRun(zipfianReads_splay, cog, reads, 250);
-//  //struct cog **inorder_list=inorder(struct cog *cog);
-//  //cog_median = getMedian(cog_result);
-//  //cog_result = timeRun(zipfianReads_splay, cog, reads, 1000);
-//  //struct cog **inorder_list=inorder(struct cog *cog);
-//  //cog_median = getMedian(cog_result);
-//  //cog_result = timeRun(zipfianReads_splay, cog, reads, 5000);
-//  //struct cog **inorder_list=inorder(struct cog *cog);
-//  //cog_median = getMedian(cog_result);
-
-//  //cog_result = timeRun(zipfianReads_splay, cog, reads, 10);
-//  //struct cog **inorder_list=inorder(struct cog *cog);
-//  cog_median = getMedian(cog_result);
+  printf("cog_result=%u\n",cog_result);
 
 
-//  // Cog with splaying
-//  timeRun(splayTest, cog, 1000, 1000000);
-//  printJITD(cog_result, 0);
-//}
+  struct cog **inorder_list=inorder(struct cog *cog);
+  cog_median = getMedian(cog_result);
+
+  Cog with splaying
+  timeRun(splayTest, cog, 1000, 1000000);
+  printJITD(cog_result, 0);
+}
+
+void test9(int reads) 
+{
+  printf("Test zipfian performance with splaying\n");
+  struct cog *cog,*cog_result,*cog_median;
+  cog = mk_random_array(1000000);
+
+  // Cog without splaying
+  cog_result = timeRun(zipfianReads_splay, cog, reads, 10000);
+  struct cog **inorder_list=inorder(struct cog *cog);
+  cog_median = getMedian(cog_result);
+  cog_result = timeRun(zipfianReads_splay, cog, reads, 250);
+  //struct cog **inorder_list=inorder(struct cog *cog);
+  //cog_median = getMedian(cog_result);
+  //cog_result = timeRun(zipfianReads_splay, cog, reads, 1000);
+  //struct cog **inorder_list=inorder(struct cog *cog);
+  //cog_median = getMedian(cog_result);
+  //cog_result = timeRun(zipfianReads_splay, cog, reads, 5000);
+  //struct cog **inorder_list=inorder(struct cog *cog);
+  //cog_median = getMedian(cog_result);
+
+  //cog_result = timeRun(zipfianReads_splay, cog, reads, 10);
+  //struct cog **inorder_list=inorder(struct cog *cog);
+  cog_median = getMedian(cog_result);
+
+
+  // Cog with splaying
+  timeRun(splayTest, cog, 1000, 1000000);
+  printJITD(cog_result, 0);
+}
 
 #ifdef __ADVANCED
 /** A simple test that makes sure read counters are properly incremented when upon cracking. */
