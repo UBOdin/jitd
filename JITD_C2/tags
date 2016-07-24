@@ -37,6 +37,7 @@ UTIL_LIB_H_SHIELD	src/include/util.h	/^#define UTIL_LIB_H_SHIELD$/;"	d
 ZIPF_LIB_H_SHIELD	src/include/zipf.h	/^#define ZIPF_LIB_H_SHIELD$/;"	d
 _DECAY_FACTOR	src/lib/policy.c	/^#define _DECAY_FACTOR /;"	d	file:
 _DECAY_THRESHOLD	src/lib/policy.c	/^#define _DECAY_THRESHOLD /;"	d	file:
+__splayTest__	src/documentation/documentation.c	/^+splayTest+$/;"	r
 __test4__	src/documentation/documentation.c	/^+test4+$/;"	r
 __test5__	src/documentation/documentation.c	/^+test5+$/;"	r
 __test6__	src/documentation/documentation.c	/^+test6+$/;"	r
