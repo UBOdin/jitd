@@ -35,7 +35,6 @@ buffer mk_sorted_buffer(int size)
   return b;
 }
 
-
 cog *mk_random_array(int size) 
 {
   return make_array(0, size, mk_random_buffer(size));
@@ -83,6 +82,7 @@ void test3()
   cleanup(c);
 }
 
+/*|__test4__|*/
 void test4() 
 {
   printf("test 4\n");
@@ -97,6 +97,7 @@ void test4()
   cleanup(c);
 }
 
+/*|__test5__|*/
 void test5() 
 {
   // Perform the test for adaptive merge
@@ -120,6 +121,7 @@ void test5()
   free(ret);
 }
 
+/*|__splayTest__|*/
 void splayTest() 
 {
   printf("Splaying Test:\n");
@@ -143,6 +145,7 @@ void splayTest()
   printJITD(seven, 0);
 }
 
+/*|__test6__|*/
 void test6(int reads)
 {
   printf("Test JITD performance without splaying\n");
@@ -155,6 +158,7 @@ void test6(int reads)
   cog = timeRun(randomReads, cog, reads, 10);
 }
 
+/*|__test7__|*/
 void test7(int reads)
 {
   printf("Test JITD performance with splaying\n");
@@ -224,6 +228,7 @@ struct cog *zipfianReads_splay(struct cog *cog, long number, long range)
   return cog;
 }
 
+/*|__test8__|*/
 void test8() 
 {
   struct cog *cog, *cog_result, *cog_median;
@@ -238,6 +243,7 @@ void test8()
   //printJITD(cog_result, 0);
 }
 
+/*|__test9__|*/
 void test9() 
 {
   struct cog *cog,*cog_result,*cog_median;

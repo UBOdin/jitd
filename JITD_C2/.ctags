@@ -1,0 +1,3 @@
+--recurse=yes
+--exclude=.git
+--regex-c=/\+([a-z0-9_]+)\+/__\1__/
