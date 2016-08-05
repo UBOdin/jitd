@@ -6,30 +6,35 @@
 #ifndef BTREE_H_SHIELD
 #define BTREE_H_SHIELD
 
-typedef enum {
+typedef enum 
+{
   COG_CONCAT, COG_BTREE, COG_ARRAY, COG_SORTEDARRAY
 } cog_type;
 
-typedef struct cog {
+typedef struct cog 
+{
   cog_type type;
-  union {
+  union 
+  {
     struct { struct cog *lhs; struct cog *rhs; } concat;
-#ifndef __ADVANCED
+    #ifndef __ADVANCED
     struct { struct cog *lhs; struct cog *rhs; long sep; } btree;
-#else
+    #else
     struct { struct cog *lhs; struct cog *rhs; long sep; long rds; } btree;
-#endif
+    #endif
     struct { int start; int len; buffer records; } array;
     struct { int start; int len; buffer records; } sortedarray;
   } data;
 } cog;
 
-typedef struct list {
+typedef struct list 
+{
   struct cog *cog;
   struct list *next;
 } list;
 
-typedef struct extracted_components {
+typedef struct extracted_components 
+{
   struct cog *lhs;
   struct cog *rhs;
   long low_key;
@@ -37,18 +42,21 @@ typedef struct extracted_components {
   struct iterator *iter;
 } extracted_components;
 
-typedef struct triple {
+typedef struct triple 
+{
   struct cog *cog;
   int depth;
   long key;
 } triple;
 
-typedef struct stack_triple {
+typedef struct stack_triple 
+{
   struct triple *triple;
   struct stack_triple *next;
 } stack_triple;
 
-typedef struct double_struct {
+typedef struct double_struct 
+{
   struct cog *cog;
   iterator iter;
 } double_struct;

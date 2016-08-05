@@ -15,12 +15,12 @@
  * @return the new root of the rearranged tree
  */
 struct cog *zig(struct cog *root, struct cog *node) {
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.lhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.rhs);
   node->data.btree.rds = total;
-#endif
+  #endif
   root->data.btree.lhs = node->data.btree.rhs;
   node->data.btree.rhs = root;
   return node;
@@ -34,12 +34,12 @@ struct cog *zig(struct cog *root, struct cog *node) {
  * @return the new root of the rearranged tree
  */
 struct cog *zag(struct cog *root, struct cog *node) {
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.rhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.lhs);
   node->data.btree.rds = total;
-#endif
+  #endif
   root->data.btree.rhs = node->data.btree.lhs;
   node->data.btree.lhs = root;
   return node;
@@ -54,7 +54,7 @@ struct cog *zag(struct cog *root, struct cog *node) {
  */
 struct cog *zigzig(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.lhs;
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.lhs);
   root->data.btree.rds += getCumulativeReads(parent->data.btree.rhs);
@@ -62,7 +62,7 @@ struct cog *zigzig(struct cog *root, struct cog *node) {
   parent->data.btree.rds += getCumulativeReads(node->data.btree.rhs);
   parent->data.btree.rds += root->data.btree.rds;
   node->data.btree.rds = total;
-#endif
+  #endif
   root->data.btree.lhs = parent->data.btree.rhs;
   parent->data.btree.lhs = node->data.btree.rhs;
   parent->data.btree.rhs = root;
@@ -79,7 +79,7 @@ struct cog *zigzig(struct cog *root, struct cog *node) {
  */
 struct cog *zagzag(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.rhs;
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.rhs);
   root->data.btree.rds += getCumulativeReads(parent->data.btree.lhs);
@@ -87,7 +87,7 @@ struct cog *zagzag(struct cog *root, struct cog *node) {
   parent->data.btree.rds += getCumulativeReads(node->data.btree.lhs);
   parent->data.btree.rds += root->data.btree.rds;
   node->data.btree.rds = total;
-#endif
+  #endif
   root->data.btree.rhs = parent->data.btree.lhs;
   parent->data.btree.rhs = node->data.btree.lhs;
   parent->data.btree.lhs = root;
@@ -104,14 +104,14 @@ struct cog *zagzag(struct cog *root, struct cog *node) {
  */
 struct cog *zigzag(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.lhs;
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.lhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.rhs);
   parent->data.btree.rds -= getCumulativeReads(parent->data.btree.rhs);
   parent->data.btree.rds += getCumulativeReads(node->data.btree.lhs);
   node->data.btree.rds = total;
-#endif
+  #endif
   root->data.btree.lhs = node->data.btree.rhs;
   parent->data.btree.rhs = node->data.btree.lhs;
   node->data.btree.lhs = parent;
@@ -128,14 +128,14 @@ struct cog *zigzag(struct cog *root, struct cog *node) {
  */
 struct cog *zagzig(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.rhs;
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.rhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.lhs);
   parent->data.btree.rds -= getCumulativeReads(parent->data.btree.lhs);
   parent->data.btree.rds += getCumulativeReads(node->data.btree.rhs);
   node->data.btree.rds = total;
-#endif
+  #endif
   root->data.btree.rhs = node->data.btree.lhs;
   parent->data.btree.lhs = node->data.btree.rhs;
   node->data.btree.rhs = parent;
@@ -151,17 +151,27 @@ struct cog *zagzig(struct cog *root, struct cog *node) {
  * @return the depth of a given node
  */
 int getDepth(struct cog *root, struct cog *node) {
-  if (root == node) {
+  if (root == node) 
+  {
     return 0;
-  } else if (node->data.btree.sep < root->data.btree.sep) {
+  } 
+  else if (node->data.btree.sep < root->data.btree.sep) 
+  {
     return 1 + getDepth(root->data.btree.lhs, node);
-  } else if (node->data.btree.sep > root->data.btree.sep) {
+  } 
+  else if (node->data.btree.sep > root->data.btree.sep) 
+  {
     return 1 + getDepth(root->data.btree.rhs, node);
-  } else {
+  } 
+  else 
+  {
     struct cog *next = root->data.btree.lhs;
-    if (next != NULL && next->type == COG_BTREE && next->data.btree.sep == node->data.btree.sep) {
+    if (next != NULL && next->type == COG_BTREE && next->data.btree.sep == node->data.btree.sep) 
+    {
       return 1 + getDepth(next, node);
-    } else {
+    } 
+    else 
+    {
       next = root->data.btree.rhs;
       return 1 + getDepth(next, node);
     }
@@ -177,63 +187,99 @@ int getDepth(struct cog *root, struct cog *node) {
  * @return the new root of the rearranged tree
  */
 struct cog *splayDepth(struct cog *root, struct cog *node, int depth) {
-  if (root == node)  {
+  if (root == node)  
+  {
     return root;
-  } else if (node->data.btree.sep < root->data.btree.sep) {
-left:
-    if (root->data.btree.lhs == node) {
-      return zig(root, node);
-    } else if (root->data.btree.lhs->data.btree.lhs == node) {
-      return zigzig(root, node);
-    } else if (root->data.btree.lhs->data.btree.rhs == node) {
-      return zigzag(root, node);
-    } else {
-      if (depth % 2) {
-        node = splayDepth(root->data.btree.lhs, node, depth);
-        root->data.btree.lhs = node;
-        return zig(root, node);
-      } else {
-        if (node->data.btree.sep <= root->data.btree.lhs->data.btree.sep) {
-          node = splayDepth(root->data.btree.lhs->data.btree.lhs, node, depth);
-          root->data.btree.lhs->data.btree.lhs = node;
+  } 
+  else if (node->data.btree.sep < root->data.btree.sep) 
+  {
+    left:
+        if (root->data.btree.lhs == node) 
+        {
+          return zig(root, node);
+        } 
+        else if (root->data.btree.lhs->data.btree.lhs == node) 
+        {
           return zigzig(root, node);
-        } else {
-          node = splayDepth(root->data.btree.lhs->data.btree.rhs, node, depth);
-          root->data.btree.lhs->data.btree.rhs = node;
+        } 
+        else if (root->data.btree.lhs->data.btree.rhs == node) 
+        {
           return zigzag(root, node);
+        } 
+        else 
+        {
+          if (depth % 2) 
+          {
+            node = splayDepth(root->data.btree.lhs, node, depth);
+            root->data.btree.lhs = node;
+            return zig(root, node);
+          } 
+          else 
+          {
+            if (node->data.btree.sep <= root->data.btree.lhs->data.btree.sep) 
+            {
+              node = splayDepth(root->data.btree.lhs->data.btree.lhs, node, depth);
+              root->data.btree.lhs->data.btree.lhs = node;
+              return zigzig(root, node);
+            } 
+            else 
+            {
+              node = splayDepth(root->data.btree.lhs->data.btree.rhs, node, depth);
+              root->data.btree.lhs->data.btree.rhs = node;
+              return zigzag(root, node);
+            }
+          }
         }
-      }
-    }
-  } else if (node->data.btree.sep > root->data.btree.sep) {
-right:
-    if (root->data.btree.rhs == node) {
-      return zag(root, node);
-    } else if (root->data.btree.rhs->data.btree.rhs == node) {
-      return zagzag(root, node);
-    } else if (root->data.btree.rhs->data.btree.lhs == node) {
-      return zagzig(root, node);
-    } else {
-      if (depth % 2) {
-        node = splayDepth(root->data.btree.rhs, node, depth);
-        root->data.btree.rhs = node;
-        return zag(root, node);
-      } else {
-        if (node->data.btree.sep > root->data.btree.rhs->data.btree.sep) {
-          node = splayDepth(root->data.btree.rhs->data.btree.rhs, node, depth);
-          root->data.btree.rhs->data.btree.rhs = node;
+  } 
+  else if (node->data.btree.sep > root->data.btree.sep) 
+  {
+    right:
+        if (root->data.btree.rhs == node) 
+        {
+          return zag(root, node);
+        } 
+        else if (root->data.btree.rhs->data.btree.rhs == node) 
+        {
           return zagzag(root, node);
-        } else {
-          node = splayDepth(root->data.btree.rhs->data.btree.lhs, node, depth);
-          root->data.btree.rhs->data.btree.lhs = node;
+        } 
+        else if (root->data.btree.rhs->data.btree.lhs == node) 
+        {
           return zagzig(root, node);
+        } 
+        else 
+        {
+          if (depth % 2) 
+          {
+            node = splayDepth(root->data.btree.rhs, node, depth);
+            root->data.btree.rhs = node;
+            return zag(root, node);
+          } 
+          else 
+          {
+            if (node->data.btree.sep > root->data.btree.rhs->data.btree.sep) 
+            {
+              node = splayDepth(root->data.btree.rhs->data.btree.rhs, node, depth);
+              root->data.btree.rhs->data.btree.rhs = node;
+              return zagzag(root, node);
+            } 
+            else 
+            {
+              node = splayDepth(root->data.btree.rhs->data.btree.lhs, node, depth);
+              root->data.btree.rhs->data.btree.lhs = node;
+              return zagzig(root, node);
+            }
+          }
         }
-      }
-    }
-  } else {
+  } 
+  else 
+  {
     struct cog *next = root->data.btree.lhs;
-    if (next != NULL && next->type == COG_BTREE && next->data.btree.sep == node->data.btree.sep) {
+    if (next != NULL && next->type == COG_BTREE && next->data.btree.sep == node->data.btree.sep) 
+    {
       goto left;
-    } else {
+    } 
+    else 
+    {
       goto right;
     }
   }

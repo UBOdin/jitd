@@ -23,7 +23,7 @@ buffer mk_random_buffer(int size)
     b->data[i].key = rand() % KEY_RANGE;
     b->data[i].value = rand();
   }
-  //record_dump(b->data, 0, size);
+  //record_dump(b->data, 0, size); // Useful for viewing test1
   return b;
 }
 
@@ -69,12 +69,12 @@ void test2()
   test_scan(c, 200, 700);
   cleanup(c);
 }
+
 void test3() 
 {
-  // Test for making a concat cog and doing a scan for
+  // Test for making a concat cog and doing a scan for it
   printf("test 3\n");
-  cog *c = 
-    make_concat(
+  cog *c = make_concat(
         mk_random_array(BUFFER_SIZE),
         mk_random_array(BUFFER_SIZE)
         );
@@ -233,12 +233,12 @@ void test8()
 {
   struct cog *cog, *cog_result, *cog_median;
   cog = mk_random_array(1000000);
-  // Cog without splaying
+  /* Cog without splaying */
   cog_result = timeRun(doZipfianReads, cog, 1000, 1000);
   //struct cog **inorder_list=inorder(struct cog *cog);
   //cog_median = getMedian(cog_result);
 
-  // Cog with splaying
+  /* Cog with splaying */
   //timeRun(splayTest, cog, 1000, 1000000);
   //printJITD(cog_result, 0);
 }
@@ -248,12 +248,12 @@ void test9()
 {
   struct cog *cog,*cog_result,*cog_median;
   cog = mk_random_array(1000000);
-  /*Cog without splaying*/
+  /* Cog without splaying */
   cog_result = timeRun(zipfianReads_splay, cog, 1000, 1000);
   //struct cog **inorder_list=inorder(struct cog *cog);
   cog_median = getMedian(cog_result);
 
-  /*Cog with splaying*/
+  /* Cog with splaying */
   //timeRun(splayTest, cog, 1000, 1000000);
   //printJITD(cog_result, 0);
 }
@@ -411,26 +411,26 @@ int main(int argc, char **argv)
 {
   int rand_start = 42; //time(NULL)
   srand(rand_start);
-  test1();
-  srand(rand_start);
-  test2();
+  //test1();
+  //srand(rand_start);
+  //test2();
   srand(rand_start);
   test3();
-  srand(rand_start);
-  test4();
-  srand(rand_start);
-  test5();
-  splayTest();
-  srand(rand_start);
-  test6(20);
-  test7(10);
+  //srand(rand_start);
+  //test4();
+  //srand(rand_start);
+  //test5();
+  //splayTest();
+  //srand(rand_start);
+  //test6(20);
+  //test7(10);
   struct cog *cog;
   cog = mk_random_array(1000000);
   timeRun(randomReads, cog, 1000, 1000000);
   test8();
   test9();
 
-#ifdef __ADVANCED
+  #ifdef __ADVANCED
   readsCounterTest();
   printf("%lf\n", harmonic(2,1));
   printf("%lu\n", getZipfCountAtCDF(100000, 1, 0.50));
@@ -438,9 +438,9 @@ int main(int argc, char **argv)
   testZipfinize();
   testConvergence();
   testSpeed();
-#endif
+  #endif
 
-#ifdef __HARVEST
+  #ifdef __HARVEST
   struct cog *harvestTestCog;
   long reads   = 1000;
   long range   = 1000000;
@@ -448,5 +448,5 @@ int main(int argc, char **argv)
   int  steps  = 10;
   harvestTestCog = mk_random_array(range);
   harvestTestCog = splayOnHarvest(harvestTestCog, reads, range, doSplay, steps);
-#endif
+  #endif
 }

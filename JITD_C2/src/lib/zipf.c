@@ -25,22 +25,26 @@ int zipf(double alpha, int n) {
   if (_initialized == FALSE) rand_val(seedlessRandom());
 
   // Compute normalization constant on first call only
-  if (first == TRUE) {
+  if (first == TRUE) 
+  {
     for (i=1; i<=n; i++) c = c + (1.0 / pow((double) i, alpha));
     c = 1.0 / c;
     first = FALSE;
   }
 
   // Pull a uniform random number (0 < z < 1)
-  do {
+  do 
+  {
     z = rand_val(0);
   } while ((z == 0) || (z == 1));
 
   // Map z to the value
   sum_prob = 0;
-  for (i=1; i<=n; i++) {
+  for (i=1; i<=n; i++) 
+  {
     sum_prob = sum_prob + c / pow((double) i, alpha);
-    if (sum_prob >= z) {
+    if (sum_prob >= z) 
+    {
       zipf_value = i;
       break;
     }
@@ -69,7 +73,8 @@ double rand_val(int seed) {
   long        x_new;          // New x value
 
   // Set the seed if argument is non-zero and then return zero
-  if (seed > 0) {
+  if (seed > 0) 
+  {
     _initialized = TRUE;
     x = seed;
     return(0.0);
@@ -94,7 +99,8 @@ double rand_val(int seed) {
  */
 double harmonic(int n, double alpha) {
   double sum = 0.0;
-  for (long i = 1; i <= n; i++) {
+  for (long i = 1; i <= n; i++) 
+  {
     sum = sum + (1.0 / (pow(i, alpha)));
   }
   return sum;
