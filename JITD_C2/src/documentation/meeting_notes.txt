@@ -1,0 +1,132 @@
+==============================================================================
+8/1/16
+-Reasons for JITD Implementation having performance that's not fast enough:
+ *Current code re-balances in one go.
+ *It is possible to do a class splay tree to increase performance.
+-Upcoming task: Try simulating changing/moving mode of distribution at an 
+                offset and see if performance drop significantly, if it 
+                does, there's improvements to be made.
+==============================================================================
+8/5/16
+-Perspective: In database design and implementation, there is a tradeoff 
+              between having reads being fast vs. writes being fast. JITD wants
+              to make balancing these choices be as flexible as possible.
+-3 choices: What's needed for read, write, or idle. B+ tree has good balance
+            between the three.
+-Adaptive index do work in addition to query to gain speed. 
+===========================
+| 7  3  6  5  2  1  4  0  |    if a query wants values between 2-5 you get
+===========================                     |
+                                                |
+                    ===========                 | 
+     linear search  | 3 5 2 4 |    <-------------
+                    ===========
+
+ Since doing linear search scans everything anyways, we can spend a little
+ extra effort and break into 3 separate chunks.
+ ======= =========== =======
+ | 1 0 | | 3 5 2 4 | | 7 6 |
+ ======= =========== =======
+ 
+ Let's look at the cracking process. To crack while getting values from 
+    ===========================      2 to 6.
+    | 7  3  6  5  2  1  4  0  |
+    ===========================
+   ^  ^                    ^         0 and  7 will get swapped
+   |  |                    |          then <6 pointer will move to left
+   |  |                    |            
+   |  i                    |
+   <2                      <6
+
+ i-pointer moves right, taking n steps. It determines where to swap the
+    value it's pointing to depending on its value.
+
+ ===========================
+ | 0  3  6  5  2  1  4  7  |
+ ===========================
+ ^ ^                   ^ 
+ | |                   |            0 is <2 so i and <2 pointer moves
+ | |                   | 
+ | i                   |
+ <2                   <6
+
+ ===========================
+ | 0  3  6  5  2  1  4  7  |
+ ===========================
+    ^ ^               ^
+    | |               |             3 is within 2-6 range so i will
+    | |               |              move onto next value
+    | i               |
+    <2               <6
+
+ ======= =========== =======
+ | 1 0 | | 3 5 2 4 | | 7 6 |  Slightly more orgnized structure
+ ======= =========== =======
+
+ Can even add a tree ontop
+
+
+                    <6
+                   /  \
+                  /    \
+                 /      \
+                <2       \
+               /  \       \
+              /    \       \
+             /      \       \
+       ======= =========== =======
+       | 1 0 | | 3 5 2 4 | | 7 6 |
+       ======= =========== =======
+
+ Splay tree is working ontop of cracking to tree policy
+            =======
+            |  A  |
+            =======
+              ||
+              ||
+              ||
+              ||
+              \/
+             <Sep
+            /    \
+           /      \
+          /        \
+         /          \
+       <Sep        >Sep
+      =====        =====
+      | A |        | A |
+      =====        =====
+
+ If accesses are truly random eventually tree will be balanced.
+ -But certain workloads are not truly random. If skewed access pattern then
+  tree will be unbalanced.
+
+ -Unbalanced tree would result from skewed        *Splaying is re-balancing*
+  workload but may work better than balanced.           in paper
+
+ -Heavy hitters-Base policy may actually work as already written
+ -Goals: Benefit to doing work at read/write.
+         -With throughput metric
+         -Time metric.
+
+ -When it comes to handling zipfian distribution, do we want our structure 
+  to have a better average read/write time? Or worst case scenario?
+ -Balanced tree is great for worst case scenario, skewed tree is good for
+  average but only if workload continues to be skewed.
+
+ -Problem: -How to rebalance?
+           -Actually re-balancing tree 
+           -When to know when workload has changed
+
+ -Maybe associate each binary tree node with a read count and each of 
+  children that was accessed.
+ -Binary tree node track read count. It affects re-balancing decisions. 
+  Where it re-balances at the median node.
+
+ -Task: Replicate what's needed to gather those numbers in the paper
+        Replicate Figure 10 from 2015 paper
+                    and
+        Replicate figure 2.2.2 but with single line from Team Twinkle report
+
+        Then add in re-balancing and bump up test to max out Mjolnir's RAM.
+            1 billion records. Have test generate log file windowed average

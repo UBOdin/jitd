@@ -1,5 +1,4 @@
-/*
-
+/* 
 Welcome to JITD documentation!! Please refer to this file for documentation. 
 Even add your own!! Full compatibility with ctags enabled to allow you to
 jump around.
