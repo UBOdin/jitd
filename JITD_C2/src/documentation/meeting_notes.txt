@@ -134,4 +134,16 @@
 |(Thoughts)|-How do I actually test the zipfian distribution?
             -If I can test zipfian distribution properly then heavy-hitter 
              would be no issue.
-            -
+==============================================================================
+8/8/16
+-Test 6 and test 7 shows performance readings on random cogs and doesn't work
+ in zipfian values.
+-The reason test8 and test9 are crashing is possibly because a function 
+ that was written getMedian() was making the assumption that it was 
+ taking in only a BTree at the root. The test case has an array at the
+ root cog. 
+-Use GDB to debug test8(), see what pointers are getting thrown around and
+ avoid segmentation fault. 
+-It would also help to create a simple instruction parser to generate tests
+ on the fly like seen in cpp/src/jitd_tester.cpp and cog_tester.cpp.
+-After then resume replicating the results of figure 2.2.2 and figure 10

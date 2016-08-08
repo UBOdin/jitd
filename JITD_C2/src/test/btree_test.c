@@ -234,7 +234,6 @@ void test8()
   cog = mk_random_array(1000000);
   /* Cog without splaying */
   cog_result = timeRun(doZipfianReads, cog, 1000, 1000);
-  printf("Hi\n");
   //struct cog **inorder_list=inorder(struct cog *cog);
   //cog_median = getMedian(cog_result);
 
