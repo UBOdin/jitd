@@ -75,9 +75,9 @@ void test3()
   // Test for making a concat cog and doing a scan for it
   printf("test 3\n");
   cog *c = make_concat(
-        mk_random_array(BUFFER_SIZE),
-        mk_random_array(BUFFER_SIZE)
-        );
+      mk_random_array(BUFFER_SIZE),
+      mk_random_array(BUFFER_SIZE)
+    );
   test_scan(c, 100, 200);
   cleanup(c);
 }
@@ -89,7 +89,7 @@ void test4()
   cog *c = make_concat(
       mk_random_array(BUFFER_SIZE),
       mk_random_array(BUFFER_SIZE)
-      );
+    );
   c = crack(c, 100, 200);
   c = crack(c, 400, 700);
   c = crack(c, 800, 900);
@@ -194,9 +194,8 @@ struct cog *doZipfianReads(struct cog *cog, long number, long range)
   {
     zipf_rv = zipf(alpha, n);
     crack_scan(cog,zipf_rv,zipf_rv+range);
-    //    printf("%d \n", zipf_rv);
+    printf("%d \n", zipf_rv);
   }
-
   return cog;
 }
 
@@ -235,6 +234,7 @@ void test8()
   cog = mk_random_array(1000000);
   /* Cog without splaying */
   cog_result = timeRun(doZipfianReads, cog, 1000, 1000);
+  printf("Hi\n");
   //struct cog **inorder_list=inorder(struct cog *cog);
   //cog_median = getMedian(cog_result);
 
@@ -414,21 +414,21 @@ int main(int argc, char **argv)
   //test1();
   //srand(rand_start);
   //test2();
-  srand(rand_start);
-  test3();
+  //srand(rand_start);
+  //test3();
   //srand(rand_start);
   //test4();
   //srand(rand_start);
   //test5();
   //splayTest();
   //srand(rand_start);
-  //test6(20);
-  //test7(10);
-  struct cog *cog;
-  cog = mk_random_array(1000000);
-  timeRun(randomReads, cog, 1000, 1000000);
+  //test6(900000);
+  //test7(900000);
+  //struct cog *cog;
+  //cog = mk_random_array(1000000);
+  //timeRun(randomReads, cog, 1000, 1000000);
   test8();
-  test9();
+  //test9();
 
   #ifdef __ADVANCED
   readsCounterTest();

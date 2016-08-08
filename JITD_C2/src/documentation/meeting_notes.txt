@@ -129,4 +129,9 @@
         Replicate figure 2.2.2 but with single line from Team Twinkle report
 
         Then add in re-balancing and bump up test to max out Mjolnir's RAM.
-            1 billion records. Have test generate log file windowed average
+          1 billion records. Have test generate log file windowed average
+
+|(Thoughts)|-How do I actually test the zipfian distribution?
+            -If I can test zipfian distribution properly then heavy-hitter 
+             would be no issue.
+            -

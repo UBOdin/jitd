@@ -76,9 +76,9 @@ void test3()
 void test4() {
   printf("test 4\n");
   cog *c = make_concat(
-            mk_random_array(BUFFER_SIZE),
-            mk_random_array(BUFFER_SIZE)
-          );
+      mk_random_array(BUFFER_SIZE),
+      mk_random_array(BUFFER_SIZE)
+    );
   c = crack(c, 100, 200);
   c = crack(c, 400, 700);
   c = crack(c, 800, 900);
@@ -89,9 +89,9 @@ void test4() {
 void test5() {
   printf("test 5\n");
   cog *c = make_concat(
-            mk_random_array(BUFFER_SIZE),
-            mk_random_array(BUFFER_SIZE)
-          );
+      mk_random_array(BUFFER_SIZE),
+      mk_random_array(BUFFER_SIZE)
+    );
   double_struct *ret;
   printf("Scan 1\n");
   ret = amerge(c, 100, 200);
