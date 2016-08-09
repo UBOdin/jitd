@@ -264,6 +264,9 @@ cog *crack_scan(cog *c, long low, long high) {
   {
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
+    //make assertion about the lhs, the value of c may be different as it goes
+    //down the code and see what the value of lhs is at the point of the if 
+    //statement where the free(c) error is occuring at
     #ifdef __ADVANCED
     long reads = 0;
     #endif

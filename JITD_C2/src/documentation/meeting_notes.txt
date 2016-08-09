@@ -147,3 +147,15 @@
 -It would also help to create a simple instruction parser to generate tests
  on the fly like seen in cpp/src/jitd_tester.cpp and cog_tester.cpp.
 -After then resume replicating the results of figure 2.2.2 and figure 10
+==============================================================================
+8/9/16
+-Use Valgrind to view memory allocation pattern and see what is going wrong
+ with freeing the uninitialized memory.
+-In crack_scan make an assertion about lhs and see what values are changing
+ before the free(c) error is occuring.
+|(Thoughts)|-When I run Valgrind, after a memory error, the program continues
+             to run in an endless loop. Yin Yang mentioned that possibly
+             another thread is running amok because he's never seen that 
+             before.
+            -GDB shows killing of a pthread so maybe that shows another
+             thread is running?
