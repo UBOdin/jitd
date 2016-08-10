@@ -298,8 +298,10 @@ cog *crack_scan(cog *c, long low, long high) {
       } 
       else 
       {
-        printf("We're at this condition:\n");
-        printf("NOT low < c->data.btree.sep\n");
+        if (debug)
+        {printf("We're at this condition:\n");
+        printf("NOT low < c->data.btree.sep\n");}
+
         lhs = crack_one(lhs, low);
         #ifdef __HARVEST
         harvest = lhs;
@@ -336,11 +338,8 @@ cog *crack_scan(cog *c, long low, long high) {
     {
       if (debug)
       {printf("Here, c->data.btree.lhs != lhs || c->data.btree.rhs != rhs\n");
-      //printf("LHS is: \n");
-      //printJITD(lhs, 0);
-      //printf("RHS is: \n");
-      //printJITD(rhs, 0);
       printJITD(c, 0);}
+
       long sep = c->data.btree.sep;
       free(c);
       #ifndef __ADVANCED

@@ -159,3 +159,11 @@
              before.
             -GDB shows killing of a pthread so maybe that shows another
              thread is running?
+==============================================================================
+8/10/16
+-So going through Valgrind output and viewing the code with Oliver, the 
+ doZipfianReads issue was that it wasn't assigning the return value of the 
+ new cog into the for loop so a simple cog = reassignment did the trick.
+-So Valgrind was a good tool to ask question such as, "why did this memory
+ get freed?" and good for finding memory leaks which are good practice to 
+ fix and optimize.
