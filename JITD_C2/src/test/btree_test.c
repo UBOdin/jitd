@@ -121,30 +121,6 @@ void test5()
   free(ret);
 }
 
-/*|__splayTest__|*/
-void splayTest() 
-{
-  printf("Splaying Test:\n");
-  cog *six = make_btree(NULL, NULL, 6);
-  cog *eight = make_btree(NULL, NULL, 8);
-  cog *seven = make_btree(six, eight, 7);
-  cog *four = make_btree(NULL, NULL, 4);
-  cog *five = make_btree(four, seven, 5);
-  cog *two = make_btree(NULL, NULL, 2);
-  cog *three = make_btree(two, five, 3);
-  cog *ten = make_btree(NULL, NULL, 10);
-  cog *nine = make_btree(three, ten, 9);
-  cog *zero = make_btree(NULL, NULL, 0);
-  cog *one = make_btree(zero, nine, 1);
-  cog *twelve = make_btree(NULL, NULL, 12);
-  cog *eleven = make_btree(one, twelve, 11);
-  printf("Before splay:\n");
-  printJITD(eleven,0);
-  printf("After splay:\n");
-  splay(eleven, seven);
-  printJITD(seven, 0);
-}
-
 /*|__test6__|*/
 void test6(int reads)
 {
@@ -173,6 +149,31 @@ void test7(int reads)
   cog = timeRun(randomReads, cog, reads, 5000);
   splay(cog, getMedian(cog));
   cog = timeRun(randomReads, cog, reads, 10);
+}
+
+
+/*|__splayTest__|*/
+void splayTest() 
+{
+  printf("Splaying Test:\n");
+  cog *six = make_btree(NULL, NULL, 6);
+  cog *eight = make_btree(NULL, NULL, 8);
+  cog *seven = make_btree(six, eight, 7);
+  cog *four = make_btree(NULL, NULL, 4);
+  cog *five = make_btree(four, seven, 5);
+  cog *two = make_btree(NULL, NULL, 2);
+  cog *three = make_btree(two, five, 3);
+  cog *ten = make_btree(NULL, NULL, 10);
+  cog *nine = make_btree(three, ten, 9);
+  cog *zero = make_btree(NULL, NULL, 0);
+  cog *one = make_btree(zero, nine, 1);
+  cog *twelve = make_btree(NULL, NULL, 12);
+  cog *eleven = make_btree(one, twelve, 11);
+  printf("Before splay:\n");
+  printJITD(eleven,0);
+  printf("After splay:\n");
+  splay(eleven, seven);
+  printJITD(seven, 0);
 }
 
 /**
@@ -227,34 +228,38 @@ struct cog *zipfianReads_splay(struct cog *cog, long number, long range)
   return cog;
 }
 
-/*|__test8__|*/
-void test8() 
+/*|__testZipfianNoSplay__|*/
+void testZipfianNoSplay(int reads) 
 {
+  printf("Running Zipfian test with no splaying\n");
   struct cog *cog, *cog_result, *cog_median;
-  cog = mk_random_array(1000000);
+  cog = mk_random_array(1000);
   /* Cog without splaying */
-  cog_result = timeRun(doZipfianReads, cog, 1000, 1000);
+  cog_result = timeRun(doZipfianReads, cog, reads, 1000);
   //struct cog **inorder_list=inorder(struct cog *cog);
   //cog_median = getMedian(cog_result);
-
-  /* Cog with splaying */
-  timeRun(splayTest, cog, 1000, 1000000);
-  //printJITD(cog_result, 0);
+  printJITD(cog_result, 0);
 }
 
-/*|__test9__|*/
-void test9() 
+/*|__testZipfianWithSplay__|*/
+void testZipfianWithSplay(int reads)
 {
-  struct cog *cog,*cog_result,*cog_median;
-  cog = mk_random_array(1000000);
-  /* Cog without splaying */
-  cog_result = timeRun(zipfianReads_splay, cog, 1000, 1000);
-  //struct cog **inorder_list=inorder(struct cog *cog);
-  cog_median = getMedian(cog_result);
-
+  printf("Running Zipfian test with splaying\n");
   /* Cog with splaying */
   //timeRun(splayTest, cog, 1000, 1000000);
   //printJITD(cog_result, 0);
+}
+
+/*|__testHeavyHitterNoSplay__|*/
+void testHeavyHitterNoSplay(int reads)
+{
+  printf("Running HeavyHitter test with no splaying\n");
+}
+
+/*|__testHeavyHitterWithSplay__|*/
+void testHeavyHitterWithSplay(int reads)
+{
+  printf("Running HeavyHitter test with splaying\n");
 }
 
 #ifdef __ADVANCED
@@ -420,14 +425,16 @@ int main(int argc, char **argv)
   //srand(rand_start);
   //test5();
   //splayTest();
-  srand(rand_start);
+  //srand(rand_start);
   //test6(10000);
   //test7(10000);
   //struct cog *cog;
   //cog = mk_random_array(1000000);
   //timeRun(randomReads, cog, 1000, 1000000);
-  test8();
-  //test9();
+  testZipfianNoSplay(1000);
+  //testZipfianWithSplay(10000);
+  //testHeavyHitterNoSplay(10000);
+  //testHeavyHitterWithSplay(10000);
 
   #ifdef __ADVANCED
   readsCounterTest();

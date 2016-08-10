@@ -40,11 +40,16 @@ in |__extract_partitions__|.
 +test7+
 
 
-+test8+
++testZipfianNoSplay+
 
 
-+test9+
++testZipfianWithSplay+
 
+
++testHeavyHitterNoSplay+
+
+
++testHeavyHitterWithSplay+
 
 
 */
