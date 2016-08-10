@@ -194,7 +194,8 @@ struct cog *doZipfianReads(struct cog *cog, long number, long range)
   {
     zipf_rv = zipf(alpha, n);
     crack_scan(cog,zipf_rv,zipf_rv+range);
-    printf("%d \n", zipf_rv);
+    printf("Hi\n");
+    //printf("%d \n", zipf_rv);
   }
   return cog;
 }
@@ -233,7 +234,7 @@ void test8()
   struct cog *cog, *cog_result, *cog_median;
   cog = mk_random_array(1000000);
   /* Cog without splaying */
-  cog_result = timeRun(doZipfianReads, cog, 1000, 1000);
+  cog_result = timeRun(doZipfianReads, cog, 1000, 30);
   //struct cog **inorder_list=inorder(struct cog *cog);
   //cog_median = getMedian(cog_result);
 
@@ -420,9 +421,9 @@ int main(int argc, char **argv)
   //srand(rand_start);
   //test5();
   //splayTest();
-  //srand(rand_start);
-  //test6(900000);
-  //test7(900000);
+  srand(rand_start);
+  //test6(10000);
+  //test7(10000);
   //struct cog *cog;
   //cog = mk_random_array(1000000);
   //timeRun(randomReads, cog, 1000, 1000000);

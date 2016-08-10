@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "cog.h"
 #include "data.h"
+#include "util.h"
+#include <stdbool.h>
+
+bool debug = false;
 
 /**
  * Code to do pushdown operation on the cog.
@@ -258,10 +262,16 @@ struct cog *getHarvest() {
 cog *crack_scan(cog *c, long low, long high) {
   if(c->type == COG_SORTEDARRAY) 
   {
+    if (debug)
+    {printf("This happened in crack_scan when c->type == COG_SORTEDARRAY\n");}
+
     return c;
   } 
   else if(c->type == COG_BTREE) 
   {
+    if (debug)
+    {printf("This happened in crack_scan when c->type == COG_BTREE\n");}
+
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
     //make assertion about the lhs, the value of c may be different as it goes
@@ -272,6 +282,9 @@ cog *crack_scan(cog *c, long low, long high) {
     #endif
     if(low < c->data.btree.sep) 
     {
+      if (debug) {printf("We're at this condition:\n");
+      printf("low < c->data.btree.sep\n");}
+
       if(high < c->data.btree.sep) 
       {
         lhs = crack_scan(lhs, low, high);
@@ -285,6 +298,8 @@ cog *crack_scan(cog *c, long low, long high) {
       } 
       else 
       {
+        printf("We're at this condition:\n");
+        printf("NOT low < c->data.btree.sep\n");
         lhs = crack_one(lhs, low);
         #ifdef __HARVEST
         harvest = lhs;
@@ -297,6 +312,10 @@ cog *crack_scan(cog *c, long low, long high) {
     }
     if(high > c->data.btree.sep) 
     {
+      if (debug)
+      {printf("We're at this condition:\n");
+      printf("high > c->data.btree.sep\n");}
+
       if(low > c->data.btree.sep) 
       {
         rhs = crack_scan(rhs, low, high);
@@ -315,6 +334,13 @@ cog *crack_scan(cog *c, long low, long high) {
 
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) 
     {
+      if (debug)
+      {printf("Here, c->data.btree.lhs != lhs || c->data.btree.rhs != rhs\n");
+      //printf("LHS is: \n");
+      //printJITD(lhs, 0);
+      //printf("RHS is: \n");
+      //printJITD(rhs, 0);
+      printJITD(c, 0);}
       long sep = c->data.btree.sep;
       free(c);
       #ifndef __ADVANCED
@@ -401,6 +427,7 @@ cog *crack_scan(cog *c, long low, long high) {
         highIdx--;
       }
     }
+    printf("It was a nonsorted array\n");
     free(r);
     iter_cleanup(iter);
     cleanup(c);
