@@ -220,7 +220,7 @@ struct cog *zipfianReads_splay(struct cog *cog, long number, long range)
   {
     zipf_rv = zipf(alpha, n);
     if(i%2==0) cog_median = getMedian(cog);
-    crack_scan(cog, zipf_rv, zipf_rv + range);
+    cog = crack_scan(cog, zipf_rv, zipf_rv + range);
     //if(i > 100) splay(cog, cog_median);
     //printf("%d \n", zipf_rv);
   }
@@ -232,21 +232,19 @@ struct cog *zipfianReads_splay(struct cog *cog, long number, long range)
 void testZipfianNoSplay(int reads) 
 {
   printf("Running Zipfian test with no splaying\n");
-  struct cog *cog, *cog_result, *cog_median;
+  struct cog *cog, *cog_result;
   cog = mk_random_array(1000);
-  /* Cog without splaying */
   cog_result = timeRun(doZipfianReads, cog, reads, 1000);
-  //struct cog **inorder_list=inorder(struct cog *cog);
-  //cog_median = getMedian(cog_result);
-  printJITD(cog_result, 0);
+  //printJITD(cog_result, 0);
 }
 
 /*|__testZipfianWithSplay__|*/
 void testZipfianWithSplay(int reads)
 {
   printf("Running Zipfian test with splaying\n");
-  /* Cog with splaying */
-  //timeRun(splayTest, cog, 1000, 1000000);
+  struct cog *cog, *cog_result;
+  cog = mk_random_array(1000);
+  cog_result = timeRun(zipfianReads_splay, cog, reads, 1000);
   //printJITD(cog_result, 0);
 }
 
@@ -431,8 +429,8 @@ int main(int argc, char **argv)
   //struct cog *cog;
   //cog = mk_random_array(1000000);
   //timeRun(randomReads, cog, 1000, 1000000);
-  testZipfianNoSplay(1000);
-  //testZipfianWithSplay(10000);
+  //testZipfianNoSplay(1000);
+  testZipfianWithSplay(1000);
   //testHeavyHitterNoSplay(10000);
   //testHeavyHitterWithSplay(10000);
 
