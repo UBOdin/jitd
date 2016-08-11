@@ -167,3 +167,6 @@
 -So Valgrind was a good tool to ask question such as, "why did this memory
  get freed?" and good for finding memory leaks which are good practice to 
  fix and optimize.
+|(Thoughts)|-I really need to get Mjolnir working, my Mac station and Macbook
+             are taking forever just to even run 1 million size array and 
+             10000 reads.

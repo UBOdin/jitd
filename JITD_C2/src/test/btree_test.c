@@ -429,7 +429,7 @@ int main(int argc, char **argv)
   //struct cog *cog;
   //cog = mk_random_array(1000000);
   //timeRun(randomReads, cog, 1000, 1000000);
-  //testZipfianNoSplay(1000);
+  testZipfianNoSplay(1000);
   testZipfianWithSplay(1000);
   //testHeavyHitterNoSplay(10000);
   //testHeavyHitterWithSplay(10000);
