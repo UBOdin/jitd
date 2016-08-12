@@ -109,7 +109,7 @@ iterator scan( struct cog *cog, long low, long high )
       long sep = cog->data.btree.sep;
       if( sep <= low ) { return scan(b, low, high); }
     }
-  if( cog->type == COG_BTREE ) //Possible duplicate code?
+  if( cog->type == COG_BTREE ) 
     {
       struct cog *a = cog->data.btree.lhs;
       struct cog *b = cog->data.btree.rhs;
