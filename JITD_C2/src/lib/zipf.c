@@ -129,3 +129,5 @@ long getZipfCountAtCDF(long n, double alpha, float cdf) {
 long getNumberOfLevels(long elements) {
   return ceill(log2(elements));
 }
+
+

@@ -12,7 +12,7 @@ HEADERS = $(shell find ${INCLUDE_PATH} -name '*.hpp') \
 
 ifeq ($(shell uname), Darwin)
 CPP_FLAGS = \
-  -std=c++11  
+  -std=c++11 -m64
 endif
 
 CPP = g++ -I ${INCLUDE_PATH} -g $(CPP_FLAGS)

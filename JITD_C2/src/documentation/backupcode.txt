@@ -1,5 +1,6 @@
 ** Removed test8 and test9 due to unclear use of inorder function and lack **
  * of modularity in test function. Saved incase has unmentioned purpose.   *
+ * was in btree_test.c
 
 void test8()
 {
@@ -33,6 +34,7 @@ void test9()
 
 ** Removed due to lack of modularity in testing protocol, **
  * saved incase has unmentioned purpose                   *
+ * btree_test.c
 
 /*|__splayTest__|*/
 void splayTest() 
@@ -59,6 +61,7 @@ void splayTest()
 }
 
 **Test6 and 7 have duplicate code but save just incase may need it**
+ * was in btree_test.c
 
 /*|__test6__|*/
 void test6(int arraySize, int reads)
@@ -100,6 +103,7 @@ int main(int argc, char **argv)
 {
   ** Leftover code in which unclear of function, saved just in case **
    * has unmentioned function                                       *
+   * was in btree_test.c
 
   #ifdef __ADVANCED
   readsCounterTest();
@@ -123,6 +127,7 @@ int main(int argc, char **argv)
 }
 
 ** Unclear importance of btree test functions. Saved just in case **
+ * was in btree_test.c
 
 #ifdef __ADVANCED
 /** A simple test that makes sure read counters are properly incremented when upon cracking. */

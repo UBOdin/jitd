@@ -20,7 +20,7 @@ int main(int argc, char **argv)
   JITD<Record> jitd;
   
   srand(time(NULL));
-//  sleep(1);
+  //sleep(1);
   for(i = 1; i < argc; i++){
     ifstream srcF;
     if((strlen(argv[i]) > 1) && (argv[i][0] == '-')){
@@ -51,5 +51,5 @@ int main(int argc, char **argv)
       }
     }
   }
-//  sleep(60);
+  //  sleep(60);
 }

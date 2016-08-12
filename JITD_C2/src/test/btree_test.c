@@ -11,6 +11,7 @@
 #include "adaptive_merge.h"
 #include "zipf.h"
 #include "policy.h"
+#include "dist_reads.h"
 
 #define BUFFER_SIZE 10
 #define KEY_RANGE 1000000
@@ -60,6 +61,7 @@ void test1()
   cog *c = mk_random_array(BUFFER_SIZE);
   test_scan(c, 200, 700);
   cleanup(c);
+  printf("\n");
 }
 
 void test2() 
@@ -69,6 +71,7 @@ void test2()
   cog *c = mk_sorted_array(BUFFER_SIZE);
   test_scan(c, 200, 700);
   cleanup(c);
+  printf("\n");
 }
 
 void test3() 
@@ -81,6 +84,7 @@ void test3()
     );
   test_scan(c, 100, 200);
   cleanup(c);
+  printf("\n");
 }
 
 /*|__test4__|*/
@@ -96,6 +100,7 @@ void test4()
   c = crack(c, 800, 900);
   test_scan(c, 1, 1000);
   cleanup(c);
+  printf("\n");
 }
 
 /*|__test5__|*/
@@ -120,6 +125,7 @@ void test5()
   cleanup(ret->cog);
   iter_cleanup(ret->iter);
   free(ret);
+  printf("\n");
 }
 
 /*|__testTreeOnArrayCrack__|*/
@@ -142,60 +148,7 @@ void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
     cog = timeRun(randomReads, cog, reads, rangeValues[i]);
     if (rebalance) { splay(cog, getMedian(cog)); }
   }
-}
-
-/**
- * Function to generate the zipfian reads calling the zipf function.
- *
- * @param cog - the given cog
- * @param number - the number of scans to be performed on the given cog
- * @param range - the range of number to be scannned(selectivity)
- * @return resulting JITD
- */
-struct cog *doZipfianReads(struct cog *cog, long number, long range) 
-{
-  float alpha =0.99;
-  int n=KEY_RANGE;
-  int zipf_rv;
-  rand_val(1400);
-
-  for (int i=1; i<number; i++) 
-  {
-    zipf_rv = zipf(alpha, n);
-    cog = crack_scan(cog, zipf_rv, zipf_rv + range);
-    //printf("%d \n", zipf_rv);
-  }
-  return cog;
-}
-
-/**
- * Function to perform zipfian read with splay operation.
- *
- * @param cog - the given cog
- * @param number - the number of iterations
- * @param range - the selectivity range
- * @return resulting JITD
- */
-struct cog *zipfianReads_splay(struct cog *cog, long number, long range) 
-{
-  float alpha = 0.99;
-  int n = KEY_RANGE;
-  int zipf_rv;
-  rand_val(1400);
-  struct cog *cog_median;
-
-  for (int i=1; i<number; i++) 
-  {
-    zipf_rv = zipf(alpha, n);
-    cog = crack_scan(cog, zipf_rv, zipf_rv + range);
-    if(i > 100 || i%2 == 0) 
-    {
-      cog_median = getMedian(cog);
-      cog = splay(cog, cog_median);
-    }
-    //printf("%d \n", zipf_rv);
-  }
-  return cog;
+  printf("\n");
 }
 
 /*|__testZipfianNoSplay__|*/
@@ -232,21 +185,21 @@ int main(int argc, char **argv)
 {
   int rand_start = 42; //time(NULL)
   srand(rand_start);
-  //test1();
-  //srand(rand_start);
-  //test2();
-  //srand(rand_start);
-  //test3();
-  //srand(rand_start);
-  //test4();
-  //srand(rand_start);
-  //test5();
-  //srand(rand_start);
+  test1();
+  srand(rand_start);
+  test2();
+  srand(rand_start);
+  test3();
+  srand(rand_start);
+  test4();
+  srand(rand_start);
+  test5();
+  srand(rand_start);
   bool rebalance;
   testTreeOnArrayCrack(rebalance = true, 1000000, 10000);
   testTreeOnArrayCrack(rebalance = false, 1000000, 10000);
-  //testZipfianNoSplay(10000, 1000);
-  //testZipfianWithSplay(10000, 1000);
+  testZipfianNoSplay(10000, 1000);
+  testZipfianWithSplay(10000, 1000);
   //testHeavyHitterNoSplay(10000);
   //testHeavyHitterWithSplay(10000);
 }

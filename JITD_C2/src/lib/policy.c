@@ -29,8 +29,7 @@ struct cog *findSplayCandidate(struct cog *cog, long reads) {
   if (cog->data.btree.rds <= reads) return NULL;
 
   long cogReads = getReadsAtNode(cog);
-  if (cogReads > reads) 
-  {
+  if (cogReads > reads) {
     contender = cog;
     reads = cogReads;
   }
@@ -55,12 +54,9 @@ struct cog *zipfinizeSubtree(struct cog *cog, long levels) {
   struct cog *candidate = findSplayCandidate(cog, reads);
 
   struct cog *rearranged;
-  if (candidate == NULL) 
-  {
+  if (candidate == NULL) {
     rearranged = cog;
-  } 
-  else 
-  {
+  } else {
     rearranged = splay(cog, candidate);
     _splays += 1;
   }
@@ -97,8 +93,7 @@ struct cog *zipfinize(struct cog *cog, long levels) {
  * @param cog - given tree
  */
 void decaySubtree(struct cog *cog) {
-  if (cog != NULL && cog->type == COG_BTREE) 
-  {
+  if (cog != NULL && cog->type == COG_BTREE) {
     cog->data.btree.rds /= _DECAY_FACTOR;
     decaySubtree(cog->data.btree.lhs);
     decaySubtree(cog->data.btree.rhs);

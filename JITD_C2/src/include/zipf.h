@@ -5,7 +5,7 @@
 
 #define FALSE 0 // Boolean false
 #define TRUE  1 // Boolean true
-#define E_NUM   2.7182818284590452354 // e
+#define E_NUM 2.7182818284590452354 // e
 #define GAMMA 0.57721566490153286060651209008240243 // Euler–Mascheroni Constant
 
 

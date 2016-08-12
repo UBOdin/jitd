@@ -28,7 +28,6 @@ buffer mk_sorted_buffer(int size)
   return b;
 }
 
-
 cog *mk_random_array(int size)
 {
   return make_array(0, size, mk_random_buffer(size));
