@@ -132,9 +132,11 @@ void test5()
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
 {
   if (rebalance)
-  {printf("Test JITD performance on random array without rebalancing ");}
+  {printf("Testing JITD performance on random array with random reads ");
+   printf("without rebalancing ");}
   else
-  {printf("Test JITD performance on random array with rebalancing ");}
+  {printf("Testing JITD performance on random array with random reads ");
+   printf("with rebalancing ");}
   printf("on array size of %d while performing ", arraySize);
   printf("%d reads\n", reads);
 

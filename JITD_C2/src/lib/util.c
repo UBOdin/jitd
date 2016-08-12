@@ -102,27 +102,20 @@ void printCog(struct cog *cog)
 void printJITD(struct cog *cog, int depth) {
   if (cog == NULL) return;
 
-  if (cog->type == COG_CONCAT || cog->type == COG_BTREE) 
-  {
-    if (cog->type == COG_CONCAT) 
-    {
-      if (cog->data.concat.rhs != NULL) 
-      {
+  if (cog->type == COG_CONCAT || cog->type == COG_BTREE) {
+    if (cog->type == COG_CONCAT) {
+      if (cog->data.concat.rhs != NULL) {
         printJITD(cog->data.concat.rhs, depth + 1);
       }
     }
-    if (cog->type == COG_BTREE) 
-    {
-      if (cog->data.btree.rhs != NULL) 
-      {
+    if (cog->type == COG_BTREE) {
+      if (cog->data.btree.rhs != NULL) {
         printJITD(cog->data.btree.rhs, depth + 1);
       }
     }
 
-    if (depth != 0) 
-    {
-      for (int i = 0; i < depth - 1; i++) 
-      {
+    if (depth != 0) {
+      for (int i = 0; i < depth - 1; i++) {
         printf("│   ");
       }
       printf("├───");
@@ -130,27 +123,19 @@ void printJITD(struct cog *cog, int depth) {
 
     printCog(cog);
 
-    if (cog->type == COG_CONCAT) 
-    {
-      if (cog->data.concat.lhs != NULL) 
-      {
+    if (cog->type == COG_CONCAT) {
+      if (cog->data.concat.lhs != NULL) {
         printJITD(cog->data.concat.lhs, depth + 1);
       }
     }
-    if (cog->type == COG_BTREE) 
-    {
-      if (cog->data.btree.lhs != NULL) 
-      {
+    if (cog->type == COG_BTREE) {
+      if (cog->data.btree.lhs != NULL) {
         printJITD(cog->data.btree.lhs, depth + 1);
       }
     }
-  }
-  else 
-  {
-    if (depth != 0) 
-    {
-      for (int i = 0; i < depth - 1; i++) 
-      {
+  } else {
+    if (depth != 0) {
+      for (int i = 0; i < depth - 1; i++) {
         printf("│   ");
       }
       printf("├───");
@@ -164,8 +149,7 @@ void printJITD(struct cog *cog, int depth) {
 void jsonize(struct cog *cog, FILE *file) {
   if (cog == NULL) fprintf(file, "null");
 
-  if (cog->type == COG_BTREE) 
-  {
+  if (cog->type == COG_BTREE) {
     fprintf(file, "{\"name\":\"%li ", cog->data.btree.sep);
     fprintf(file, "Total: %li ", cog->data.btree.rds);
     fprintf(file, "Reads: %li\",", getReadsAtNode(cog));
@@ -174,9 +158,7 @@ void jsonize(struct cog *cog, FILE *file) {
     fprintf(file, ",");
     jsonize(cog->data.btree.rhs, file);
     fprintf(file, "]}");
-  } 
-  else 
-  {
+  } else {
     fprintf(file, "{\"name\":\"Elements\"}");
   }
 }

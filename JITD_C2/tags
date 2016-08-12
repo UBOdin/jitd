@@ -8,6 +8,7 @@ ADAPTIVE_MERGE_H_SHEILD	src/include/adaptive_merge.h	/^#define ADAPTIVE_MERGE_H_
 BLOCK_SIZE	src/include/adaptive_merge.h	/^#define BLOCK_SIZE /;"	d
 BTREE_H_SHIELD	src/include/cog.h	/^#define BTREE_H_SHIELD$/;"	d
 BTREE_LIB_H_SHIELD	src/include/data.h	/^#define BTREE_LIB_H_SHIELD$/;"	d
+BUFFER_SIZE	src/lib/dist_reads.c	/^#define BUFFER_SIZE /;"	d	file:
 BUFFER_SIZE	src/test/btree_test.c	/^#define BUFFER_SIZE /;"	d	file:
 CC	Makefile	/^CC = gcc -std=c11 -Isrc\/include -g$/;"	m
 CC	Makefile	/^advanced: CC = gcc -D__ADVANCED -std=c11 -Isrc\/include -g$/;"	m
@@ -17,13 +18,15 @@ COG_BTREE	src/include/cog.h	/^  COG_CONCAT, COG_BTREE, COG_ARRAY, COG_SORTEDARRA
 COG_CONCAT	src/include/cog.h	/^  COG_CONCAT, COG_BTREE, COG_ARRAY, COG_SORTEDARRAY$/;"	e	enum:__anon1
 COG_SORTEDARRAY	src/include/cog.h	/^  COG_CONCAT, COG_BTREE, COG_ARRAY, COG_SORTEDARRAY$/;"	e	enum:__anon1
 CRACKER_H_SHEILD	src/include/cracker.h	/^#define CRACKER_H_SHEILD$/;"	d
+DIST_READS_H_SHEILD	src/include/dist_reads.h	/^#define DIST_READS_H_SHEILD$/;"	d
 E_NUM	src/include/zipf.h	/^#define E_NUM /;"	d
 FALSE	src/include/cracker.h	/^#define FALSE /;"	d
 FALSE	src/include/zipf.h	/^#define FALSE /;"	d
 FILES	Makefile	/^FILES = \\$/;"	m
 GAMMA	src/include/zipf.h	/^#define GAMMA /;"	d
+KEY_RANGE	src/lib/dist_reads.c	/^#define KEY_RANGE /;"	d	file:
 KEY_RANGE	src/test/btree_test.c	/^#define KEY_RANGE /;"	d	file:
-LIB_FILES	Makefile	/^LIB_FILES = cog data util splay zipf policy$/;"	m
+LIB_FILES	Makefile	/^LIB_FILES = cog data util splay zipf policy dist_reads$/;"	m
 MAX_VALUE	src/include/cog.h	/^#define MAX_VALUE /;"	d
 MERGE_BLOCK_SIZE	src/include/adaptive_merge.h	/^#define MERGE_BLOCK_SIZE /;"	d
 MIN_VALUE	src/include/cog.h	/^#define MIN_VALUE /;"	d
@@ -37,13 +40,20 @@ UTIL_LIB_H_SHIELD	src/include/util.h	/^#define UTIL_LIB_H_SHIELD$/;"	d
 ZIPF_LIB_H_SHIELD	src/include/zipf.h	/^#define ZIPF_LIB_H_SHIELD$/;"	d
 _DECAY_FACTOR	src/lib/policy.c	/^#define _DECAY_FACTOR /;"	d	file:
 _DECAY_THRESHOLD	src/lib/policy.c	/^#define _DECAY_THRESHOLD /;"	d	file:
+__amerge__	src/documentation/documentation.c	/^+amerge+$/;"	r
+__extract_partitions__	src/documentation/documentation.c	/^+extract_partitions+$/;"	r
+__gather_partitions__	src/documentation/documentation.c	/^+gather_partitions+$/;"	r
+__merge_partitions__	src/documentation/documentation.c	/^+merge_partitions+$/;"	r
+__partition_cog__	src/documentation/documentation.c	/^+partition_cog+$/;"	r
 __splayTest__	src/documentation/documentation.c	/^+splayTest+$/;"	r
 __test4__	src/documentation/documentation.c	/^+test4+$/;"	r
 __test5__	src/documentation/documentation.c	/^+test5+$/;"	r
 __test6__	src/documentation/documentation.c	/^+test6+$/;"	r
 __test7__	src/documentation/documentation.c	/^+test7+$/;"	r
-__test8__	src/documentation/documentation.c	/^+test8+$/;"	r
-__test9__	src/documentation/documentation.c	/^+test9+$/;"	r
+__testHeavyHitterNoSplay__	src/documentation/documentation.c	/^+testHeavyHitterNoSplay+$/;"	r
+__testHeavyHitterWithSplay__	src/documentation/documentation.c	/^+testHeavyHitterWithSplay+$/;"	r
+__testZipfianNoSplay__	src/documentation/documentation.c	/^+testZipfianNoSplay+$/;"	r
+__testZipfianWithSplay__	src/documentation/documentation.c	/^+testZipfianWithSplay+$/;"	r
 _initialized	src/lib/zipf.c	/^static int _initialized = FALSE;$/;"	v	file:
 _interval	src/lib/policy.c	/^static long _interval  = 100;$/;"	v	file:
 _splays	src/lib/policy.c	/^static long _splays    = 0;$/;"	v	file:
@@ -56,9 +66,9 @@ array_iter_cleanup	src/lib/data.c	/^void array_iter_cleanup(void *vdata)$/;"	f
 array_iter_data	src/lib/data.c	/^} array_iter_data;$/;"	t	typeref:struct:__anon9	file:
 array_iter_get_next	src/lib/data.c	/^void array_iter_get_next(void *vdata, record r)$/;"	f
 array_iter_has_next	src/lib/data.c	/^int array_iter_has_next(void *vdata)$/;"	f
-array_iter_impl	src/lib/data.c	/^struct iterator_impl array_iter_impl = {$/;"	v	typeref:struct:iterator_impl
+array_iter_impl	src/lib/data.c	/^struct iterator_impl array_iter_impl = $/;"	v	typeref:struct:iterator_impl
 array_iter_next	src/lib/data.c	/^void array_iter_next(void *vdata, record r)$/;"	f
-array_load	src/lib/cog.c	/^struct cog *array_load(iterator iter,int len) {$/;"	f
+array_load	src/lib/cog.c	/^struct cog *array_load(iterator iter,int len) $/;"	f
 array_scan	src/lib/data.c	/^iterator array_scan(long low, long high, int start, int len, buffer buffer)$/;"	f
 b	src/lib/data.c	/^  buffer b;$/;"	m	struct:__anon9	file:
 btree	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep; long rds; } btree;$/;"	m	union:cog::__anon2	typeref:struct:cog::__anon2::__anon5
@@ -66,26 +76,26 @@ btree	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long se
 buffer	src/include/data.h	/^typedef struct buffer {$/;"	s
 buffer	src/include/data.h	/^} *buffer;$/;"	t	typeref:struct:buffer
 buffer_alloc	src/lib/data.c	/^buffer buffer_alloc(int size)$/;"	f
-buffer_key	src/lib/data.c	/^long buffer_key(buffer b, int i){$/;"	f
+buffer_key	src/lib/data.c	/^long buffer_key(buffer b, int i)$/;"	f
 buffer_release	src/lib/data.c	/^void buffer_release(buffer b)$/;"	f
 buffer_retain	src/lib/data.c	/^void buffer_retain(buffer b)$/;"	f
-buffer_start	src/lib/data.c	/^record buffer_start(buffer b, int idx){$/;"	f
-buffer_value	src/lib/data.c	/^long buffer_value(buffer b, int i){$/;"	f
-clean	src/lib/cog.c	/^void clean(cog *c) {$/;"	f
+buffer_start	src/lib/data.c	/^record buffer_start(buffer b, int idx)$/;"	f
+buffer_value	src/lib/data.c	/^long buffer_value(buffer b, int i)$/;"	f
+clean	src/lib/cog.c	/^void clean(cog *c) $/;"	f
 cleanup	src/include/data.h	/^  void (*cleanup)(void *data);$/;"	m	struct:iterator_impl
-cleanup	src/lib/cog.c	/^void cleanup(cog *c){$/;"	f
-cleanup_extracted_components	src/lib/cog.c	/^void cleanup_extracted_components(extracted_components *extracted_components) {$/;"	f
-cleanup_list	src/lib/cog.c	/^void cleanup_list(list *list) {$/;"	f
-cleanup_stack	src/lib/cog.c	/^void cleanup_stack(stack_triple *stack) {$/;"	f
+cleanup	src/lib/cog.c	/^void cleanup(cog *c)$/;"	f
+cleanup_extracted_components	src/lib/cog.c	/^void cleanup_extracted_components(extracted_components *extracted_components) $/;"	f
+cleanup_list	src/lib/cog.c	/^void cleanup_list(list *list) $/;"	f
+cleanup_stack	src/lib/cog.c	/^void cleanup_stack(stack_triple *stack) $/;"	f
 click	dendrogram.html	/^        function click(d) {$/;"	f
 cnt	src/lib/data.c	/^  int cnt;$/;"	m	struct:__anon10	file:
 cog	src/include/cog.h	/^  struct cog *cog;$/;"	m	struct:double_struct	typeref:struct:double_struct::cog
 cog	src/include/cog.h	/^  struct cog *cog;$/;"	m	struct:list	typeref:struct:list::cog
 cog	src/include/cog.h	/^  struct cog *cog;$/;"	m	struct:triple	typeref:struct:triple::cog
-cog	src/include/cog.h	/^typedef struct cog {$/;"	s
+cog	src/include/cog.h	/^typedef struct cog $/;"	s
 cog	src/include/cog.h	/^} cog;$/;"	t	typeref:struct:cog
-cog_length	src/lib/cog.c	/^int cog_length(struct cog *cog) {$/;"	f
-cog_min	src/lib/cog.c	/^long cog_min(struct cog *c) {$/;"	f
+cog_length	src/lib/cog.c	/^int cog_length(struct cog *cog) $/;"	f
+cog_min	src/lib/cog.c	/^long cog_min(struct cog *c) $/;"	f
 cog_type	src/include/cog.h	/^} cog_type;$/;"	t	typeref:enum:__anon1
 color	dendrogram.html	/^        function color(d) {$/;"	f
 concat	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; } concat;$/;"	m	union:cog::__anon2	typeref:struct:cog::__anon2::__anon3
@@ -93,16 +103,16 @@ concat_iter_cleanup	src/lib/data.c	/^void concat_iter_cleanup(void *vdata)$/;"	f
 concat_iter_data	src/lib/data.c	/^} concat_iter_data;$/;"	t	typeref:struct:__anon10	file:
 concat_iter_get_next	src/lib/data.c	/^void concat_iter_get_next(void *vdata, record r)$/;"	f
 concat_iter_has_next	src/lib/data.c	/^int concat_iter_has_next(void *vdata)$/;"	f
-concat_iter_impl	src/lib/data.c	/^struct iterator_impl concat_iter_impl = {$/;"	v	typeref:struct:iterator_impl
+concat_iter_impl	src/lib/data.c	/^struct iterator_impl concat_iter_impl = $/;"	v	typeref:struct:iterator_impl
 concat_iter_next	src/lib/data.c	/^void concat_iter_next(void *vdata, record r)$/;"	f
-convert_to_sortedarray	src/lib/cog.c	/^void convert_to_sortedarray(struct cog *cog) {$/;"	f
+convert_to_sortedarray	src/lib/cog.c	/^void convert_to_sortedarray(struct cog *cog) $/;"	f
 crack	src/rewrites/cracker.c	/^cog *crack(cog *c, long low, long high) {$/;"	f
 crack_one	src/rewrites/cracker.c	/^cog *crack_one(cog *c, long val) {$/;"	f
 crack_scan	src/rewrites/cracker.c	/^cog *crack_scan(cog *c, long low, long high) {$/;"	f
-create_double_struct	src/lib/cog.c	/^double_struct *create_double_struct() {$/;"	f
-create_list	src/lib/cog.c	/^list *create_list() {$/;"	f
-create_stack	src/lib/cog.c	/^stack_triple *create_stack() {$/;"	f
-create_triple	src/lib/cog.c	/^triple *create_triple() {$/;"	f
+create_double_struct	src/lib/cog.c	/^double_struct *create_double_struct() $/;"	f
+create_list	src/lib/cog.c	/^list *create_list() $/;"	f
+create_stack	src/lib/cog.c	/^stack_triple *create_stack() $/;"	f
+create_triple	src/lib/cog.c	/^triple *create_triple() $/;"	f
 curr	src/lib/data.c	/^  int curr;$/;"	m	struct:__anon8	file:
 curr	src/lib/data.c	/^  int curr;$/;"	m	struct:__anon9	file:
 data	src/include/cog.h	/^  } data;$/;"	m	struct:cog	typeref:union:cog::__anon2
@@ -111,16 +121,16 @@ data	src/include/data.h	/^  void *data;$/;"	m	struct:iterator
 decay	src/lib/policy.c	/^struct cog *decay(struct cog *cog) {$/;"	f
 decaySubtree	src/lib/policy.c	/^void decaySubtree(struct cog *cog) {$/;"	f
 depth	src/include/cog.h	/^  int depth;$/;"	m	struct:triple
-doZipfianReads	src/test/btree_test.c	/^struct cog *doZipfianReads(struct cog *cog, long number, long range) $/;"	f
-double_struct	src/include/cog.h	/^typedef struct double_struct {$/;"	s
+doZipfianReads	src/lib/dist_reads.c	/^struct cog *doZipfianReads(struct cog *cog, long number, long range) $/;"	f
+double_struct	src/include/cog.h	/^typedef struct double_struct $/;"	s
 double_struct	src/include/cog.h	/^} double_struct;$/;"	t	typeref:struct:double_struct
 end	src/lib/data.c	/^  int end;$/;"	m	struct:__anon9	file:
 extract_partitions	src/rewrites/adaptive_merge.c	/^extracted_components *extract_partitions(cog *c, long low, long high) {$/;"	f
-extracted_components	src/include/cog.h	/^typedef struct extracted_components {$/;"	s
+extracted_components	src/include/cog.h	/^typedef struct extracted_components $/;"	s
 extracted_components	src/include/cog.h	/^} extracted_components;$/;"	t	typeref:struct:extracted_components
 findSplayCandidate	src/lib/policy.c	/^struct cog *findSplayCandidate(struct cog *cog, long reads) {$/;"	f
-fold	src/lib/cog.c	/^cog *fold(stack_triple **stack) {$/;"	f
-fold_append	src/lib/cog.c	/^void fold_append(stack_triple **stack, struct cog *c, long low) {$/;"	f
+fold	src/lib/cog.c	/^cog *fold(stack_triple **stack) $/;"	f
+fold_append	src/lib/cog.c	/^void fold_append(stack_triple **stack, struct cog *c, long low) $/;"	f
 free_cog	src/lib/cog.c	/^void free_cog(cog *c) { free(c); }$/;"	f
 gather_partitions	src/rewrites/adaptive_merge.c	/^list *gather_partitions(list *list, cog *c) {$/;"	f
 getBtreeNodeCount	src/lib/util.c	/^long getBtreeNodeCount(struct cog *cog) {$/;"	f
@@ -135,8 +145,8 @@ getReadsAtNode	src/lib/util.c	/^long getReadsAtNode(struct cog *cog) {$/;"	f
 getSplays	src/lib/policy.c	/^long getSplays() {$/;"	f
 getThreshold	src/lib/policy.c	/^long getThreshold() {$/;"	f
 getZipfCountAtCDF	src/lib/zipf.c	/^long getZipfCountAtCDF(long n, double alpha, float cdf) {$/;"	f
-get_cog_from_list	src/lib/cog.c	/^list *get_cog_from_list(list *list, struct cog *cog) {$/;"	f
-get_length	src/lib/cog.c	/^int get_length(list *list) {$/;"	f
+get_cog_from_list	src/lib/cog.c	/^list *get_cog_from_list(list *list, struct cog *cog) $/;"	f
+get_length	src/lib/cog.c	/^int get_length(list *list) $/;"	f
 get_next	src/include/data.h	/^  void (*get_next)(void *data, record rec);$/;"	m	struct:iterator_impl
 harmonic	src/lib/zipf.c	/^double harmonic(int n, double alpha) {$/;"	f
 harvest	src/rewrites/cracker.c	/^struct cog *harvest = NULL;$/;"	v	typeref:struct:cog
@@ -157,10 +167,10 @@ iter_get_next	src/lib/data.c	/^void iter_get_next(iterator iter, record r)$/;"	f
 iter_has_next	src/lib/data.c	/^int iter_has_next(iterator iter)$/;"	f
 iter_list	src/include/data.h	/^typedef struct iter_list {$/;"	s
 iter_list	src/include/data.h	/^} iter_list;$/;"	t	typeref:struct:iter_list
-iter_list_add	src/lib/data.c	/^iter_list *iter_list_add(iter_list *list, iterator iter) {$/;"	f
-iter_list_cleanup	src/lib/data.c	/^void iter_list_cleanup(iter_list *list) {$/;"	f
-iter_list_length	src/lib/data.c	/^int iter_list_length(iter_list *list) {$/;"	f
-iter_merge	src/lib/data.c	/^iterator iter_merge(iter_list *list) {$/;"	f
+iter_list_add	src/lib/data.c	/^iter_list *iter_list_add(iter_list *list, iterator iter) $/;"	f
+iter_list_cleanup	src/lib/data.c	/^void iter_list_cleanup(iter_list *list) $/;"	f
+iter_list_length	src/lib/data.c	/^int iter_list_length(iter_list *list) $/;"	f
+iter_merge	src/lib/data.c	/^iterator iter_merge(iter_list *list) $/;"	f
 iter_next	src/lib/data.c	/^void iter_next(iterator iter, record r)$/;"	f
 iterator	src/include/data.h	/^typedef struct iterator {$/;"	s
 iterator	src/include/data.h	/^} *iterator;$/;"	t	typeref:struct:iterator
@@ -178,25 +188,25 @@ lhs	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep;
 lhs	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep; } btree;$/;"	m	struct:cog::__anon2::__anon4	typeref:struct:cog::__anon2::__anon4::cog
 lhs	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; } concat;$/;"	m	struct:cog::__anon2::__anon3	typeref:struct:cog::__anon2::__anon3::cog
 lhs	src/include/cog.h	/^  struct cog *lhs;$/;"	m	struct:extracted_components	typeref:struct:extracted_components::cog
-list	src/include/cog.h	/^typedef struct list {$/;"	s
+list	src/include/cog.h	/^typedef struct list $/;"	s
 list	src/include/cog.h	/^} list;$/;"	t	typeref:struct:list
-list_has_next	src/lib/cog.c	/^int list_has_next(list *list) {$/;"	f
+list_has_next	src/lib/cog.c	/^int list_has_next(list *list) $/;"	f
 low_key	src/include/cog.h	/^  long low_key;$/;"	m	struct:extracted_components
 main	src/test/btree_test.c	/^int main(int argc, char **argv) $/;"	f
-makeBtreeWithReads	src/lib/cog.c	/^cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds) {$/;"	f
-make_array	src/lib/cog.c	/^cog *make_array( int start, int len, buffer records ) {$/;"	f
-make_btree	src/lib/cog.c	/^cog *make_btree( struct cog *lhs, struct cog *rhs, long sep ) {$/;"	f
-make_concat	src/lib/cog.c	/^cog *make_concat( struct cog *lhs, struct cog *rhs ) {$/;"	f
-make_extracted_components	src/lib/cog.c	/^extracted_components *make_extracted_components(struct cog *lhs, struct cog *rhs, long low_key, long high_key, iterator iter) {$/;"	f
-make_sortedarray	src/lib/cog.c	/^cog *make_sortedarray( int start, int len, buffer records ) {$/;"	f
-math_max	src/lib/data.c	/^int math_max(int arg1, int arg2) {$/;"	f
-math_min	src/lib/data.c	/^int math_min(int arg1, int arg2) {$/;"	f
-merge_iter_cleanup	src/lib/data.c	/^void merge_iter_cleanup(void *vdata) {$/;"	f
+makeBtreeWithReads	src/lib/cog.c	/^cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds) $/;"	f
+make_array	src/lib/cog.c	/^cog *make_array( int start, int len, buffer records ) $/;"	f
+make_btree	src/lib/cog.c	/^cog *make_btree( struct cog *lhs, struct cog *rhs, long sep ) $/;"	f
+make_concat	src/lib/cog.c	/^cog *make_concat( struct cog *lhs, struct cog *rhs ) $/;"	f
+make_extracted_components	src/lib/cog.c	/^extracted_components *make_extracted_components(struct cog *lhs, struct cog *rhs, long low_key, long high_key, iterator iter) $/;"	f
+make_sortedarray	src/lib/cog.c	/^cog *make_sortedarray( int start, int len, buffer records ) $/;"	f
+math_max	src/lib/data.c	/^int math_max(int arg1, int arg2) $/;"	f
+math_min	src/lib/data.c	/^int math_min(int arg1, int arg2) $/;"	f
+merge_iter_cleanup	src/lib/data.c	/^void merge_iter_cleanup(void *vdata) $/;"	f
 merge_iter_data	src/lib/data.c	/^} merge_iter_data;$/;"	t	typeref:struct:__anon8	file:
-merge_iter_get_next	src/lib/data.c	/^void merge_iter_get_next(void *vdata, record r) {$/;"	f
-merge_iter_has_next	src/lib/data.c	/^int merge_iter_has_next(void *vdata) {$/;"	f
-merge_iter_impl	src/lib/data.c	/^struct iterator_impl merge_iter_impl = {$/;"	v	typeref:struct:iterator_impl
-merge_iter_next	src/lib/data.c	/^void merge_iter_next(void *vdata, record r) {$/;"	f
+merge_iter_get_next	src/lib/data.c	/^void merge_iter_get_next(void *vdata, record r) $/;"	f
+merge_iter_has_next	src/lib/data.c	/^int merge_iter_has_next(void *vdata) $/;"	f
+merge_iter_impl	src/lib/data.c	/^struct iterator_impl merge_iter_impl = $/;"	v	typeref:struct:iterator_impl
+merge_iter_next	src/lib/data.c	/^void merge_iter_next(void *vdata, record r) $/;"	f
 merge_partitions	src/rewrites/adaptive_merge.c	/^double_struct *merge_partitions(cog *c, long low, long high) {$/;"	f
 mk_random_array	src/test/btree_test.c	/^cog *mk_random_array(int size) $/;"	f
 mk_random_buffer	src/test/btree_test.c	/^buffer mk_random_buffer(int size) $/;"	f
@@ -208,28 +218,27 @@ next	src/include/cog.h	/^  struct stack_triple *next;$/;"	m	struct:stack_triple	
 next	src/include/data.h	/^  struct iter_list *next;$/;"	m	struct:iter_list	typeref:struct:iter_list::iter_list
 next	src/include/data.h	/^  void (*next)(void *data, record rec);$/;"	m	struct:iterator_impl
 partition_cog	src/rewrites/adaptive_merge.c	/^cog *partition_cog(cog *c) {$/;"	f
-peek_depth	src/lib/cog.c	/^int peek_depth(stack_triple **top) {$/;"	f
-pop_stack	src/lib/cog.c	/^stack_triple *pop_stack(stack_triple **top) {$/;"	f
+peek_depth	src/lib/cog.c	/^int peek_depth(stack_triple **top) $/;"	f
+pop_stack	src/lib/cog.c	/^stack_triple *pop_stack(stack_triple **top) $/;"	f
 printArrayCog	src/lib/util.c	/^void printArrayCog(struct cog *cog) {$/;"	f
-printCog	src/lib/util.c	/^void printCog(struct cog *cog) {$/;"	f
+printCog	src/lib/util.c	/^void printCog(struct cog *cog) $/;"	f
 printJITD	src/lib/util.c	/^void printJITD(struct cog *cog, int depth) {$/;"	f
 printMode	src/lib/util.c	/^void printMode() {$/;"	f
 printTreeCog	src/lib/util.c	/^void printTreeCog(struct cog *cog) {$/;"	f
-push_stack	src/lib/cog.c	/^void push_stack(struct triple *t, stack_triple **top) {$/;"	f
+push_stack	src/lib/cog.c	/^void push_stack(struct triple *t, stack_triple **top) $/;"	f
 pushdown_concats	src/rewrites/cracker.c	/^cog *pushdown_concats(cog *c, long low, long high) {$/;"	f
-radix	src/lib/data.c	/^int radix(buffer b, int low, int cnt, int radix){$/;"	f
+radix	src/lib/data.c	/^int radix(buffer b, int low, int cnt, int radix)$/;"	f
 rand_val	src/lib/zipf.c	/^double rand_val(int seed) {$/;"	f
 randomReads	src/lib/util.c	/^struct cog *randomReads(struct cog *cog, long number, long range) {$/;"	f
 rds	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep; long rds; } btree;$/;"	m	struct:cog::__anon2::__anon5
-readsCounterTest	src/test/btree_test.c	/^void readsCounterTest() $/;"	f
 record	src/include/data.h	/^typedef struct record {$/;"	s
 record	src/include/data.h	/^} *record;$/;"	t	typeref:struct:record
 record_binarysearch	src/lib/data.c	/^int record_binarysearch(record r, long key, int start, int len)$/;"	f
-record_copy	src/lib/data.c	/^void record_copy(record src, record dst){$/;"	f
+record_copy	src/lib/data.c	/^void record_copy(record src, record dst)$/;"	f
 record_dump	src/lib/data.c	/^void record_dump(record r, int start, int end)$/;"	f
-record_set	src/lib/data.c	/^void record_set(record src, long key, long value){$/;"	f
+record_set	src/lib/data.c	/^void record_set(record src, long key, long value)$/;"	f
 record_sort	src/lib/data.c	/^void record_sort(record r, int start, int end)$/;"	f
-record_swap	src/lib/data.c	/^void record_swap(record ir, record jr){$/;"	f
+record_swap	src/lib/data.c	/^void record_swap(record ir, record jr)$/;"	f
 records	src/include/cog.h	/^    struct { int start; int len; buffer records; } array;$/;"	m	struct:cog::__anon2::__anon6
 records	src/include/cog.h	/^    struct { int start; int len; buffer records; } sortedarray;$/;"	m	struct:cog::__anon2::__anon7
 refcount	src/include/data.h	/^  int refcount;             \/\/ The number of references to this buffer.$/;"	m	struct:buffer
@@ -237,8 +246,8 @@ rhs	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep;
 rhs	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep; } btree;$/;"	m	struct:cog::__anon2::__anon4	typeref:struct:cog::__anon2::__anon4::cog
 rhs	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; } concat;$/;"	m	struct:cog::__anon2::__anon3	typeref:struct:cog::__anon2::__anon3::cog
 rhs	src/include/cog.h	/^  struct cog *rhs;$/;"	m	struct:extracted_components	typeref:struct:extracted_components::cog
-scan	src/lib/cog.c	/^iterator scan( struct cog *cog, long low, long high ) {$/;"	f
-scan_full_array	src/lib/cog.c	/^iterator scan_full_array( struct cog *cog) {$/;"	f
+scan	src/lib/cog.c	/^iterator scan( struct cog *cog, long low, long high ) $/;"	f
+scan_full_array	src/lib/cog.c	/^iterator scan_full_array( struct cog *cog) $/;"	f
 seedlessRandom	src/lib/util.c	/^int seedlessRandom() {$/;"	f
 sep	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep; long rds; } btree;$/;"	m	struct:cog::__anon2::__anon5
 sep	src/include/cog.h	/^    struct { struct cog *lhs; struct cog *rhs; long sep; } btree;$/;"	m	struct:cog::__anon2::__anon4
@@ -250,9 +259,8 @@ sortedarray	src/include/cog.h	/^    struct { int start; int len; buffer records;
 splay	src/lib/splay.c	/^struct cog *splay(struct cog *root, struct cog *node) {$/;"	f
 splayDepth	src/lib/splay.c	/^struct cog *splayDepth(struct cog *root, struct cog *node, int depth) {$/;"	f
 splayOnHarvest	src/lib/util.c	/^struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay, int steps) {$/;"	f
-splayTest	src/test/btree_test.c	/^void splayTest() $/;"	f
-stack_empty	src/lib/cog.c	/^int stack_empty(stack_triple **top) {$/;"	f
-stack_triple	src/include/cog.h	/^typedef struct stack_triple {$/;"	s
+stack_empty	src/lib/cog.c	/^int stack_empty(stack_triple **top) $/;"	f
+stack_triple	src/include/cog.h	/^typedef struct stack_triple $/;"	s
 stack_triple	src/include/cog.h	/^} stack_triple;$/;"	t	typeref:struct:stack_triple
 start	src/include/cog.h	/^    struct { int start; int len; buffer records; } array;$/;"	m	struct:cog::__anon2::__anon6
 start	src/include/cog.h	/^    struct { int start; int len; buffer records; } sortedarray;$/;"	m	struct:cog::__anon2::__anon7
@@ -261,17 +269,15 @@ test2	src/test/btree_test.c	/^void test2() $/;"	f
 test3	src/test/btree_test.c	/^void test3() $/;"	f
 test4	src/test/btree_test.c	/^void test4() $/;"	f
 test5	src/test/btree_test.c	/^void test5() $/;"	f
-test6	src/test/btree_test.c	/^void test6(int reads)$/;"	f
-test7	src/test/btree_test.c	/^void test7(int reads)$/;"	f
-test8	src/test/btree_test.c	/^void test8() $/;"	f
-test9	src/test/btree_test.c	/^void test9() $/;"	f
-testConvergence	src/test/btree_test.c	/^void testConvergence() $/;"	f
-testSpeed	src/test/btree_test.c	/^void testSpeed() $/;"	f
-testZipfinize	src/test/btree_test.c	/^void testZipfinize() $/;"	f
+testHeavyHitterNoSplay	src/test/btree_test.c	/^void testHeavyHitterNoSplay(int reads)$/;"	f
+testHeavyHitterWithSplay	src/test/btree_test.c	/^void testHeavyHitterWithSplay(int reads)$/;"	f
+testTreeOnArrayCrack	src/test/btree_test.c	/^void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)$/;"	f
+testZipfianNoSplay	src/test/btree_test.c	/^void testZipfianNoSplay(int arraySize, int reads) $/;"	f
+testZipfianWithSplay	src/test/btree_test.c	/^void testZipfianWithSplay(int arraySize, int reads)$/;"	f
 test_scan	src/test/btree_test.c	/^void test_scan(cog *c, long low, long high) $/;"	f
 timeRun	src/lib/util.c	/^struct cog *timeRun(struct cog *(*function)(struct cog *, long, long),$/;"	f
 triple	src/include/cog.h	/^  struct triple *triple;$/;"	m	struct:stack_triple	typeref:struct:stack_triple::triple
-triple	src/include/cog.h	/^typedef struct triple {$/;"	s
+triple	src/include/cog.h	/^typedef struct triple $/;"	s
 triple	src/include/cog.h	/^} triple;$/;"	t	typeref:struct:triple
 type	src/include/cog.h	/^  cog_type type;$/;"	m	struct:cog
 update	dendrogram.html	/^                function update(source) {$/;"	f
@@ -284,6 +290,6 @@ zigzag	src/lib/splay.c	/^struct cog *zigzag(struct cog *root, struct cog *node) 
 zigzig	src/lib/splay.c	/^struct cog *zigzig(struct cog *root, struct cog *node) {$/;"	f
 zipf	src/lib/zipf.c	/^int zipf(double alpha, int n) {$/;"	f
 zipfianReads	src/lib/util.c	/^struct cog *zipfianReads(struct cog *cog, double alpha, long number, long range) {$/;"	f
-zipfianReads_splay	src/test/btree_test.c	/^struct cog *zipfianReads_splay(struct cog *cog, long number, long range) $/;"	f
+zipfianReads_splay	src/lib/dist_reads.c	/^struct cog *zipfianReads_splay(struct cog *cog, long number, long range) $/;"	f
 zipfinize	src/lib/policy.c	/^struct cog *zipfinize(struct cog *cog, long levels) {$/;"	f
 zipfinizeSubtree	src/lib/policy.c	/^struct cog *zipfinizeSubtree(struct cog *cog, long levels) {$/;"	f
