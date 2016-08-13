@@ -16,44 +16,6 @@
 #define BUFFER_SIZE 10
 #define KEY_RANGE 1000000
 
-buffer mk_random_buffer(int size) 
-{
-  buffer b = buffer_alloc(size);
-  int i;
-  for(i = 0; i < size; i++)
-  {
-    b->data[i].key = rand() % KEY_RANGE;
-    b->data[i].value = rand();
-  }
-  //record_dump(b->data, 0, size); // Useful for viewing test1
-  return b;
-}
-
-buffer mk_sorted_buffer(int size) 
-{
-  buffer b = mk_random_buffer(size);
-  record_sort(b->data, 0, size);
-  record_dump(b->data, 0, size);
-  return b;
-}
-
-cog *mk_random_array(int size) 
-{
-  return make_array(0, size, mk_random_buffer(size));
-}
-
-cog *mk_sorted_array(int size) 
-{
-  return make_sortedarray(0, size, mk_sorted_buffer(size));
-}
-
-void test_scan(cog *c, long low, long high) 
-{
-  iterator iter = scan(c, low, high);
-  iter_dump(iter);
-  iter_cleanup(iter);
-}
-
 void test1() 
 {
   // Test for making a random array cog
@@ -205,40 +167,24 @@ void testHeavyHitterWithSplay(int reads)
   printf("Running HeavyHitter test with splaying\n");
 }
 
-void test9()
-{
-  
-}
-
 struct cog *execute_workload_test(struct workload_test *w)
 {
   struct cog *cog;
-  workload_type type = w->type;
-  bool rebalance = w->rebalance;
-  long number_of_reads = w->number_of_reads;
-  long range = w->range;
   cog = mk_random_array(w->test_array_size);
-
-  if (type == RANDOM)
-  {
-      
-  }
-  else if (type == ZIPFIAN)
-  {
-      
-  }
-  else if (type == HEAVYHITTER)
-  {
-      
-  }
-  else
-  {
-    printf("Invalid workload type, please specify RANDOM, ZIPFIAN, ");
-    printf("or HEAVYHITTER\n");
-    exit(0);
-  }
-  free_workload_test(w);
+  w->cog = cog;
+  cog = testReads(w);
+  /* remember to free workload when done */
   return cog;
+}
+
+void test9()
+{
+  printf("test 9\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(RANDOM, true, 1000000, 10000, 10000);
+  cog = execute_workload_test(work);
+  printf("\n");
 }
 
 int main(int argc, char **argv) 
@@ -260,6 +206,8 @@ int main(int argc, char **argv)
   test7();
   srand(rand_start);
   test8();
+  srand(rand_start);
+  test9();
   //testHeavyHitterNoSplay(10000);
   //testHeavyHitterWithSplay(10000);
 }
