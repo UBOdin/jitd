@@ -128,6 +128,20 @@ void test5()
   printf("\n");
 }
 
+void test6()
+{
+  // Perform pre-loaded tests for tree operations on cracking an array
+  printf("test 6\n");
+  testTreeOnArrayCrack(false, 1000000, 10000);
+}
+
+void test7()
+{
+  // Perform pre-loaded tests for tree operations on cracking an array
+  printf("test 7\n");
+  testTreeOnArrayCrack(true, 1000000, 10000);
+}
+
 /*|__testTreeOnArrayCrack__|*/
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
 {
@@ -171,6 +185,14 @@ void testZipfianWithSplay(int arraySize, int reads)
   cog_result = timeRun(zipfianReads_splay, cog, reads, 1000);
 }
 
+void test8()
+{
+  printf("test 8\n");
+  testZipfianNoSplay(10000, 1000);
+  testZipfianWithSplay(10000, 1000);
+  printf("\n");
+}
+
 /*|__testHeavyHitterNoSplay__|*/
 void testHeavyHitterNoSplay(int reads)
 {
@@ -181,6 +203,42 @@ void testHeavyHitterNoSplay(int reads)
 void testHeavyHitterWithSplay(int reads)
 {
   printf("Running HeavyHitter test with splaying\n");
+}
+
+void test9()
+{
+  
+}
+
+struct cog *execute_workload_test(struct workload_test *w)
+{
+  struct cog *cog;
+  workload_type type = w->type;
+  bool rebalance = w->rebalance;
+  long number_of_reads = w->number_of_reads;
+  long range = w->range;
+  cog = mk_random_array(w->test_array_size);
+
+  if (type == RANDOM)
+  {
+      
+  }
+  else if (type == ZIPFIAN)
+  {
+      
+  }
+  else if (type == HEAVYHITTER)
+  {
+      
+  }
+  else
+  {
+    printf("Invalid workload type, please specify RANDOM, ZIPFIAN, ");
+    printf("or HEAVYHITTER\n");
+    exit(0);
+  }
+  free_workload_test(w);
+  return cog;
 }
 
 int main(int argc, char **argv) 
@@ -197,11 +255,11 @@ int main(int argc, char **argv)
   srand(rand_start);
   test5();
   srand(rand_start);
-  bool rebalance;
-  testTreeOnArrayCrack(rebalance = true, 1000000, 10000);
-  testTreeOnArrayCrack(rebalance = false, 1000000, 10000);
-  testZipfianNoSplay(10000, 1000);
-  testZipfianWithSplay(10000, 1000);
+  test6();
+  srand(rand_start);
+  test7();
+  srand(rand_start);
+  test8();
   //testHeavyHitterNoSplay(10000);
   //testHeavyHitterWithSplay(10000);
 }
