@@ -128,12 +128,9 @@ struct cog *zipfianReads_splay(struct cog *cog, long number, long range)
 struct cog *randomread_randomarray(struct cog *cog, bool rebalance, 
     long number, long range)
 {
-  if (rebalance)
-  {printf("Testing JITD performance on random array with random reads ");
-   printf("with rebalancing ");}
-  else
-  {printf("Testing JITD performance on random array with random reads ");
-   printf("without rebalancing ");}
+  printf("Testing JITD performance on random array with random reads ");
+  if (rebalance) printf("with rebalancing ");
+  else printf("without rebalancing ");
   printf("on array size of %d while performing ", cog_length(cog));
   printf("%ld reads\n", number);
 
@@ -146,19 +143,32 @@ struct cog *randomread_randomarray(struct cog *cog, bool rebalance,
 struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance, 
     long number, long range) 
 {
+  printf("Testing JITD performance on random array with zipfian reads ");
+  if (rebalance) printf("with rebalancing ");
+  else printf("without rebalancing ");
+  printf("on array size of %d while performing ", cog_length(cog));
+  printf("%ld reads\n", number);
+  printf("For range value %ld: ", range);
+
   float alpha =0.99;
   int n=KEY_RANGE;
   int zipf_rv;
+  int splayCount = 0;
   rand_val(1400);
   struct cog *cog_median;
 
   for (int i=1; i<number; i++) {
     zipf_rv = zipf(alpha, n);
     cog = crack_scan(cog, zipf_rv, zipf_rv + range);
-    if(rebalance && (i > 100 || i%2 == 0)) {
+    if(rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) {
       cog_median = getMedian(cog);
       cog = splay(cog, cog_median);
+      splayCount++;
     }
+    //if(rebalance && (i > 100 || i%2 == 0)) {
+    //  cog_median = getMedian(cog);
+    //  cog = splay(cog, cog_median);
+    //}
   }
   return cog;
 }
@@ -166,6 +176,22 @@ struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance,
 struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance, 
     long number, long range) 
 {
+  //float alpha = 0.99;
+  //int n = KEY_RANGE;
+  //int heavy_rv;
+  //rand_val(1400);
+  //struct cog *cog_median;
+
+  //for (int i=1; i<number; i++) 
+  //{
+  //  heavy_rv = heavy(alpha, n);
+  //  cog = crack_scan(cog, heavy_rv, heavy_rv + range);
+  //  if(i > 1000 || i%2 == 0) 
+  //  {
+  //    cog_median = getMedian(cog);
+  //    cog = splay(cog, cog_median);
+  //  }
+  //}
   return cog;
 }
 
@@ -205,4 +231,16 @@ void test_scan(cog *c, long low, long high)
   iterator iter = scan(c, low, high);
   iter_dump(iter);
   iter_cleanup(iter);
+}
+
+long long int twoPow(long long int exp)
+{
+  long long int base = 2;
+  long long int result = 1;
+  while (exp) {
+    if (exp & 1) result *= base;
+    exp >>= 1;
+    base *= base;
+  }
+  return result;
 }

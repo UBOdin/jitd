@@ -155,21 +155,10 @@ void test8()
   printf("\n");
 }
 
-/*|__testHeavyHitterNoSplay__|*/
-void testHeavyHitterNoSplay(int reads)
-{
-  printf("Running HeavyHitter test with no splaying\n");
-}
-
-/*|__testHeavyHitterWithSplay__|*/
-void testHeavyHitterWithSplay(int reads)
-{
-  printf("Running HeavyHitter test with splaying\n");
-}
-
 struct cog *execute_workload_test(struct workload_test *w)
 {
   struct cog *cog;
+  w->cog = cog;
   cog = mk_random_array(w->test_array_size);
   w->cog = cog;
   cog = testReads(w);
@@ -187,27 +176,49 @@ void test9()
   printf("\n");
 }
 
+void test10()
+{
+  printf("test 10\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(ZIPFIAN, false, 10000, 1000000, 1000);
+  execute_workload_test(work);
+  free_workload_test(work);
+  printf("\n");
+}
+
+void test11()
+{
+  printf("test 11\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(ZIPFIAN, true, 10000, 1000000, 1000);
+  execute_workload_test(work);
+  free_workload_test(work);
+  printf("\n");
+}
+
 int main(int argc, char **argv) 
 {
-  int rand_start = 42; //time(NULL)
-  srand(rand_start);
-  test1();
-  srand(rand_start);
-  test2();
-  srand(rand_start);
-  test3();
-  srand(rand_start);
-  test4();
-  srand(rand_start);
-  test5();
-  srand(rand_start);
-  test6();
-  srand(rand_start);
-  test7();
-  srand(rand_start);
-  test8();
-  srand(rand_start);
-  test9();
-  //testHeavyHitterNoSplay(10000);
-  //testHeavyHitterWithSplay(10000);
+  //int rand_start = 42; //time(NULL)
+  //srand(rand_start);
+  //test1();
+  //srand(rand_start);
+  //test2();
+  //srand(rand_start);
+  //test3();
+  //srand(rand_start);
+  //test4();
+  //srand(rand_start);
+  //test5();
+  //srand(rand_start);
+  //test6();
+  //srand(rand_start);
+  //test7();
+  //srand(rand_start);
+  //test8();
+  //srand(rand_start);
+  //test9();
+  test10();
+  test11();
 }

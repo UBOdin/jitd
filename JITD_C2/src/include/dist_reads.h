@@ -61,4 +61,6 @@ cog *mk_sorted_array(int size);
 
 void test_scan(cog *c, long low, long high);
 
+long long int twoPow(long long int exp);
+
 #endif //DIST_READS_H_SHEILD
