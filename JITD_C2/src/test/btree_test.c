@@ -107,12 +107,9 @@ void test7()
 /*|__testTreeOnArrayCrack__|*/
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
 {
-  if (rebalance)
-  {printf("Testing JITD performance on random array with random reads ");
-   printf("without rebalancing ");}
-  else
-  {printf("Testing JITD performance on random array with random reads ");
-   printf("with rebalancing ");}
+  printf("Testing JITD performance on random array with random reads ");
+  if (rebalance) printf("without rebalancing ");
+  else printf("with rebalancing ");
   printf("on array size of %d while performing ", arraySize);
   printf("%d reads\n", reads);
 
@@ -120,38 +117,11 @@ void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
   cog = mk_random_array(arraySize);
   int rangeValues[6] = {10000, 250, 1000, 5000, 10, 5000};
 
-  for (int i=0; i<6; i++)
-  {
+  for (int i=0; i<6; i++) {
     printf("For range value %d: ", rangeValues[i]);
     cog = timeRun(randomReads, cog, reads, rangeValues[i]);
     if (rebalance) { splay(cog, getMedian(cog)); }
   }
-  printf("\n");
-}
-
-/*|__testZipfianNoSplay__|*/
-void testZipfianNoSplay(int arraySize, int reads) 
-{
-  printf("Running Zipfian test with no splaying\n");
-  struct cog *cog, *cog_result;
-  cog = mk_random_array(arraySize);
-  cog_result = timeRun(doZipfianReads, cog, reads, 1000);
-}
-
-/*|__testZipfianWithSplay__|*/
-void testZipfianWithSplay(int arraySize, int reads)
-{
-  printf("Running Zipfian test with splaying\n");
-  struct cog *cog, *cog_result;
-  cog = mk_random_array(arraySize);
-  cog_result = timeRun(zipfianReads_splay, cog, reads, 1000);
-}
-
-void test8()
-{
-  printf("test 8\n");
-  testZipfianNoSplay(10000, 1000);
-  testZipfianWithSplay(10000, 1000);
   printf("\n");
 }
 
@@ -166,13 +136,30 @@ struct cog *execute_workload_test(struct workload_test *w)
   return cog;
 }
 
+void test8()
+{
+  printf("test 8\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(RANDOM, true, 1000000, 10000, 10000);
+  cog = execute_workload_test(work);
+  work->cog = cog;
+  work->range = 5000;
+  cog = testReads(work);
+  work->cog = cog;
+  work->range = 1000;
+  cog = testReads(work);
+  printf("\n");
+}
+
 void test9()
 {
   printf("test 9\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(RANDOM, true, 1000000, 10000, 10000);
-  cog = execute_workload_test(work);
+  work = make_workload_test(ZIPFIAN, false, 10000, 10000, 1000);
+  execute_workload_test(work);
+  free_workload_test(work);
   printf("\n");
 }
 
@@ -181,18 +168,7 @@ void test10()
   printf("test 10\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(ZIPFIAN, false, 10000, 1000000, 1000);
-  execute_workload_test(work);
-  free_workload_test(work);
-  printf("\n");
-}
-
-void test11()
-{
-  printf("test 11\n");
-  struct workload_test *work;
-  struct cog *cog;
-  work = make_workload_test(ZIPFIAN, true, 10000, 1000000, 1000);
+  work = make_workload_test(ZIPFIAN, true, 10000, 10000, 1000);
   execute_workload_test(work);
   free_workload_test(work);
   printf("\n");
@@ -200,7 +176,7 @@ void test11()
 
 int main(int argc, char **argv) 
 {
-  //int rand_start = 42; //time(NULL)
+  int rand_start = 42; //time(NULL)
   //srand(rand_start);
   //test1();
   //srand(rand_start);
@@ -211,14 +187,13 @@ int main(int argc, char **argv)
   //test4();
   //srand(rand_start);
   //test5();
-  //srand(rand_start);
-  //test6();
-  //srand(rand_start);
-  //test7();
-  //srand(rand_start);
-  //test8();
-  //srand(rand_start);
+  srand(rand_start);
+  test6();
+  srand(rand_start);
+  test7();
+  srand(rand_start);
+  test8();
+  srand(rand_start);
   //test9();
-  test10();
-  test11();
+  //test10();
 }
