@@ -165,6 +165,7 @@ struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance,
       cog = splay(cog, cog_median);
       splayCount++;
     }
+    // Use this if statement instead of one above for really slow performance
     //if(rebalance && (i > 100 || i%2 == 0)) {
     //  cog_median = getMedian(cog);
     //  cog = splay(cog, cog_median);
