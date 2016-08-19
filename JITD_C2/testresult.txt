@@ -1,0 +1,9 @@
+====== Testing btree ======
+test 9
+Testing JITD performance on random array with zipfian reads without rebalancing on array size of 1000000000 while performing 1000000 reads
+For range value 1000: Took 5984551 milliseconds
+
+test 10
+Testing JITD performance on random array with zipfian reads with rebalancing on array size of 1000000000 while performing 1000000 reads
+For range value 1000: Took 5984590 milliseconds
+

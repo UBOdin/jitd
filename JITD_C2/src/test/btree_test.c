@@ -157,7 +157,7 @@ void test9()
   printf("test 9\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(ZIPFIAN, false, 10000, 10000, 1000);
+  work = make_workload_test(ZIPFIAN, false, 1000000000, 1000000, 1000);
   execute_workload_test(work);
   free_workload_test(work);
   printf("\n");
@@ -168,7 +168,7 @@ void test10()
   printf("test 10\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(ZIPFIAN, true, 10000, 10000, 1000);
+  work = make_workload_test(ZIPFIAN, true, 1000000000, 1000000, 1000);
   execute_workload_test(work);
   free_workload_test(work);
   printf("\n");
@@ -187,13 +187,13 @@ int main(int argc, char **argv)
   //test4();
   //srand(rand_start);
   //test5();
+  //srand(rand_start);
+  //test6();
+  //srand(rand_start);
+  //test7();
+  //srand(rand_start);
+  //test8();
   srand(rand_start);
-  test6();
-  srand(rand_start);
-  test7();
-  srand(rand_start);
-  test8();
-  srand(rand_start);
-  //test9();
-  //test10();
+  test9();
+  test10();
 }
