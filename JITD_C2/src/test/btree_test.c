@@ -174,6 +174,28 @@ void test10()
   printf("\n");
 }
 
+void test11()
+{
+  printf("test 11\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(HEAVYHITTER, false, 10000, 10000, 1000);
+  execute_workload_test(work);
+  free_workload_test(work);
+  printf("\n");
+}
+
+void test12()
+{
+  printf("test 12\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(HEAVYHITTER, true, 10000, 10000, 1000);
+  execute_workload_test(work);
+  free_workload_test(work);
+  printf("\n");
+}
+
 int main(int argc, char **argv) 
 {
   int rand_start = 42; //time(NULL)
@@ -196,4 +218,6 @@ int main(int argc, char **argv)
   srand(rand_start);
   //test9();
   //test10();
+  //test11();
+  //test12();
 }

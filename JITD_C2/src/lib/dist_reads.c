@@ -8,6 +8,7 @@
 #include "splay.h"
 #include "util.h"
 #include "zipf.h"
+#include "heavyhit.h"
 #include "dist_reads.h"
 
 #define BUFFER_SIZE 10
