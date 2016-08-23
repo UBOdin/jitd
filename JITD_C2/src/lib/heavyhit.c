@@ -1,89 +1,61 @@
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
+#include "heavyhit.h"
+#include "zipf.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-
-int r = rand();
-
-private int lowerBound;
-private int upperBound;
-private int hotInterval;
-private int coldInterval;
-private double hotsetFraction;
-private double hotOpnFraction;
-
-int nextValue()
+struct heavyhit *create_heavyhit(
+    int lower_bound, 
+    int upper_bound, 
+    double hot_data_fraction, 
+    double hot_access_fraction
+    );
 {
-
-}
-
-int getLowerBound()
-{
-
-}
-
-int getUpperBound()
-{
-
-}
-
-double getHotsetFraction()
-{
-
-}
-
-double getHotOpnFraction()
-{
-
-}
-
-double mean()
-{
-
-}
-
-/**
- * Jain's random number generator.
- *
- * @param seed - seed
- * @return a random value between 0.0 and 1.0
- */
-double rand_val(int seed) {
-  const long  a =      16807; // Multiplier
-  const long  m = 2147483647; // Modulus
-  const long  q =     127773; // m div a
-  const long  r =       2836; // m mod a
-  static long x;              // Random int value
-  long        x_div_q;        // x divided by q
-  long        x_mod_q;        // x modulo q
-  long        x_new;          // New x value
-
-  // Set the seed if argument is non-zero and then return zero
-  if (seed > 0) 
-  {
-    _initialized = TRUE;
-    x = seed;
-    return(0.0);
+  if (hot_data_fraction < 0.0 || hot_data_fraction > 1.0){
+    printf("Hot data fraction out of range. Setting to 0.0\n");
+    hot_data_fraction = 0.0;
   }
-
-  // RNG using integer arithmetic
-  x_div_q = x / q;
-  x_mod_q = x % q;
-  x_new = (a * x_mod_q) - (r * x_div_q);
-  if (x_new > 0) x = x_new;
-  else x = x_new + m;
-
-  return((double) x / m);
+  if (hot_access_fraction < 0.0 || hot_access_fraction > 1.0){
+    printf("Hot access fraction out of range. Setting to 0.0\n");
+    hot_access_fraction = 0.0;
+  }
+  if (lower_bound > upper_bound){
+    printf("Upper bound of Hotspot generator smaller than the lower bound. ");
+    printf("Swapping the values.\n");
+    int temp = lower_bound;
+    lower_bound = upper_bound;
+    upper_bound = temp;
+  }
+  heavyhit *h = malloc(sizeof(struct heavyhit));
+  h->lower_bound = lower_bound;
+  h->upper_bound = upper_bound;
+  h->hot_data_fraction = hot_data_fraction;
+  h->hot_access_fraction = hot_access_fraction;
+  int interval = upper_bound - lower_bound + 1;
+  h->hot_interval = (int)(interval * hot_data_fraction);
+  h->cold_interval = interval - hot_interval;
+  return h;
 }
 
+int next_value(struct *heavyhit h)
+{
+  int value = 0;
+  if (rand_val(0) < h->hot_access_fraction)
+  {
+     /* Choose a value from the hot set */
+    srand(h->hot_interval);
+    value = h->lower_bound + (rand() % h->hot_interval);
+  }
+  else
+  {
+     /* Choose a value from the cold set */
+    srand(h->cold_interval);
+    value = h->lower_bound + h-> hot_interval + (rand() % h->cold_interval);
+  }
+  return value;
+}
+
+double mean(struct *heavyhit)
+{
+  return hot_access_fraction * (lower_bound + hot_interval/2.0)
+    + (1 - hot_access_fraction) * (lower_bound + hot_interval + cold_interval/2.0);
+}

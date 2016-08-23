@@ -209,27 +209,6 @@ int main(int argc, char **argv)
   //test4();
   //srand(rand_start);
   //test5();
-  srand(rand_start);
-  test6();
-  srand(rand_start);
-  execute_workload_test(work);
-  free_workload_test(work);
-  printf("\n");
-}
-
-int main(int argc, char **argv) 
-{
-  int rand_start = 42; //time(NULL)
-  //srand(rand_start);
-  //test1();
-  //srand(rand_start);
-  //test2();
-  //srand(rand_start);
-  //test3();
-  //srand(rand_start);
-  //test4();
-  //srand(rand_start);
-  //test5();
   //srand(rand_start);
   //test6();
   //srand(rand_start);
