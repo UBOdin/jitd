@@ -2,4 +2,3 @@ workload
 *.o
 driver
 workload_gen
-.DS_Store

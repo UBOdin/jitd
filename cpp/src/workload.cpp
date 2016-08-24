@@ -21,11 +21,9 @@ int main(int argc, char** argv)
   
   for(op = 0; op < op_count; op++)
   {
-    //if(op % 10 == 0){ 
+//    if(op % 10 == 0){ 
       cerr <<endl<< ":" << op; cerr.flush(); 
-	//
-	//
-	//}
+//      }
     long int choice = rand() % diff_mark;
     long int threshold = values.size() - low_mark;
     char cmd;

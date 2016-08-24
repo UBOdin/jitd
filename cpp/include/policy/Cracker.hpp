@@ -37,8 +37,6 @@ class CrackerPolicy : public RewritePolicyBase <Tuple>
       }
     void beforeIterator(CogHandle<Tuple> node)
     {
-	  /*Have a language that does this, facility that can make a call
-	   * to optimize when needed*/
       if(pushdownArr){ pushdownArray(node); }
       if(inlineArr >= 0){ inlineArray(inlineArr, node); }
       if(balanceBT){ balanceBTree(node); }

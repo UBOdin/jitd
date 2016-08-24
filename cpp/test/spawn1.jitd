@@ -3,14 +3,6 @@ policy cracker 1000000
 -- spawn_slow 100 workload/1.jitd
 -- 
 -- ---------- key_range batch_size ____record_cnt____ ms_per ms_tot
---            ---------- #of_possible_keys batch_size(# of records that get added or deleted after every operation) ____record_cnt____(always move total # of records between these 2 values) ms_per(how frequently it generates update) ms_tot(how long to run before exiting or between thread finishes)
---            ---------- key_range batch_size ____record_cnt____ ms_per ms_tot
--- *run 1* spawn_updates 100000000 1000000    10000000  30000000 4000   60000
--- *run 2* spawn_updates 300000000 1000000    10000000  30000000 4000   60000
--- *run 3* spawn_updates 100000000 2000000    10000000  30000000 4000   60000
--- *run 4* spawn_updates 100000000 1000000    20000000  30000000 4000   60000
--- *run 5* spawn_updates 100000000 1000000    10000000  60000000 4000   60000
--- *run 6* spawn_updates 100000000 1000000    10000000  30000000 8000   60000
-spawn_updates 300000000 1000000    10000000  30000000 4000   60000
+spawn_updates 100000000 1000000    10000000  30000000 4000   60000
 run test/scan_for_1_min.jitd
 run test/scan_for_1_min.jitd

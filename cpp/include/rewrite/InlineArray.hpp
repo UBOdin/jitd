@@ -9,8 +9,7 @@ template <class Tuple>
       auto cog = h->get();
       bool rebuild = false;
       
-	  /*Cases where you want to take cog structure you have and replace it with
-	   * one big sorted array*/
+      
       switch(cog->type) {
         case COG_CONCAT: 
           rebuild = (((ConcatCog<Tuple>*)cog.get())->lhs->type() == COG_SORTED_ARRAY)
@@ -34,7 +33,6 @@ template <class Tuple>
       
       if(rebuild){
         if((bt_split_threshold <= 0) || (cog->size() < bt_split_threshold)){
-		  /*Dumps everything into a sorted buffer*/
           Buffer<Tuple> newBuff = cog->iterator(NAIVE_POLICY(Tuple))->toBuffer();
           
           h->put(
