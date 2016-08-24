@@ -11,7 +11,7 @@ typedef struct heavyhit
   int cold_interval;
   double hot_data_fraction;
   double hot_access_fraction;
-}
+} heavyhit;
 
 struct heavyhit *create_heavyhit(
     int lower_bound, 
@@ -20,8 +20,10 @@ struct heavyhit *create_heavyhit(
     double hot_access_fraction
     );
 
-int next_value(struct *heavyhit);
+int next_value(struct heavyhit *h);
 
-double mean(struct *heavyhit);
+double mean(struct heavyhit *h);
+
+void shift_keyset(struct heavyhit *h);
 
 #endif //HEAVYHIT_H_SHEILD

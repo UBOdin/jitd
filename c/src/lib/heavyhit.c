@@ -8,7 +8,7 @@ struct heavyhit *create_heavyhit(
     int upper_bound, 
     double hot_data_fraction, 
     double hot_access_fraction
-    );
+    )
 {
   if (hot_data_fraction < 0.0 || hot_data_fraction > 1.0){
     printf("Hot data fraction out of range. Setting to 0.0\n");
@@ -32,30 +32,36 @@ struct heavyhit *create_heavyhit(
   h->hot_access_fraction = hot_access_fraction;
   int interval = upper_bound - lower_bound + 1;
   h->hot_interval = (int)(interval * hot_data_fraction);
-  h->cold_interval = interval - hot_interval;
+  h->cold_interval = interval - h->hot_interval;
   return h;
 }
 
-int next_value(struct *heavyhit h)
+int next_value(struct heavyhit *h)
 {
   int value = 0;
-  if (rand_val(0) < h->hot_access_fraction)
-  {
+  if (rand_val(0) < h->hot_access_fraction) {
      /* Choose a value from the hot set */
-    srand(h->hot_interval);
     value = h->lower_bound + (rand() % h->hot_interval);
-  }
-  else
-  {
+  } else {
      /* Choose a value from the cold set */
-    srand(h->cold_interval);
     value = h->lower_bound + h-> hot_interval + (rand() % h->cold_interval);
   }
   return value;
 }
 
-double mean(struct *heavyhit)
+double mean(struct heavyhit *h)
 {
-  return hot_access_fraction * (lower_bound + hot_interval/2.0)
-    + (1 - hot_access_fraction) * (lower_bound + hot_interval + cold_interval/2.0);
+  return h->hot_access_fraction * (h->lower_bound + h->hot_interval/2.0)
+    + (1 - h->hot_access_fraction) * 
+    (h->lower_bound + h->hot_interval + h->cold_interval/2.0);
+}
+
+void shift_keyset(struct heavyhit *h)
+{
+    
+}
+
+void free_heavyhit(heavyhit *h)
+{
+    free(h);
 }
