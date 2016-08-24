@@ -126,22 +126,35 @@ struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance,
 struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance, 
     long number, long range) 
 {
-  //float alpha = 0.99;
-  //int n = KEY_RANGE;
-  //int heavy_rv;
-  //rand_val(1400);
-  //struct cog *cog_median;
+  return cog;
+}
 
-  //for (int i=1; i<number; i++) 
-  //{
-  //  heavy_rv = heavy(alpha, n);
-  //  cog = crack_scan(cog, heavy_rv, heavy_rv + range);
-  //  if(i > 1000 || i%2 == 0) 
-  //  {
-  //    cog_median = getMedian(cog);
-  //    cog = splay(cog, cog_median);
-  //  }
-  //}
+struct cog *heavyhit_test(bool rebalance, struct cog *cog, 
+    struct heavyhit *heavy)
+{
+  long number = 100000;
+  long range = 1000;
+  printf("Testing JITD performance on random array with heavyhitter reads ");
+  if (rebalance) printf("with rebalancing ");
+  else printf("without rebalancing ");
+  printf("on array size of %d while performing ", cog_length(cog));
+  printf("%ld reads\n", number);
+  printf("For range value %ld: ", range);
+
+  int heavy_value;
+  int splayCount = 0;
+  struct cog *cog_median;
+
+  for (int i=1; i<number; i++)
+  {
+    heavy_value = next_value(heavy);
+    cog = crack_scan(cog, heavy_value, heavy_value + range);
+    if(rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) {
+      cog_median = getMedian(cog);
+      cog = splay(cog, cog_median);
+      splayCount++;
+    }
+  }
   return cog;
 }
 

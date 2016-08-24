@@ -2,6 +2,7 @@
 #define DIST_READS_H_SHEILD
 
 #include <stdbool.h>
+#include "heavyhit.h"
 
 typedef enum 
 {
@@ -28,14 +29,6 @@ struct workload_test *make_workload_test(
 
 struct cog *testReads(struct workload_test *w);
 
-struct cog *doZipfianReads(struct cog *cog, long number, long range);
-
-struct cog *zipfianReads_splay(struct cog *cog, long number, long range);
-
-struct cog *heavyHitterNoSplay();
-
-struct cog *heavyHitterWithSplay();
-
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads);
 
 void free_workload_test(workload_test *w);
@@ -50,6 +43,9 @@ struct cog *randomread_randomarray(struct cog *cog, bool rebalance,
 
 struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance, 
     long number, long range);
+
+struct cog *heavyhit_test(bool rebalance, struct cog *cog, 
+    struct heavyhit *heavy);
 
 buffer mk_random_buffer(int size);
 

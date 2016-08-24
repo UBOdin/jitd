@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "cog.h"
 #include "cracker.h"
@@ -177,22 +178,37 @@ void test10()
 void test11()
 {
   printf("test 11\n");
-  struct workload_test *work;
+  struct timeval stop, start;
+  struct heavyhit *heavy;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, false, 10000, 10000, 1000);
-  execute_workload_test(work);
-  free_workload_test(work);
+  heavy = create_heavyhit(20, 600, 0.2, 0.3);
+  cog = mk_random_array(10000000);
+  gettimeofday(&start, NULL);
+  heavyhit_test(false, cog, heavy);
+  gettimeofday(&stop, NULL);
+  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
+  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
+  printf("Took %lld milliseconds\n", stopms - startms);
+  //printCog(cog);
   printf("\n");
 }
 
 void test12()
 {
+
   printf("test 12\n");
-  struct workload_test *work;
+  struct timeval stop, start;
+  struct heavyhit *heavy;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, true, 10000, 10000, 1000);
-  execute_workload_test(work);
-  free_workload_test(work);
+  heavy = create_heavyhit(20, 600, 0.2, 0.3);
+  cog = mk_random_array(10000000);
+  gettimeofday(&start, NULL);
+  heavyhit_test(true, cog, heavy);
+  gettimeofday(&stop, NULL);
+  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
+  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
+  printf("Took %lld milliseconds\n", stopms - startms);
+  //printCog(cog);
   printf("\n");
 }
 
@@ -215,9 +231,9 @@ int main(int argc, char **argv)
   //test7();
   //srand(rand_start);
   //test8();
-  srand(rand_start);
-  test9();
-  test10();
-  //test11();
-  //test12();
+  //srand(rand_start);
+  //test9();
+  //test10();
+  test11();
+  test12();
 }
