@@ -132,7 +132,7 @@ struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance,
 struct cog *heavyhit_test(bool rebalance, struct cog *cog, 
     struct heavyhit *heavy)
 {
-  long number = 1000000;
+  long number = 100000000;
   long range = 1000;
   printf("Testing JITD performance on random array with heavyhitter reads ");
   if (rebalance) printf("with rebalancing ");
@@ -164,7 +164,7 @@ struct cog *heavyhit_test(bool rebalance, struct cog *cog,
 struct cog *shift_heavyhit_test(bool rebalance, struct cog *cog,
     struct heavyhit *heavy)
 {
-  long number = 1000000;
+  long number = 100000000;
   long range = 1000;
   printf("Testing JITD performance on random array with shifted heavyhitter reads ");
   if (rebalance) printf("with rebalancing ");
