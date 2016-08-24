@@ -181,15 +181,16 @@ void test11()
   struct timeval stop, start;
   struct heavyhit *heavy;
   struct cog *cog;
-  heavy = create_heavyhit(20, 600, 0.2, 0.3);
-  cog = mk_random_array(10000000);
+  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
   gettimeofday(&start, NULL);
   heavyhit_test(false, cog, heavy);
   gettimeofday(&stop, NULL);
   long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
   long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
   printf("Took %lld milliseconds\n", stopms - startms);
-  //printCog(cog);
+  //printJITD(cog, 0);
+  //free_heavyhit(heavy);
   printf("\n");
 }
 
@@ -200,15 +201,56 @@ void test12()
   struct timeval stop, start;
   struct heavyhit *heavy;
   struct cog *cog;
-  heavy = create_heavyhit(20, 600, 0.2, 0.3);
-  cog = mk_random_array(10000000);
+  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
   gettimeofday(&start, NULL);
   heavyhit_test(true, cog, heavy);
   gettimeofday(&stop, NULL);
   long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
   long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
   printf("Took %lld milliseconds\n", stopms - startms);
-  //printCog(cog);
+  //printJITD(cog, 0);
+  //free_heavyhit(heavy);
+  printf("\n");
+}
+
+void test13()
+{
+  printf("test 13\n");
+  struct timeval stop, start;
+  struct heavyhit *heavy;
+  struct cog *cog;
+  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
+  gettimeofday(&start, NULL);
+  cog = heavyhit_test(false, cog, heavy);
+  cog = shift_heavyhit_test(false, cog, heavy);
+  gettimeofday(&stop, NULL);
+  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
+  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
+  printf("Took %lld milliseconds\n", stopms - startms);
+  //printJITD(cog, 0);
+  //free_heavyhit(heavy);
+  printf("\n");
+}
+
+void test14()
+{
+  printf("test 14\n");
+  struct timeval stop, start;
+  struct heavyhit *heavy;
+  struct cog *cog;
+  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
+  gettimeofday(&start, NULL);
+  cog = heavyhit_test(true, cog, heavy);
+  cog = shift_heavyhit_test(true, cog, heavy);
+  gettimeofday(&stop, NULL);
+  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
+  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
+  printf("Took %lld milliseconds\n", stopms - startms);
+  //printJITD(cog, 0);
+  //free_heavyhit(heavy);
   printf("\n");
 }
 
@@ -234,6 +276,8 @@ int main(int argc, char **argv)
   //srand(rand_start);
   //test9();
   //test10();
-  test11();
-  test12();
+  //test11();
+  //test12();
+  test13();
+  test14();
 }

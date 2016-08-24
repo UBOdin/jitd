@@ -47,6 +47,9 @@ struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance,
 struct cog *heavyhit_test(bool rebalance, struct cog *cog, 
     struct heavyhit *heavy);
 
+struct cog *shift_heavyhit_test(bool rebalance, struct cog *cog,
+    struct heavyhit *heavy);
+
 buffer mk_random_buffer(int size);
 
 buffer mk_sorted_buffer(int size);

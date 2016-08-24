@@ -132,7 +132,7 @@ struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance,
 struct cog *heavyhit_test(bool rebalance, struct cog *cog, 
     struct heavyhit *heavy)
 {
-  long number = 100000;
+  long number = 1000000;
   long range = 1000;
   printf("Testing JITD performance on random array with heavyhitter reads ");
   if (rebalance) printf("with rebalancing ");
@@ -143,6 +143,7 @@ struct cog *heavyhit_test(bool rebalance, struct cog *cog,
 
   int heavy_value;
   int splayCount = 0;
+  rand_val(1400);
   struct cog *cog_median;
 
   for (int i=1; i<number; i++)
@@ -154,6 +155,43 @@ struct cog *heavyhit_test(bool rebalance, struct cog *cog,
       cog = splay(cog, cog_median);
       splayCount++;
     }
+    // Can use this to verify output of heavyhitter
+    //printf("Heavy hit gave out: %d\n", heavy_value);
+  }
+  return cog;
+}
+
+struct cog *shift_heavyhit_test(bool rebalance, struct cog *cog,
+    struct heavyhit *heavy)
+{
+  long number = 1000000;
+  long range = 1000;
+  printf("Testing JITD performance on random array with shifted heavyhitter reads ");
+  if (rebalance) printf("with rebalancing ");
+  else printf("without rebalancing ");
+  printf("on array size of %d while performing ", cog_length(cog));
+  printf("%ld reads\n", number);
+  printf("For range value %ld", range);
+  printf("With a shift of %d\n", 2 * heavy->hot_interval);
+
+  int key_shift = 2 * heavy->hot_interval;
+  int mod_value = heavy->upper_bound;
+  int heavy_value;
+  int splayCount = 0;
+  rand_val(1400);
+  struct cog *cog_median;
+
+  for (int i=1; i<number; i++)
+  {
+    heavy_value = (next_value(heavy) + key_shift) % mod_value;
+    cog = crack_scan(cog, heavy_value, heavy_value + range);
+    if(rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) {
+      cog_median = getMedian(cog);
+      cog = splay(cog, cog_median);
+      splayCount++;
+    }
+    // Can use this to verify output of heavyhitter
+    //printf("Heavy hit gave out: %d\n", heavy_value);
   }
   return cog;
 }

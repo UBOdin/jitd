@@ -26,4 +26,6 @@ double mean(struct heavyhit *h);
 
 void shift_keyset(struct heavyhit *h);
 
+void free_heavyhit(heavyhit *h);
+
 #endif //HEAVYHIT_H_SHEILD
