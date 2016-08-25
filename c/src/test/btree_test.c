@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 
 #include "cog.h"
 #include "cracker.h"
@@ -236,28 +237,34 @@ void test14()
 
 int main(int argc, char **argv) 
 {
-  int rand_start = 42; //time(NULL)
-  //srand(rand_start);
-  //test1();
-  //srand(rand_start);
-  //test2();
-  //srand(rand_start);
-  //test3();
-  //srand(rand_start);
-  //test4();
-  //srand(rand_start);
-  //test5();
-  //srand(rand_start);
-  //test6();
-  //srand(rand_start);
-  //test7();
-  //srand(rand_start);
-  //test8();
-  //srand(rand_start);
-  //test9();
-  //test10();
-  //test11();
-  //test12();
-  test13();
-  test14();
+  if (argc < 2){
+    printf("Please input argument. --default for default tests, ");
+    printf("<filename> to execute test instruction in that file\n");
+    exit(0);
+  } else if (strcmp(argv[1], "--default") == 0){
+    int rand_start = 42; //time(NULL)
+    srand(rand_start);
+    test1();
+    srand(rand_start);
+    test2();
+    srand(rand_start);
+    test3();
+    srand(rand_start);
+    test4();
+    srand(rand_start);
+    test5();
+    srand(rand_start);
+    test6();
+    srand(rand_start);
+    test7();
+    srand(rand_start);
+    test8();
+    srand(rand_start);
+    test9();
+    test10();
+    test11();
+    test12();
+    test13();
+    test14();
+  }
 }
