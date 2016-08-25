@@ -5,6 +5,7 @@
 
 typedef struct heavyhit
 {
+  int key_shift;
   int lower_bound;
   int upper_bound;
   int hot_interval;
@@ -14,6 +15,7 @@ typedef struct heavyhit
 } heavyhit;
 
 struct heavyhit *create_heavyhit(
+    int key_shift,
     int lower_bound, 
     int upper_bound, 
     double hot_data_fraction, 
@@ -23,8 +25,6 @@ struct heavyhit *create_heavyhit(
 int next_value(struct heavyhit *h);
 
 double mean(struct heavyhit *h);
-
-void shift_keyset(struct heavyhit *h);
 
 void free_heavyhit(heavyhit *h);
 

@@ -126,30 +126,16 @@ void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
   printf("\n");
 }
 
-struct cog *execute_workload_test(struct workload_test *w)
-{
-  struct cog *cog;
-  w->cog = cog;
-  cog = mk_random_array(w->test_array_size);
-  w->cog = cog;
-  cog = testReads(w);
-  /* remember to free workload when done */
-  return cog;
-}
-
 void test8()
 {
   printf("test 8\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(RANDOM, true, 1000000, 10000, 10000);
-  cog = execute_workload_test(work);
-  work->cog = cog;
-  work->range = 5000;
-  cog = testReads(work);
-  work->cog = cog;
-  work->range = 1000;
-  cog = testReads(work);
+  cog = mk_random_array(1000000);
+  work = make_workload_test(RANDOM, true, 10000, 1000);
+  cog = test_reads(cog, work);
+  free_cog(cog);
+  free_workload_test(work);
   printf("\n");
 }
 
@@ -158,8 +144,10 @@ void test9()
   printf("test 9\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(ZIPFIAN, false, 1000000000, 1000000, 1000);
-  execute_workload_test(work);
+  cog = mk_random_array(1000000);  
+  work = make_workload_test(ZIPFIAN, false, 1000, 1000);
+  cog = test_reads(cog, work);
+  free_cog(cog);
   free_workload_test(work);
   printf("\n");
 }
@@ -168,9 +156,10 @@ void test10()
 {
   printf("test 10\n");
   struct workload_test *work;
-  struct cog *cog;
-  work = make_workload_test(ZIPFIAN, true, 1000000000, 1000000, 1000);
-  execute_workload_test(work);
+  struct cog *cog = mk_random_array(1000000);  
+  work = make_workload_test(ZIPFIAN, true, 1000, 1000);
+  cog = test_reads(cog, work);
+  free_cog(cog);
   free_workload_test(work);
   printf("\n");
 }
@@ -178,19 +167,16 @@ void test10()
 void test11()
 {
   printf("test 11\n");
-  struct timeval stop, start;
-  struct heavyhit *heavy;
+  struct workload_test *work;
   struct cog *cog;
-  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
-  gettimeofday(&start, NULL);
-  heavyhit_test(false, cog, heavy);
-  gettimeofday(&stop, NULL);
-  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
-  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
-  printf("Took %lld milliseconds\n", stopms - startms);
+  cog = test_reads(cog, work);
   //printJITD(cog, 0);
-  //free_heavyhit(heavy);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
+  free_workload_test(work);
   printf("\n");
 }
 
@@ -198,59 +184,53 @@ void test12()
 {
 
   printf("test 12\n");
-  struct timeval stop, start;
-  struct heavyhit *heavy;
+  struct workload_test *work;
   struct cog *cog;
-  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
-  gettimeofday(&start, NULL);
-  heavyhit_test(true, cog, heavy);
-  gettimeofday(&stop, NULL);
-  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
-  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
-  printf("Took %lld milliseconds\n", stopms - startms);
+  cog = test_reads(cog, work);
   //printJITD(cog, 0);
-  //free_heavyhit(heavy);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
+  free_workload_test(work);
   printf("\n");
 }
 
 void test13()
 {
   printf("test 13\n");
-  struct timeval stop, start;
-  struct heavyhit *heavy;
+  struct workload_test *work;
   struct cog *cog;
-  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
-  gettimeofday(&start, NULL);
-  cog = heavyhit_test(false, cog, heavy);
-  cog = shift_heavyhit_test(false, cog, heavy);
-  gettimeofday(&stop, NULL);
-  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
-  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
-  printf("Took %lld milliseconds\n", stopms - startms);
+  cog = test_reads(cog, work);
+  work->heavy->key_shift = 5000;
+  cog = test_reads(cog, work);
   //printJITD(cog, 0);
-  //free_heavyhit(heavy);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
+  free_workload_test(work);
   printf("\n");
 }
 
 void test14()
 {
+
   printf("test 14\n");
-  struct timeval stop, start;
-  struct heavyhit *heavy;
+  struct workload_test *work;
   struct cog *cog;
-  heavy = create_heavyhit(0, 1000000, 0.1, 0.5);
+  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
-  gettimeofday(&start, NULL);
-  cog = heavyhit_test(true, cog, heavy);
-  cog = shift_heavyhit_test(true, cog, heavy);
-  gettimeofday(&stop, NULL);
-  long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
-  long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
-  printf("Took %lld milliseconds\n", stopms - startms);
+  cog = test_reads(cog, work);
+  work->heavy->key_shift = 5000;
+  cog = test_reads(cog, work);
   //printJITD(cog, 0);
-  //free_heavyhit(heavy);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
+  free_workload_test(work);
   printf("\n");
 }
 

@@ -11,10 +11,10 @@ typedef enum
 
 typedef struct workload_test
 {
-  struct cog *cog;
   workload_type type;
+  struct zipfian *zipfian;
+  struct heavyhit *heavy;
   bool rebalance;
-  long test_array_size;
   long number_of_reads;
   long range;
 } workload_test;
@@ -22,33 +22,19 @@ typedef struct workload_test
 struct workload_test *make_workload_test(
     workload_type type,
     bool rebalance, 
-    long test_array_size,
     long number_of_reads, 
     long range
     );
 
-struct cog *testReads(struct workload_test *w);
+struct cog *test_reads(struct cog *cog, struct workload_test *w);
 
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads);
 
-void free_workload_test(workload_test *w);
+struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w);
 
-struct cog *execute_workload_test(struct workload_test *w);
+struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w);
 
-struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range);
-
-struct cog *randomread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range);
-
-struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range);
-
-struct cog *heavyhit_test(bool rebalance, struct cog *cog, 
-    struct heavyhit *heavy);
-
-struct cog *shift_heavyhit_test(bool rebalance, struct cog *cog,
-    struct heavyhit *heavy);
+struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w);
 
 buffer mk_random_buffer(int size);
 
@@ -61,5 +47,7 @@ cog *mk_sorted_array(int size);
 void test_scan(cog *c, long low, long high);
 
 long long int twoPow(long long int exp);
+
+void free_workload_test(workload_test *w);
 
 #endif //DIST_READS_H_SHEILD
