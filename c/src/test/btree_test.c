@@ -207,7 +207,7 @@ void test13()
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
   cog = test_reads(cog, work);
-  work->heavy->key_shift = 5000;
+  work->heavy->key_shift = 500000;
   cog = test_reads(cog, work);
   //printJITD(cog, 0);
   free_cog(cog);
@@ -226,13 +226,21 @@ void test14()
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
   cog = test_reads(cog, work);
-  work->heavy->key_shift = 5000;
+  work->heavy->key_shift = 500000;
   cog = test_reads(cog, work);
   //printJITD(cog, 0);
   free_cog(cog);
   free_heavyhit(work->heavy);
   free_workload_test(work);
   printf("\n");
+}
+
+void run_input(char *filename);
+
+void run_input(char *filename)
+{
+  FILE *input;
+  input = fopen(filename, "r");
 }
 
 int main(int argc, char **argv) 
@@ -266,5 +274,7 @@ int main(int argc, char **argv)
     test12();
     test13();
     test14();
+  } else {
+    run_input(argv[1]);
   }
 }

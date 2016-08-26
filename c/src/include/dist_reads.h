@@ -36,6 +36,9 @@ struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w);
 
 struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w);
 
+struct cog *med_policy(struct cog *cog, bool rebalance, int i, 
+    long long int **splayCount);
+
 buffer mk_random_buffer(int size);
 
 buffer mk_sorted_buffer(int size);
