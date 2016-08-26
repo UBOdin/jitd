@@ -239,8 +239,46 @@ void run_input(char *filename);
 
 void run_input(char *filename)
 {
+  printf("Running test from %s\n", filename);
   FILE *input;
+  char *item;
+  struct cog *cog;
+  struct workload_test *work;
+  struct heavyhit *heavy;
   input = fopen(filename, "r");
+  while (!feof(input)) {
+    if (fscanf(input, "%s", item) == 1) {
+      if (strcmp(item, "insert") == 0) {
+        int size;
+        fscanf(input, "%s %d", item, &size);
+        cog = mk_random_array(size);
+        printf("Created a randomm array of size %d\n", size);
+      } else if (strcmp(item, "heavyhit") == 0) {
+        int key_shift;
+        int lower_bound;
+        int upper_bound;
+        double hot_data_fraction;
+        double hot_access_fraction;
+        fscanf(input, "%d %d %d %lf %lf", &key_shift, &lower_bound, 
+            &upper_bound, &hot_data_fraction, &hot_access_fraction);
+        heavy = create_heavyhit(key_shift, lower_bound, upper_bound, 
+                    hot_data_fraction, hot_access_fraction);
+        printf("Created heavy hitter generator\n");
+      } else if (strcmp(item, "workload") == 0) {
+        int rebalance;
+        long number_of_reads;
+        long range;
+        fscanf(input, "%s %d %ld %ld", item, &rebalance, &number_of_reads, 
+            &range);
+        work = make_workload_test(HEAVYHITTER, (bool)rebalance, 
+                   number_of_reads, range);
+        work->heavy = heavy;
+        printf("Created workload test\n");
+      } else if (strcmp(item, "run") == 0) {
+        test_reads(cog, work);
+      }
+    }
+  }
 }
 
 int main(int argc, char **argv) 

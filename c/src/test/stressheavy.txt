@@ -1,4 +1,4 @@
-insert random 1000000000
+insert random 10000000
 heavyhit 0 0 10000000 0.1 0.8
-workload HEAVYHITTER true 10000000 1000
+workload HEAVYHITTER 0 10000000 1000
 run
