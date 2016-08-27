@@ -275,7 +275,12 @@ void run_input(char *filename)
         work->heavy = heavy;
         printf("Created workload test\n");
       } else if (strcmp(item, "run") == 0) {
-        test_reads(cog, work);
+        cog = test_reads(cog, work);
+      } else if (strcmp(item, "heavyshift") == 0) {
+        int key_shift;
+        fscanf(input, "%d", &key_shift);
+        work->heavy->key_shift = key_shift;
+        printf("Shifted heavyhit workload by %d\n", key_shift);
       }
     }
   }
