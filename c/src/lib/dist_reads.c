@@ -163,15 +163,10 @@ struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
     splayCount++;
     //printf("splayCount is now %lld\n", splayCount);
   }
-  // Use this if statement instead of one above for really slow performance
-  //if(rebalance && (i > 100 || i%2 == 0)) {
-  //  cog_median = getMedian(cog);
-  //  cog = splay(cog, cog_median);
-  //}
   return cog;
 }
 
-buffer mk_random_buffer(int size) 
+buffer mk_random_buffer(int size)
 {
   buffer b = buffer_alloc(size);
   int i;
