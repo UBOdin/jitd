@@ -1,0 +1,10 @@
+#!/bin/bash
+
+files=/src/test/testsuite/*.txt
+outputdestination=../../paper-JITD-Journal/testlogs/rawtestlog.txt
+echo -e "\nRunning testsuite on $(date "+%m-%d-%Y %H:%M:%S")\n" #>> $outputdestination
+for f in $files
+do
+  echo $f #>> $outputdestination
+  ./btree $f #>> $outputdestination
+done

@@ -241,7 +241,7 @@ void run_input(char *filename)
 {
   printf("Running test from %s\n", filename);
   FILE *input;
-  char *item;
+  char item[50];
   struct cog *cog;
   struct workload_test *work;
   struct heavyhit *heavy;
