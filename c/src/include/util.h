@@ -13,7 +13,7 @@
  */
 void printJITD(struct cog *c, int depth);
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 /**
  * Converts the JITD to JSON and places it in the file './test.txt'.
  *
@@ -21,7 +21,7 @@ void printJITD(struct cog *c, int depth);
  * @param name - output file name
  */
 void jsonJITD(struct cog *cog, char *name);
-#endif
+//#endif
 
 /** Prints the current pre-processor mode. */
 void printMode();
@@ -117,7 +117,7 @@ cog *getRandomArray(int size, int range);
 struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay, int steps);
 #endif
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 /**
  * Acquires the cumulative reads at a node if possible.
  *
@@ -133,6 +133,6 @@ long getCumulativeReads(struct cog *cog);
  * @return the actual read count for that given BTree node
  */
 long getReadsAtNode(struct cog *cog);
-#endif
+//#endif
 
 #endif

@@ -15,33 +15,33 @@
  * @param cog - cog to print
  */
 void printArrayCog(struct cog *cog) {
-#ifndef __ADVANCED
-  printf("[");
-
-  if (cog->type == COG_ARRAY) 
-  {
-    for (int i = 0; i < cog->data.array.len; i++) 
-    {
-      int offset = cog->data.array.start;
-      printf("%ld", cog->data.array.records->data[i + offset].key);
-      if (i + 1 < cog->data.array.len) printf(",");
-    }
-
-    printf("]");
-  }
-
-  if (cog->type == COG_SORTEDARRAY) 
-  {
-    for (int i = 0; i < cog->data.sortedarray.len; i++) 
-    {
-      int offset = cog->data.sortedarray.start;
-      printf("%ld", cog->data.sortedarray.records->data[i + offset].key);
-      if (i + 1 < cog->data.sortedarray.len) printf(",");
-    }
-
-    printf(">");
-  }
-#endif
+//#ifndef __ADVANCED
+//  printf("[");
+//
+//  if (cog->type == COG_ARRAY) 
+//  {
+//    for (int i = 0; i < cog->data.array.len; i++) 
+//    {
+//      int offset = cog->data.array.start;
+//      printf("%ld", cog->data.array.records->data[i + offset].key);
+//      if (i + 1 < cog->data.array.len) printf(",");
+//    }
+//
+//    printf("]");
+//  }
+//
+//  if (cog->type == COG_SORTEDARRAY) 
+//  {
+//    for (int i = 0; i < cog->data.sortedarray.len; i++) 
+//    {
+//      int offset = cog->data.sortedarray.start;
+//      printf("%ld", cog->data.sortedarray.records->data[i + offset].key);
+//      if (i + 1 < cog->data.sortedarray.len) printf(",");
+//    }
+//
+//    printf(">");
+//  }
+//#endif
 }
 
 /**
@@ -57,11 +57,11 @@ void printTreeCog(struct cog *cog) {
 
   if (cog->type == COG_BTREE) 
   {
-  #ifndef __ADVANCED
-    printf("≤ %ld", cog->data.btree.sep);
-  #else
+  //#ifndef __ADVANCED
+    //printf("≤ %ld", cog->data.btree.sep);
+  //#else
     printf("%ld|%ld", cog->data.btree.rds, getReadsAtNode(cog));
-  #endif
+  //#endif
   }
 }
 
@@ -145,7 +145,7 @@ void printJITD(struct cog *cog, int depth) {
   }
 }
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 void jsonize(struct cog *cog, FILE *file) {
   if (cog == NULL) fprintf(file, "null");
 
@@ -174,15 +174,15 @@ void jsonJITD(struct cog *cog, char *name) {
   jsonize(cog, file);
   fclose(file);
 }
-#endif
+//#endif
 
 /** Prints the current pre-processor mode. */
 void printMode() {
-#ifndef __ADVANCED
-  printf("Classic Mode!\n");
-#else
+//#ifndef __ADVANCED
+  //printf("Classic Mode!\n");
+//#else
   printf("Advanced Mode!\n");
-#endif
+//#endif
 }
 
 /**
@@ -389,7 +389,7 @@ struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay,
 }
 #endif
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 /**
  * Acquires the cumulative reads at a node if possible.
  *
@@ -414,4 +414,4 @@ long getReadsAtNode(struct cog *cog) {
   count -= getCumulativeReads(cog->data.btree.rhs);
   return count;
 }
-#endif
+//#endif

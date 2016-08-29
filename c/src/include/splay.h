@@ -3,9 +3,9 @@
 
 #include "cog.h"
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 #include "util.h"
-#endif
+//#endif
 
 
 /**

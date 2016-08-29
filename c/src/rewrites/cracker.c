@@ -106,11 +106,11 @@ cog *pushdown_concats(cog *c, long low, long high) {
         new_rhs = make_concat(lhs->data.btree.rhs, array2);
       }
       cog *btree;
-      #ifndef __ADVANCED
-      btree = make_btree(new_lhs, new_rhs, lhs->data.btree.sep);
-      #else
+      //#ifndef __ADVANCED
+      //btree = make_btree(new_lhs, new_rhs, lhs->data.btree.sep);
+      //#else
       btree = makeBtreeWithReads(new_lhs, new_rhs, lhs->data.btree.sep, lhs->data.btree.rds);
-      #endif
+      //#endif
       cleanup(c);
       return pushdown_concats(btree, low, high); 
     }
@@ -160,17 +160,17 @@ cog *crack_one(cog *c, long val) {
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) 
     {
       long val = c->data.btree.sep;
-      #ifndef __ADVANCED
-      return make_btree(lhs, rhs, val);
-      #else
+      //#ifndef __ADVANCED
+      //return make_btree(lhs, rhs, val);
+      //#else
       return makeBtreeWithReads(lhs, rhs, val, c->data.btree.rds + 1);
-      #endif
+      //#endif
     } 
     else 
     {
-      #ifdef __ADVANCED
+      //#ifdef __ADVANCED
       c->data.btree.rds += 1;
-      #endif
+      //#endif
       return c;
     }
   } 
@@ -197,11 +197,11 @@ cog *crack_one(cog *c, long val) {
     cog *array1 = make_array(low, radixPos - low, c->data.array.records);
     cog *array2 = make_array(radixPos, high - radixPos, c->data.array.records);
     cleanup(c);
-    #ifndef __ADVANCED
-    return make_btree(array1, array2, val);
-    #else
+    //#ifndef __ADVANCED
+    //return make_btree(array1, array2, val);
+    //#else
     return makeBtreeWithReads(array1, array2, val, 1);
-    #endif
+    //#endif
   } 
   else 
   {
@@ -229,11 +229,11 @@ cog *crack_one(cog *c, long val) {
     cog *array1 = make_array(0, lowIdx, out);
     cog *array2 = make_array(highIdx + 1, out->size - highIdx - 1, out);
     cleanup(c);
-    #ifndef __ADVANCED
-    return make_btree(array1, array2, val);
-    #else
+    //#ifndef __ADVANCED
+    //return make_btree(array1, array2, val);
+    //#else
     return makeBtreeWithReads(array1, array2, val, 1);
-    #endif
+    //#endif
   }
 }
 
@@ -270,9 +270,9 @@ cog *crack_scan(cog *c, long low, long high) {
     //make assertion about the lhs, the value of c may be different as it goes
     //down the code and see what the value of lhs is at the point of the if 
     //statement where the free(c) error is occuring at
-    #ifdef __ADVANCED
+    //#ifdef __ADVANCED
     long reads = 0;
-    #endif
+    //#endif
     if(low < c->data.btree.sep) 
     {
       if(high < c->data.btree.sep) 
@@ -282,9 +282,9 @@ cog *crack_scan(cog *c, long low, long high) {
         harvest = lhs;
         #endif
 
-        #ifdef __ADVANCED
+        //#ifdef __ADVANCED
         reads += 2;
-        #endif
+        //#endif
       } 
       else 
       {
@@ -293,9 +293,9 @@ cog *crack_scan(cog *c, long low, long high) {
         harvest = lhs;
         #endif
 
-        #ifdef __ADVANCED
+        //#ifdef __ADVANCED
         reads += 1;
-        #endif
+        //#endif
       }
     }
     if(high > c->data.btree.sep) 
@@ -303,16 +303,16 @@ cog *crack_scan(cog *c, long low, long high) {
       if(low > c->data.btree.sep) 
       {
         rhs = crack_scan(rhs, low, high);
-        #ifdef __ADVANCED
+        //#ifdef __ADVANCED
         reads += 2;
-        #endif
+        //#endif
       } 
       else 
       {
         rhs = crack_one(rhs, high);
-        #ifdef __ADVANCED
+        //#ifdef __ADVANCED
         reads += 1;
-        #endif
+        //#endif
       }
     }
 
@@ -320,17 +320,17 @@ cog *crack_scan(cog *c, long low, long high) {
     {
       long sep = c->data.btree.sep;
       free(c);
-      #ifndef __ADVANCED
-      return make_btree(lhs, rhs, sep);
-      #else
+      //#ifndef __ADVANCED
+      //return make_btree(lhs, rhs, sep);
+      //#else
       return makeBtreeWithReads(lhs, rhs, sep, c->data.btree.rds + reads);
-      #endif
+      //#endif
     } 
     else 
     {
-      #ifdef __ADVANCED
+      //#ifdef __ADVANCED
       c->data.btree.rds += reads;
-      #endif
+      //#endif
       return c;
     }
   } 
@@ -366,11 +366,11 @@ cog *crack_scan(cog *c, long low, long high) {
     cog *array2 = make_array(lowRadixPos, highRadixPos-lowRadixPos, c->data.array.records);
     cog *array3 = make_array(highRadixPos, highIdx-highRadixPos, c->data.array.records);
     cleanup(c);
-    #ifndef __ADVANCED
-    return make_btree(array1, make_btree(array2, array3, high), low);
-    #else
+    //#ifndef __ADVANCED
+    //return make_btree(array1, make_btree(array2, array3, high), low);
+    //#else
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
-    #endif
+    //#endif
   } 
   else 
   {
@@ -411,11 +411,11 @@ cog *crack_scan(cog *c, long low, long high) {
     cog *array1 = make_array(0, lowIdx, out);
     cog *array2 = make_array(lowIdx, midIdx - lowIdx, out);
     cog *array3 = make_array(highIdx + 1, out->size - highIdx -1, out);
-    #ifndef __ADVANCED
-    return make_btree(array1, make_btree(array2, array3, high), low);
-    #else
+    //#ifndef __ADVANCED
+    //return make_btree(array1, make_btree(array2, array3, high), low);
+    //#else
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
-    #endif
+    //#endif
   } 
 }
 

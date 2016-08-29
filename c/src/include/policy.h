@@ -1,7 +1,7 @@
 #ifndef POLICY_LIB_H_SHIELD
 #define POLICY_LIB_H_SHIELD
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 #include "cog.h"
 
 

@@ -1,4 +1,4 @@
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 #include <stdio.h>
 #include <limits.h>
 
