@@ -183,7 +183,6 @@ void test11()
 
 void test12()
 {
-
   printf("test 12\n");
   struct workload_test *work;
   struct cog *cog;
@@ -218,7 +217,6 @@ void test13()
 
 void test14()
 {
-
   printf("test 14\n");
   struct workload_test *work;
   struct cog *cog;

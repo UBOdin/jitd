@@ -65,5 +65,5 @@ long getThreshold();
  * @return the number of splays performed during the last zipfinize operation
  */
 long getSplays();
-#endif
+//#endif
 #endif

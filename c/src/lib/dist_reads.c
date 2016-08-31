@@ -88,7 +88,8 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
     cog = crack(cog, low, high);
-    cog = getmedian_policy(cog, rebalance, i);
+    //cog = splay_once(cog, i);
+    //cog = getmedian_policy(cog, rebalance, i);
   }
   splayCount = 0;
   return cog;
@@ -116,7 +117,8 @@ struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w)
   for (int i=1; i<number; i++) {
     zipf_rv = zipf(alpha, n);
     cog = crack_scan(cog, zipf_rv, zipf_rv + range);
-    cog = getmedian_policy(cog, rebalance, i);
+    //cog = splay_once(cog, i);
+    //cog = getmedian_policy(cog, rebalance, i);
   }
   splayCount = 0;
   return cog;
@@ -146,7 +148,8 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
   for (int i=1; i<number; i++) {
     heavy_value = (next_value(heavy) + key_shift) % mod_value;
     cog = crack_scan(cog, heavy_value, heavy_value + range);
-    cog = getmedian_policy(cog, rebalance, i);
+    //cog = splay_once(cog, i);
+    //cog = getmedian_policy(cog, rebalance, i);
      //Can use this to verify output of heavyhitter
     //printf("Heavy hit gave out: %d\n", heavy_value);
   }
@@ -164,6 +167,17 @@ struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
     //printf("splayCount is now %lld\n", splayCount);
   }
   return cog;
+}
+
+struct cog *splay_once(struct cog *cog, int i)
+{
+  struct cog *cog_median;
+  if (i == 1000) {
+    cog_median = getMedian(cog);
+    cog = splay(cog, cog_median);
+  } else {
+    return cog;
+  }
 }
 
 buffer mk_random_buffer(int size)
