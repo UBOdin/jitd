@@ -87,7 +87,10 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
     long b = rand() % range;
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
-    cog = crack(cog, low, high);
+    //printf("low in random reads is %ld\n", low);
+    //printf("high in random reads is %ld\n", high);
+    cog = crack_scan(cog, low, high);
+    //printJITD(cog, 0);
     cog = mostread_policy(cog, rebalance, i);
     //cog = splay_once(cog, i);
     //cog = getmedian_policy(cog, rebalance, i);
@@ -165,6 +168,8 @@ struct cog *mostread_policy(struct cog *cog, bool rebalance, int i)
   {
     most_read = get_most_read(cog);
     cog = splay(cog, most_read);
+    printf("Cog with most read is: \n");
+    printJITD(most_read, 0);
   }
   //if (rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) 
   //{
