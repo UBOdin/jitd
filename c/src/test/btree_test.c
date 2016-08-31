@@ -233,6 +233,28 @@ void test14()
   printf("\n");
 }
 
+void treetest1()
+{
+  printf("tree test 1\n");
+  printf("Testing to make sure find most read and splay works\n");
+  struct cog *cog;
+  struct workload_test *work;
+  cog = mk_random_array(100);
+  printf("Before splaying: \n");
+  printArrayCog(cog);
+  printf("\n");
+  work = make_workload_test(RANDOM, true, 100, 10);
+  cog = test_reads(cog, work);
+  printf("After splaying: \n");
+  printJITD(cog, 0);
+  printf("\n");
+}
+
+void treetest2()
+{
+  printf("tree test 2\n");
+}
+
 void run_input(char *filename);
 
 void run_input(char *filename)
@@ -290,7 +312,7 @@ int main(int argc, char **argv)
     printf("Please input argument. --default for default tests, ");
     printf("<filename> to execute test instruction in that file\n");
     exit(0);
-  } else if (strcmp(argv[1], "--default") == 0){
+  } else if (strcmp(argv[1], "--default") == 0) {
     int rand_start = 42; //time(NULL)
     srand(rand_start);
     test1();
@@ -315,6 +337,11 @@ int main(int argc, char **argv)
     test12();
     test13();
     test14();
+  } else if (strcmp(argv[1], "--treetests") == 0) {
+    int rand_start = 42; //time(NULL)
+    srand(rand_start);
+    treetest1();
+    treetest2();
   } else {
     run_input(argv[1]);
   }

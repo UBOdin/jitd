@@ -6,6 +6,10 @@
 #include <stdbool.h>
 
 
+#ifdef __HARVEST
+struct cog *harvest = NULL;
+#endif
+
 /**
  * Code to do pushdown operation on the cog.
  *
@@ -15,57 +19,44 @@
  * @return the root of the resulting tree
  */
 cog *pushdown_concats(cog *c, long low, long high) {
-  if(c->type == COG_BTREE) 
-  {
+  if(c->type == COG_BTREE) {
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
 
-    if(c->data.btree.sep <= high) 
-    {
+    if(c->data.btree.sep <= high) {
       rhs = pushdown_concats(rhs, low, high);
     }
 
-    if(c->data.btree.sep >= low) 
-    {
+    if(c->data.btree.sep >= low) {
       lhs = pushdown_concats(lhs, low, high);
     }
 
-    if(lhs != c->data.btree.lhs || rhs != c->data.btree.rhs) 
-    {
+    if(lhs != c->data.btree.lhs || rhs != c->data.btree.rhs) {
       cog *ret = malloc(sizeof(struct cog));
       ret->type = COG_BTREE;
       ret->data.btree.lhs = lhs;
       ret->data.btree.rhs = rhs;
       cleanup(c);
       return ret;
-    } 
-    else 
-    {
+    } else {
       return c;
     }
-  } 
-  else if(c->type == COG_CONCAT) 
-  {
+  } else if(c->type == COG_CONCAT) {
     cog *lhs = pushdown_concats(c->data.concat.lhs, low, high);
     cog *rhs = pushdown_concats(c->data.concat.rhs, low, high);
-    if(rhs->type == COG_BTREE && lhs->type == COG_ARRAY) 
-    {
+    if(rhs->type == COG_BTREE && lhs->type == COG_ARRAY) {
       cog *tmp = rhs;
       rhs = lhs;
       lhs = tmp;
     }
-    if(lhs->type == COG_BTREE && (rhs->type == COG_ARRAY || rhs->type == COG_SORTEDARRAY)) 
-    {
+    if(lhs->type == COG_BTREE && (rhs->type == COG_ARRAY || rhs->type == COG_SORTEDARRAY)) {
       int start, count;
       cog *array_cog;
-      if(rhs->type == COG_ARRAY) 
-      {
+      if(rhs->type == COG_ARRAY) {
         array_cog = rhs;
         start = array_cog->data.array.start;
         count = rhs->data.array.len;
-      } 
-      else 
-      {
+      } else {
         array_cog = c->data.concat.rhs;
         start = array_cog->data.sortedarray.start;
         count = rhs->data.sortedarray.len;
@@ -74,32 +65,24 @@ cog *pushdown_concats(cog *c, long low, long high) {
       cog *new_lhs = lhs->data.btree.lhs;
       cog *new_rhs = lhs->data.btree.rhs;
       
-      if(radix_pos > 0) 
-      {
+      if(radix_pos > 0) {
         cog *array1;
         buffer buf;
-        if(array_cog->type == COG_ARRAY) 
-        {
+        if(array_cog->type == COG_ARRAY) {
           buf =  array_cog->data.array.records;
-        } 
-        else 
-        {
+        } else {
           buf = array_cog->data.sortedarray.records;
         }
         array1 = make_array(start, radix_pos, buf);
         new_lhs = make_concat(lhs->data.btree.lhs, array1);
       }
 
-      if(radix_pos < count)
-      {
+      if(radix_pos < count) {
         cog *array2;
         buffer buf;
-        if(array_cog->type == COG_ARRAY) 
-        {
+        if(array_cog->type == COG_ARRAY) {
           buf = array_cog->data.array.records;
-        } 
-        else 
-        {
+        } else {
           buf = array_cog->data.sortedarray.records;
         }
         array2 = make_array(start+radix_pos, count-radix_pos, buf);
@@ -114,17 +97,12 @@ cog *pushdown_concats(cog *c, long low, long high) {
       cleanup(c);
       return pushdown_concats(btree, low, high); 
     }
-    if(lhs != c->data.concat.lhs || rhs != c->data.concat.rhs) 
-    {
+    if(lhs != c->data.concat.lhs || rhs != c->data.concat.rhs) {
       return make_concat(lhs, rhs);
-    } 
-    else 
-    {
+    } else {
       return c;
     }
-  } 
-  else 
-  {
+  } else {
     return c;
   }
 }
@@ -137,45 +115,32 @@ cog *pushdown_concats(cog *c, long low, long high) {
  * @return the root of the resulting tree
  */
 cog *crack_one(cog *c, long val) {
-  if(c->type == COG_SORTEDARRAY) 
-  {
+  if(c->type == COG_SORTEDARRAY) {
     return c;
-  } 
-  else if(c->type == COG_BTREE) 
-  {
+  } else if(c->type == COG_BTREE) {
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
-    if(val == c->data.btree.sep) 
-    {
+    if(val == c->data.btree.sep) {
       return c;
-    } 
-    else if(val < c->data.btree.sep)
-    {
+    } else if(val < c->data.btree.sep) {
       lhs = crack_one(lhs, val);
-    } 
-    else 
-    {
+    } else {
       rhs = crack_one(rhs, val);
     }
-    if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) 
-    {
+    if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long val = c->data.btree.sep;
       //#ifndef __ADVANCED
       //return make_btree(lhs, rhs, val);
       //#else
       return makeBtreeWithReads(lhs, rhs, val, c->data.btree.rds + 1);
       //#endif
-    } 
-    else 
-    {
+    } else {
       //#ifdef __ADVANCED
       c->data.btree.rds += 1;
       //#endif
       return c;
     }
-  } 
-  else if(c->type == COG_ARRAY) 
-  {
+  } else if(c->type == COG_ARRAY) {
     int low, high;
     low = c->data.array.start;
     high = low + c->data.array.len;
@@ -183,12 +148,9 @@ cog *crack_one(cog *c, long val) {
     buffer buf = c->data.array.records;
     record r = buf->data;
     int i;
-    for(i = low; i < high; i++) 
-    {
-      if(r[i].key < val) 
-      {
-        if(i > radixPos) 
-        {
+    for(i = low; i < high; i++) {
+      if(r[i].key < val) {
+        if(i > radixPos) {
           record_swap(&(r[i]), &(r[radixPos]));
         }
         radixPos++;
@@ -202,25 +164,19 @@ cog *crack_one(cog *c, long val) {
     //#else
     return makeBtreeWithReads(array1, array2, val, 1);
     //#endif
-  } 
-  else 
-  {
+  } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
     int lowIdx =0, highIdx = cog_length(c) - 1;
     iterator iter = scan_full_array(c);
     record r = malloc(sizeof(struct record));
-    while(iter_has_next(iter)) 
-    {
+    while(iter_has_next(iter)) {
       iter_next(iter, r);
       long key = r->key;
-      if(key < val) 
-      {
+      if(key < val) {
         record_set(&(buf[lowIdx]), key, r->value);
         lowIdx++;
-      } 
-      else 
-      {
+      } else {
         record_set(&(buf[highIdx]), key, r->value);
         highIdx--;
       } 
@@ -238,8 +194,6 @@ cog *crack_one(cog *c, long val) {
 }
 
 #ifdef __HARVEST
-struct cog *harvest = NULL;
-
 /**
  * Acquires the last BTree cog that was read from in crack_scan().
  *
@@ -259,24 +213,16 @@ struct cog *getHarvest() {
  * @return the root of the resulting tree
  */
 cog *crack_scan(cog *c, long low, long high) {
-  if(c->type == COG_SORTEDARRAY) 
-  {
+  if(c->type == COG_SORTEDARRAY) {
     return c;
-  } 
-  else if(c->type == COG_BTREE) 
-  {
+  } else if(c->type == COG_BTREE) {
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
-    //make assertion about the lhs, the value of c may be different as it goes
-    //down the code and see what the value of lhs is at the point of the if 
-    //statement where the free(c) error is occuring at
     //#ifdef __ADVANCED
     long reads = 0;
     //#endif
-    if(low < c->data.btree.sep) 
-    {
-      if(high < c->data.btree.sep) 
-      {
+    if(low < c->data.btree.sep) {
+      if(high < c->data.btree.sep) {
         lhs = crack_scan(lhs, low, high);
         #ifdef __HARVEST
         harvest = lhs;
@@ -285,9 +231,7 @@ cog *crack_scan(cog *c, long low, long high) {
         //#ifdef __ADVANCED
         reads += 2;
         //#endif
-      } 
-      else 
-      {
+      } else {
         lhs = crack_one(lhs, low);
         #ifdef __HARVEST
         harvest = lhs;
@@ -298,17 +242,13 @@ cog *crack_scan(cog *c, long low, long high) {
         //#endif
       }
     }
-    if(high > c->data.btree.sep) 
-    {
-      if(low > c->data.btree.sep) 
-      {
+    if(high > c->data.btree.sep) {
+      if(low > c->data.btree.sep) {
         rhs = crack_scan(rhs, low, high);
         //#ifdef __ADVANCED
         reads += 2;
         //#endif
-      } 
-      else 
-      {
+      } else {
         rhs = crack_one(rhs, high);
         //#ifdef __ADVANCED
         reads += 1;
@@ -316,8 +256,7 @@ cog *crack_scan(cog *c, long low, long high) {
       }
     }
 
-    if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) 
-    {
+    if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long sep = c->data.btree.sep;
       free(c);
       //#ifndef __ADVANCED
@@ -325,17 +264,13 @@ cog *crack_scan(cog *c, long low, long high) {
       //#else
       return makeBtreeWithReads(lhs, rhs, sep, c->data.btree.rds + reads);
       //#endif
-    } 
-    else 
-    {
+    } else {
       //#ifdef __ADVANCED
       c->data.btree.rds += reads;
       //#endif
       return c;
     }
-  } 
-  else if(c->type == COG_ARRAY) 
-  {
+  } else if(c->type == COG_ARRAY) {
     int lowIdx, highIdx;
     lowIdx = c->data.array.start;
     highIdx = lowIdx + c->data.array.len;
@@ -344,19 +279,14 @@ cog *crack_scan(cog *c, long low, long high) {
     int lowRadixPos = lowIdx, highRadixPos = highIdx;
     int i;
     record r = buf->data;
-    for(i = lowIdx; i<highRadixPos; i++) 
-    {
+    for(i = lowIdx; i<highRadixPos; i++) {
       long key = buf->data[i].key;
-      if(key < low) 
-      {
-        if(i > lowRadixPos) 
-        {
+      if(key < low) {
+        if(i > lowRadixPos) {
             record_swap(&(r[i]), &(r[lowRadixPos]));
         }
         lowRadixPos++;
-      } 
-      else if(key >= high) 
-      {
+      } else if(key >= high) {
         record_swap(&(r[i]), &(r[highRadixPos-1]));
         highRadixPos--;
         i--;
@@ -371,35 +301,26 @@ cog *crack_scan(cog *c, long low, long high) {
     //#else
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
     //#endif
-  } 
-  else 
-  {
+  } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
     int lowIdx = 0, midIdx = 0, highIdx = out->size - 1;
     iterator iter = scan_full_array(c);
     record r = malloc(sizeof(struct record));
-    while(iter_has_next(iter)) 
-    {
+    while(iter_has_next(iter)) {
       iter_next(iter, r);
       long key = r->key;
-      if(key < low) 
-      {
-        if(lowIdx < midIdx) 
-        {
+      if(key < low) {
+        if(lowIdx < midIdx) {
           record_copy(&(buf[lowIdx]), &(buf[midIdx]));
         }
         record_set(&(buf[lowIdx]), key, r->value);
         lowIdx++;
         midIdx++;
-      } 
-      else if(key < high) 
-      {
+      } else if(key < high) {
         record_set(&(buf[midIdx]), key, r->value);
         midIdx++;
-      } 
-      else 
-      {
+      } else {
         record_set(&(buf[highIdx]), key, r->value);
         highIdx--;
       }

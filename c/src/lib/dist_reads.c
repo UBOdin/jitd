@@ -88,6 +88,7 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
     cog = crack(cog, low, high);
+    cog = mostread_policy(cog, rebalance, i);
     //cog = splay_once(cog, i);
     //cog = getmedian_policy(cog, rebalance, i);
   }
@@ -154,6 +155,23 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
     //printf("Heavy hit gave out: %d\n", heavy_value);
   }
   splayCount = 0;
+  return cog;
+}
+
+struct cog *mostread_policy(struct cog *cog, bool rebalance, int i)
+{
+  struct cog *most_read;
+  if (i == 50)
+  {
+    most_read = get_most_read(cog);
+    cog = splay(cog, most_read);
+  }
+  //if (rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) 
+  //{
+  //  most_read = get_most_read(cog);
+  //  cog = splay(cog, most_read);
+  //  splayCount++;
+  //}
   return cog;
 }
 

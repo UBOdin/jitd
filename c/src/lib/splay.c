@@ -151,6 +151,7 @@ struct cog *zagzig(struct cog *root, struct cog *node) {
  * @return the depth of a given node
  */
 int getDepth(struct cog *root, struct cog *node) {
+  printf("Oh woooowww\n");
   if (root == node) 
   {
     return 0;

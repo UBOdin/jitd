@@ -52,6 +52,10 @@ struct cog **inorder(struct cog *cog, long count);
  */
 struct cog *getMedian(struct cog *root);
 
+struct cog *get_most_read(struct cog *root);
+
+struct cog *find_most_read(struct cog **list);
+
 /**
  * Executes a given function and times the execution.
  *

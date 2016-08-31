@@ -15,33 +15,33 @@
  * @param cog - cog to print
  */
 void printArrayCog(struct cog *cog) {
-//#ifndef __ADVANCED
-//  printf("[");
-//
-//  if (cog->type == COG_ARRAY) 
-//  {
-//    for (int i = 0; i < cog->data.array.len; i++) 
-//    {
-//      int offset = cog->data.array.start;
-//      printf("%ld", cog->data.array.records->data[i + offset].key);
-//      if (i + 1 < cog->data.array.len) printf(",");
-//    }
-//
-//    printf("]");
-//  }
-//
-//  if (cog->type == COG_SORTEDARRAY) 
-//  {
-//    for (int i = 0; i < cog->data.sortedarray.len; i++) 
-//    {
-//      int offset = cog->data.sortedarray.start;
-//      printf("%ld", cog->data.sortedarray.records->data[i + offset].key);
-//      if (i + 1 < cog->data.sortedarray.len) printf(",");
-//    }
-//
-//    printf(">");
-//  }
-//#endif
+#ifndef __ADVANCED
+  printf("[");
+
+  if (cog->type == COG_ARRAY) 
+  {
+    for (int i = 0; i < cog->data.array.len; i++) 
+    {
+      int offset = cog->data.array.start;
+      printf("%ld", cog->data.array.records->data[i + offset].key);
+      if (i + 1 < cog->data.array.len) printf(",");
+    }
+
+    printf("]");
+  }
+
+  if (cog->type == COG_SORTEDARRAY) 
+  {
+    for (int i = 0; i < cog->data.sortedarray.len; i++) 
+    {
+      int offset = cog->data.sortedarray.start;
+      printf("%ld", cog->data.sortedarray.records->data[i + offset].key);
+      if (i + 1 < cog->data.sortedarray.len) printf(",");
+    }
+
+    printf(">");
+  }
+#endif
 }
 
 /**
@@ -269,6 +269,29 @@ struct cog *getMedian(struct cog *root) {
   struct cog *median = list[count/2];
   free(list);
   return median;
+}
+
+struct cog *get_most_read(struct cog *root)
+{
+  long count = getBtreeNodeCount(root);
+  struct cog **list = inorder(root, count);
+  struct cog *most_read = find_most_read(list);
+  free(list);
+  return most_read;
+}
+
+struct cog *find_most_read(struct cog **list)
+{
+  int total_length = cog_length(*list);
+  int i;
+  int largest_reads = 0;
+  for (i = 0; i < total_length; i++)
+  {
+    if (list[i]->data.btree.rds > largest_reads)
+    {
+      largest_reads = list[i]->data.btree.rds;
+    }
+  }
 }
 
 /**
