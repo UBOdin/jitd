@@ -181,6 +181,18 @@ struct cog *mostread_policy(struct cog *cog, bool rebalance, int i)
 struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
 {
   struct cog *cog_median;
+  {
+    most_read = get_most_read(cog);
+    cog = splay(cog, most_read);
+    splayCount++;
+    printf("Ha ha rebalanced!!\n");
+  }
+  return cog;
+}
+
+struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
+{
+  struct cog *cog_median;
   if(rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) {
     cog_median = getMedian(cog);
     cog = splay(cog, cog_median);

@@ -241,9 +241,9 @@ void treetest1()
   struct workload_test *work;
   cog = mk_random_array(100);
   printf("Before splaying: \n");
-  printArrayCog(cog);
+  printJITD(cog, 0);
   printf("\n");
-  work = make_workload_test(RANDOM, true, 100, 10);
+  work = make_workload_test(RANDOM, false, 100, 100);
   cog = test_reads(cog, work);
   printf("After splaying: \n");
   printJITD(cog, 0);
