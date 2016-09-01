@@ -3,6 +3,10 @@
 
 #include "cog.h"
 
+/**
+ * TODO
+ */
+void printArrayCog(struct cog *cog);
 
 /**
  * Prints the internal representation of the JITD providing a detailed layout

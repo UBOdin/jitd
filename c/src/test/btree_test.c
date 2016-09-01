@@ -132,8 +132,8 @@ void test8()
   printf("test 8\n");
   struct workload_test *work;
   struct cog *cog;
-  cog = mk_random_array(1000000);
-  work = make_workload_test(RANDOM, true, 10000, 1000);
+  cog = mk_random_array(10000);
+  work = make_workload_test(RANDOM, true, 10000, 1000000);
   cog = test_reads(cog, work);
   free_cog(cog);
   free_workload_test(work);
@@ -253,6 +253,25 @@ void treetest1()
 void treetest2()
 {
   printf("tree test 2\n");
+  printf("Testing performance of find most read to splay\n");
+  struct cog *cog;
+  struct workload_test *work;
+  cog = mk_random_array(100000);
+  work = make_workload_test(RANDOM, false, 60000, 1000000);
+  cog = test_reads(cog, work);
+  printf("\n");
+}
+
+void treetest3()
+{
+  printf("tree test 3\n");
+  printf("Testing performance of find most read to splay\n");
+  struct cog *cog;
+  struct workload_test *work;
+  cog = mk_random_array(100000);
+  work = make_workload_test(RANDOM, true, 60000, 1000000);
+  cog = test_reads(cog, work);
+  printf("\n");
 }
 
 void run_input(char *filename);
@@ -342,6 +361,7 @@ int main(int argc, char **argv)
     srand(rand_start);
     treetest1();
     treetest2();
+    treetest3();
   } else {
     run_input(argv[1]);
   }

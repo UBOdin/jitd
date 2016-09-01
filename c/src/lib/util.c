@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
+#include <assert.h>
 
 #include "cog.h"
 #include "cracker.h"
@@ -282,16 +283,19 @@ struct cog *get_most_read(struct cog *root)
 
 struct cog *find_most_read(struct cog **list)
 {
+  struct cog *most_read = list[0];
   int total_length = cog_length(*list);
-  int i;
   int largest_reads = 0;
+  int i;
   for (i = 0; i < total_length; i++)
   {
-    if (list[i]->data.btree.rds > largest_reads)
+    if (list[i]->type == COG_BTREE && list[i]->data.btree.rds > largest_reads)
     {
       largest_reads = list[i]->data.btree.rds;
+      most_read = list[i];
     }
   }
+  return most_read;
 }
 
 /**
