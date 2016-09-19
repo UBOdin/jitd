@@ -79,8 +79,6 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
   long number = w->number_of_reads;
   long range = w->range;
   bool rebalance = w->rebalance;
-  splayCount = 0;
-  struct cog *cog_median;
 
   for (int i=0; i<number; i++) {
     long a = rand() % range;
@@ -88,11 +86,7 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
     cog = crack(cog, low, high);
-    cog = mostread_policy(cog, rebalance, i);
-    //cog = splay_once(cog, i);
-    //cog = getmedian_policy(cog, rebalance, i);
   }
-  splayCount = 0;
   return cog;
 }
 
@@ -111,18 +105,12 @@ struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w)
   float alpha = 0.99;
   int n=KEY_RANGE;
   int zipf_rv;
-  splayCount = 0;
   rand_val(1400);
-  struct cog *cog_median;
 
   for (int i=1; i<number; i++) {
     zipf_rv = zipf(alpha, n);
-    cog = crack_scan(cog, zipf_rv, zipf_rv + range);
-    cog = mostread_policy(cog, rebalance, i);
-    //cog = splay_once(cog, i);
-    //cog = getmedian_policy(cog, rebalance, i);
+    cog = crack_scan(cog, zipf_rv, zipf_rv + range, rebalance);
   }
-  splayCount = 0;
   return cog;
 }
 
@@ -143,52 +131,33 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
   int key_shift = heavy->key_shift;
   int mod_value = heavy->upper_bound;
   int heavy_value;
-  splayCount = 0;
   rand_val(1400);
-  struct cog *cog_median;
 
   for (int i=1; i<number; i++) {
     heavy_value = (next_value(heavy) + key_shift) % mod_value;
-    cog = crack_scan(cog, heavy_value, heavy_value + range);
-    cog = mostread_policy(cog, rebalance, i);
-    //cog = splay_once(cog, i);
-    //cog = getmedian_policy(cog, rebalance, i);
-     //Can use this to verify output of heavyhitter
+    cog = crack_scan(cog, heavy_value, heavy_value + range, rebalance);
     //printf("Heavy hit gave out: %d\n", heavy_value);
   }
-  splayCount = 0;
   return cog;
 }
 
-struct cog *mostread_policy(struct cog *cog, bool rebalance, int i)
-{
-  struct cog *most_read;
-  //if (i == 50)
-  //{
-  //  most_read = get_most_read(cog);
-  //  cog = splay(cog, most_read);
-  //}
-  if (rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) 
-  {
-    most_read = get_most_read(cog);
-    cog = splay(cog, most_read);
-    splayCount++;
-    printf("Ha ha rebalanced!!\n");
-  }
-  return cog;
-}
-
-struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
-{
-  struct cog *cog_median;
-  {
-    most_read = get_most_read(cog);
-    cog = splay(cog, most_read);
-    splayCount++;
-    printf("Ha ha rebalanced!!\n");
-  }
-  return cog;
-}
+//struct cog *mostread_policy(struct cog *cog, bool rebalance, int i)
+//{
+//  struct cog *most_read;
+//  //if (i == 50)
+//  //{
+//  //  most_read = get_most_read(cog);
+//  //  cog = splay(cog, most_read);
+//  //}
+//  if (rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) 
+//  {
+//    most_read = get_most_read(cog);
+//    cog = splay(cog, most_read);
+//    splayCount++;
+//    printf("Ha ha rebalanced!!\n");
+//  }
+//  return cog;
+//}
 
 struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
 {

@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "cog.h"
 #include "cracker.h"
@@ -61,7 +62,8 @@ void printTreeCog(struct cog *cog) {
   //#ifndef __ADVANCED
     //printf("≤ %ld", cog->data.btree.sep);
   //#else
-    printf("%ld|%ld", cog->data.btree.rds, getReadsAtNode(cog));
+    printf("%ld,%ld|%ld,%ld", cog->data.btree.sep, 
+        cog->data.btree.rds, getReadsAtNode(cog), cog->data.btree.epoch);
   //#endif
   }
 }
@@ -89,7 +91,6 @@ void printCog(struct cog *cog)
       printTreeCog(cog);
     }
   }
-
   printf("\n");
 }
 

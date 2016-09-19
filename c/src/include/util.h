@@ -2,6 +2,7 @@
 #define UTIL_LIB_H_SHIELD
 
 #include "cog.h"
+#include <stdbool.h>
 
 /**
  * TODO
@@ -142,5 +143,7 @@ long getCumulativeReads(struct cog *cog);
  */
 long getReadsAtNode(struct cog *cog);
 //#endif
+
+bool condition_for_pivot(struct cog *c);
 
 #endif

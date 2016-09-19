@@ -20,7 +20,14 @@ typedef struct cog
     //#ifndef __ADVANCED
     //struct { struct cog *lhs; struct cog *rhs; long sep; } btree;
     //#else
-    struct { struct cog *lhs; struct cog *rhs; long sep; long rds; } btree;
+    struct 
+    { 
+      struct cog *lhs; 
+      struct cog *rhs; 
+      long sep; 
+      long rds; 
+      long epoch;
+    } btree;
     //#endif
     struct { int start; int len; buffer records; } array;
     struct { int start; int len; buffer records; } sortedarray;

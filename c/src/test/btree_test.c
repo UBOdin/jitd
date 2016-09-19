@@ -243,7 +243,7 @@ void treetest1()
   printf("Before splaying: \n");
   printJITD(cog, 0);
   printf("\n");
-  work = make_workload_test(RANDOM, false, 100, 100);
+  work = make_workload_test(RANDOM, false, 100, 1000000);
   cog = test_reads(cog, work);
   printf("After splaying: \n");
   printJITD(cog, 0);
@@ -256,21 +256,28 @@ void treetest2()
   printf("Testing performance of find most read to splay\n");
   struct cog *cog;
   struct workload_test *work;
-  cog = mk_random_array(100000);
-  work = make_workload_test(RANDOM, false, 60000, 1000000);
+  cog = mk_random_array(100);
+  printf("Before splaying: \n");
+  printJITD(cog, 0);
+  printf("\n");
+  work = make_workload_test(RANDOM, true, 100, 1000000);
   cog = test_reads(cog, work);
+  printf("After splaying: \n");
+  printJITD(cog, 0);
   printf("\n");
 }
 
 void treetest3()
 {
-  printf("tree test 3\n");
-  printf("Testing performance of find most read to splay\n");
+  printf("tree test 3\n"); 
+  printf("Testing if splay operations work\n");
   struct cog *cog;
   struct workload_test *work;
-  cog = mk_random_array(100000);
-  work = make_workload_test(RANDOM, true, 60000, 1000000);
+  cog = mk_random_array(100);
+  work = make_workload_test(HEAVYHITTER, true, 100, 1000);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = test_reads(cog, work);
+  printJITD(cog, 0);
   printf("\n");
 }
 
@@ -329,39 +336,40 @@ int main(int argc, char **argv)
 {
   if (argc < 2){
     printf("Please input argument. --default for default tests, ");
+    printf("--treetests for tree tests, \n");
     printf("<filename> to execute test instruction in that file\n");
     exit(0);
   } else if (strcmp(argv[1], "--default") == 0) {
     int rand_start = 42; //time(NULL)
     srand(rand_start);
-    test1();
-    srand(rand_start);
-    test2();
-    srand(rand_start);
-    test3();
-    srand(rand_start);
-    test4();
-    srand(rand_start);
-    test5();
-    srand(rand_start);
-    test6();
-    srand(rand_start);
-    test7();
-    srand(rand_start);
-    test8();
-    srand(rand_start);
-    test9();
-    test10();
-    test11();
-    test12();
+    //test1();
+    //srand(rand_start);
+    //test2();
+    //srand(rand_start);
+    //test3();
+    //srand(rand_start);
+    //test4();
+    //srand(rand_start);
+    //test5();
+    //srand(rand_start);
+    //test6();
+    //srand(rand_start);
+    //test7();
+    //srand(rand_start);
+    //test8();
+    //srand(rand_start);
+    //test9();
+    //test10();
+    //test11();
+    //test12();
     test13();
     test14();
   } else if (strcmp(argv[1], "--treetests") == 0) {
     int rand_start = 42; //time(NULL)
     srand(rand_start);
     treetest1();
-    treetest2();
-    treetest3();
+    //treetest2();
+    //treetest3();
   } else {
     run_input(argv[1]);
   }
