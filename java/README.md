@@ -37,6 +37,12 @@ The class `jitd.ScriptDriver` accepts one or more files on the command-line and 
 * `read`
     * Performs a single read to a uniform-random key
 * `seqread {count}`
-    *  Performs `count` reads, each to a uniform-random key
+    * Performs `count` reads, each to a uniform-random key
 * `mode {naive|cracker|merge|simplemerge|enhancedmerge}`
-
+    * Switch to the specified policy right now
+* `transition {mode1} {mode2} {reads}`
+    * Switch immediately to the `mode1` policy.  Over the next `reads` reads, perform a linear transition from 100% requests being satisfied by the `mode1` policy to 100% requests being satisfied by the `mode2` policy
+* `dump`
+    * Immediately produce a textual representation of the current JITD's structure
+* `seed {seed}`
+    * Set the PRNG seed for data and request generation to `seed`
