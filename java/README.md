@@ -1,6 +1,6 @@
 # Java Implementation
 
-The Java implementation is a proof of concept developed for our [CIDR 2015](http://mjolnir.cse.buffalo.edu/wp-content/uploads/2014/11/main.pdf) paper.  It is being phased out in favor of our C/C++ implementations, but still serves as a good overview of the concepts involved and includes a visual demonstration mode that does not appear in any of the other implementations.
+The Java implementation is a proof of concept developed for our [CIDR 2015](http://mjolnir.cse.buffalo.edu/wp-content/uploads/2014/11/main.pdf) paper.  Although it lacks the same performance as the C/C++ implementations due to the GC, it provides a nice, usable framework for trying out ideas and quick tests.  It also includes a visual demo mode that the other implementations lack.
 
 ## Code Overview
 
@@ -25,3 +25,18 @@ https://github.com/okennedy/jitd/blob/master/java/src/jitd/Mode.java
 - Mode itself defines a default no-op logic.
 - CrackerMode and PushdownMergeMode implement Cracker Indexes and Adaptive Merge indexes as defined in the paper
 - EnhancedMergeMode is a slightly more efficient form of PushdownMergeMode.
+
+## Testing
+
+The class `jitd.ScriptDriver` accepts one or more files on the command-line and permits simple command-line style testing of JITD policies and workloads.  Operations are as follows:
+
+* `init {datasize}`
+    * Replaces the currently active JITD with a fresh array containing `datasize` records generated with a uniform-random key distribution.
+* `write {datasize}`
+    * Appends an array to the currently active JITD containing `datasize` records generated with a uniform-random key distribution.
+* `read`
+    * Performs a single read to a uniform-random key
+* `seqread {count}`
+    *  Performs `count` reads, each to a uniform-random key
+* `mode {naive|cracker|merge|simplemerge|enhancedmerge}`
+
