@@ -17,3 +17,9 @@ results
 *.o
 *.dSYM
 synthesis/examples/btree
+
+*.sublime-project
+
+*.sublime-project
+
+JITD.sublime-project

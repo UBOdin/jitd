@@ -15,6 +15,7 @@
 #include "test.hpp"
 #include "policy/Cracker.hpp"
 #include "policy/Inline.hpp"
+#include "policy/MyPolicy.hpp"
 //#include "policy/DumbCracker.hpp"
 
 using namespace std;
@@ -163,6 +164,10 @@ int jitd_test(
       } else if(string("inline") == policyName){
         jitd.setPolicy(
           RewritePolicy<Record>(new InlinePolicy<Record>())
+        );
+      } else if(string("mypolicy") == policyName){
+        jitd.setPolicy(
+          RewritePolicy<Record>(new MyPolicy<Record>())
         );
       }
       cout << "Now using policy: " << jitd.getPolicy()->name() << endl;
