@@ -80,12 +80,12 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
   long range = w->range;
   bool rebalance = w->rebalance;
 
-  for (int i=0; i<number; i++) {
+  for (int i = 0; i < number; i++) {
     long a = rand() % range;
     long b = rand() % range;
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
-    cog = crack(cog, low, high);
+    cog = crack_scan(cog, low, high, rebalance);
   }
   return cog;
 }
@@ -107,7 +107,7 @@ struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w)
   int zipf_rv;
   rand_val(1400);
 
-  for (int i=1; i<number; i++) {
+  for (int i = 1; i < number; i++) {
     zipf_rv = zipf(alpha, n);
     cog = crack_scan(cog, zipf_rv, zipf_rv + range, rebalance);
   }
@@ -133,7 +133,7 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
   int heavy_value;
   rand_val(1400);
 
-  for (int i=1; i<number; i++) {
+  for (int i = 1; i < number; i++) {
     heavy_value = (next_value(heavy) + key_shift) % mod_value;
     cog = crack_scan(cog, heavy_value, heavy_value + range, rebalance);
     //printf("Heavy hit gave out: %d\n", heavy_value);

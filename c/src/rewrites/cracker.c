@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "cog.h"
 #include "data.h"
 #include "util.h"
@@ -118,6 +119,8 @@ cog *pushdown_concats(cog *c, long low, long high) {
  * @return the root of the resulting tree
  */
 cog *crack_one(cog *c, long val) {
+  printf("Man\n");
+  assert(c != NULL);
   if(c->type == COG_SORTEDARRAY) {
     return c;
   } else if(c->type == COG_BTREE) {
@@ -126,10 +129,14 @@ cog *crack_one(cog *c, long val) {
     if(val == c->data.btree.sep) {
       return c;
     } else if(val < c->data.btree.sep) {
+      printf("Stop segfaulting please\n");
+      assert(lhs != NULL);
       lhs = crack_one(lhs, val);
     } else {
       rhs = crack_one(rhs, val);
     }
+    assert(lhs != NULL && rhs != NULL);
+    printf("Woah\n");
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long val = c->data.btree.sep;
       //#ifndef __ADVANCED
@@ -217,12 +224,14 @@ struct cog *getHarvest() {
  */
 cog *crack_scan(cog *c, long low, long high, bool rebalance) 
 {
+  printf("Hi\n");
   if(c->type == COG_SORTEDARRAY) 
   {
     return c;
   } 
   else if(c->type == COG_BTREE) 
   {
+    printf("Hoe\n");
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
     c = pivot_if_needed(rebalance, c);
@@ -392,7 +401,7 @@ cog *crack(cog *c, long low, long high) {
 
 struct cog *pivot_if_needed(bool rebalance, struct cog *c)
 {
-  if (rebalance && offbalance_exist(c) && pivot_advantage(c))
+  if (c->type == COG_BTREE && rebalance && offbalance_exist(c) && pivot_advantage(c))
   {
     return pivot(c);
   }
@@ -404,15 +413,79 @@ struct cog *pivot_if_needed(bool rebalance, struct cog *c)
 
 bool offbalance_exist(struct cog *c)
 {
-  return false;
+  long parentRds = c->data.btree.rds;
+  cog *lhs = c->data.btree.lhs;
+  cog *rhs = c->data.btree.rhs;
+  if ((lhs->type == COG_BTREE && lhs->data.btree.rds >= (2/3)*parentRds) ||
+      (rhs->type == COG_BTREE && rhs->data.btree.rds >= (2/3)*parentRds))
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool pivot_advantage(struct cog *c)
 {
+  cog *lhs = c->data.btree.lhs;
+  cog *rhs = c->data.btree.rhs;
+  if (lhs->type == COG_BTREE)
+  {
+    cog *l_of_l = lhs->data.btree.lhs;
+    if (l_of_l->type == COG_BTREE && l_of_l->data.btree.rds >= (2/3)*lhs->data.btree.rds)
+    {
+      return true;
+    }
+  }
+  if (rhs->type == COG_BTREE)
+  {
+    cog *r_of_r = rhs->data.btree.rhs;
+    if (r_of_r->type == COG_BTREE && r_of_r->data.btree.rds >= (2/3)*rhs->data.btree.rds)
+    {
+      return true;
+    }
+  }
   return false;
 }
 
 struct cog *pivot(struct cog *c)
 {
+  cog *lhs = c->data.btree.lhs;
+  cog *rhs = c->data.btree.rhs;
+  if (lhs->data.btree.rds >= (2/3)*lhs->data.btree.rds)
+  {
+    c = left_to_top(c);
+  }
+  else if (rhs->data.btree.rds >= (2/3)*rhs->data.btree.rds)
+  {
+    c = right_to_top(c);
+  }
   return c;
+}
+
+struct cog *left_to_top(struct cog *c)
+{
+  printf("Pow\n");
+  long total = c->data.btree.rds;
+  struct cog *lhs = c->data.btree.lhs;
+  c->data.btree.rds -= getCumulativeReads(c->data.btree.lhs);
+  c->data.btree.rds += getCumulativeReads(lhs->data.btree.rhs);
+  lhs->data.btree.rds = total;
+  c->data.btree.lhs = lhs->data.btree.rhs;
+  lhs->data.btree.rhs = c;
+  return lhs;
+}
+
+struct cog *right_to_top(struct cog *c)
+{
+  long total = c->data.btree.rds;
+  struct cog *rhs = c->data.btree.rhs;
+  c->data.btree.rds -= getCumulativeReads(c->data.btree.rhs);
+  c->data.btree.rds += getCumulativeReads(rhs->data.btree.lhs);
+  rhs->data.btree.rds = total;
+  c->data.btree.rhs = rhs->data.btree.lhs;
+  rhs->data.btree.lhs = c;
+  return rhs;
 }

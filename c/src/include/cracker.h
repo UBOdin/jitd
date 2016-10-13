@@ -34,4 +34,8 @@ bool pivot_advantage(struct cog *c);
 
 struct cog *pivot(struct cog *c);
 
+struct cog *left_to_top(struct cog *c);
+
+struct cog *right_to_top(struct cog *c);
+
 #endif //CRACKER_H_SHEILD
