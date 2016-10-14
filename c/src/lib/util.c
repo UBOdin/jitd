@@ -425,8 +425,21 @@ struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay,
  * @return the cumulative reads at the cog, 0 if it is NULL or it is not a BTree cog
  */
 long getCumulativeReads(struct cog *cog) {
-  if (cog == NULL || cog->type != COG_BTREE) return 0;
-  return cog->data.btree.rds;
+  if (cog == NULL) 
+  {
+    //printf("pppppppppppppp\n");
+    return 0;
+  }
+  else if (cog->type == COG_BTREE)
+  {
+    //printf("zzzzzzzzz\n");
+    //printf("%d\n", cog->type);
+    return 0;
+  }
+  else
+  {
+    return cog->data.btree.rds;
+  }
 }
 
 /**

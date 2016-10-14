@@ -141,24 +141,6 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
   return cog;
 }
 
-//struct cog *mostread_policy(struct cog *cog, bool rebalance, int i)
-//{
-//  struct cog *most_read;
-//  //if (i == 50)
-//  //{
-//  //  most_read = get_most_read(cog);
-//  //  cog = splay(cog, most_read);
-//  //}
-//  if (rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) 
-//  {
-//    most_read = get_most_read(cog);
-//    cog = splay(cog, most_read);
-//    splayCount++;
-//    printf("Ha ha rebalanced!!\n");
-//  }
-//  return cog;
-//}
-
 struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
 {
   struct cog *cog_median;

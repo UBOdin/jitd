@@ -342,26 +342,26 @@ int main(int argc, char **argv)
   } else if (strcmp(argv[1], "--default") == 0) {
     int rand_start = 42; //time(NULL)
     srand(rand_start);
-    //test1();
-    //srand(rand_start);
-    //test2();
-    //srand(rand_start);
-    //test3();
-    //srand(rand_start);
-    //test4();
-    //srand(rand_start);
-    //test5();
-    //srand(rand_start);
-    //test6();
-    //srand(rand_start);
-    //test7();
-    //srand(rand_start);
-    //test8();
-    //srand(rand_start);
-    //test9();
-    //test10();
-    //test11();
-    //test12();
+    test1();
+    srand(rand_start);
+    test2();
+    srand(rand_start);
+    test3();
+    srand(rand_start);
+    test4();
+    srand(rand_start);
+    test5();
+    srand(rand_start);
+    test6();
+    srand(rand_start);
+    test7();
+    srand(rand_start);
+    test8();
+    srand(rand_start);
+    test9();
+    test10();
+    test11();
+    test12();
     test13();
     test14();
   } else if (strcmp(argv[1], "--treetests") == 0) {

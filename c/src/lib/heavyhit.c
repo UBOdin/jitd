@@ -42,10 +42,10 @@ int next_value(struct heavyhit *h)
 {
   int value = 0;
   if (rand_val(0) < h->hot_access_fraction) {
-     /* Choose a value from the hot set */
+    /* Choose a value from the hot set */
     value = h->lower_bound + (rand() % h->hot_interval);
   } else {
-     /* Choose a value from the cold set */
+    /* Choose a value from the cold set */
     value = h->lower_bound + h-> hot_interval + (rand() % h->cold_interval);
   }
   return value;
