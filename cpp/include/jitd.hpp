@@ -131,4 +131,12 @@ class JITD {
     }
 };
 
+template <typename Tuple>
+  inline Buffer<Tuple>
+    sortBuffer(Buffer<Tuple> b)
+  {
+    std::sort(b->begin(),b->end());
+    return b;
+  }
+
 #endif //_JITD_H_SHIELD

@@ -100,7 +100,6 @@ class CogHandleBase {
     { 
       atomic_store(&ref, nref); 
     }
-    
     inline Iterator<Tuple> iterator(RewritePolicy<Tuple> p)
                                                  { return get()->iterator(p); }
     inline int             size()                { return get()->size(); }
@@ -111,7 +110,6 @@ class CogHandleBase {
 
 template <class Tuple>
   using CogHandle = std::shared_ptr<CogHandleBase<Tuple> >;
-
 
 #include "iterator.hpp"
 

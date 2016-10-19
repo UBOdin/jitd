@@ -23,3 +23,5 @@ synthesis/examples/btree
 *.sublime-project
 
 JITD.sublime-project
+
+*.sublime-project

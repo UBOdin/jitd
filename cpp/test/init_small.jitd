@@ -1,2 +1,5 @@
+policy mypolicy
 insert random 50 1000
-policy cracker 10
+dump
+random_scan 2000 1000 1000
+dump

@@ -41,7 +41,7 @@ template <typename Tuple>
                 BufferElement<Tuple> end, 
                 const Tuple &pivot)
   {
-    Buffer<Tuple> low (new std::vector<Tuple>);
+    Buffer<Tuple> low (new std::vector<Tuple>); //segmentation fault:11
     Buffer<Tuple> high(new std::vector<Tuple>);
     for(; curr < end; ++curr){
       if(*curr < pivot){ low ->push_back(*curr); }
@@ -55,6 +55,5 @@ template <typename Tuple>
   {
     return splitBuffer(b->begin(), b->end(), pivot);
   }
-
 
 #endif // _DATA_HPP_SHIELD
