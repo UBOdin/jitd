@@ -311,14 +311,18 @@ void run_input(char *filename)
                     hot_data_fraction, hot_access_fraction);
         printf("Created heavy hitter generator\n");
       } else if (strcmp(item, "workload") == 0) {
+        int type;
         int rebalance;
         long number_of_reads;
         long range;
-        fscanf(input, "%s %d %ld %ld", item, &rebalance, &number_of_reads, 
+        fscanf(input, "%d %d %ld %ld", &type, &rebalance, &number_of_reads, 
             &range);
-        work = make_workload_test(HEAVYHITTER, (bool)rebalance, 
+        work = make_workload_test(type, (bool)rebalance, 
                    number_of_reads, range);
-        work->heavy = heavy;
+        if (type == HEAVYHITTER)
+        {
+          work->heavy = heavy;
+        }
         printf("Created workload test\n");
       } else if (strcmp(item, "run") == 0) {
         cog = test_reads(cog, work);

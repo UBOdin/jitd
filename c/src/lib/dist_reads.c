@@ -148,20 +148,8 @@ struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
     cog_median = getMedian(cog);
     cog = splay(cog, cog_median);
     splayCount++;
-    //printf("splayCount is now %lld\n", splayCount);
   }
   return cog;
-}
-
-struct cog *splay_once(struct cog *cog, int i)
-{
-  struct cog *cog_median;
-  if (i == 1000) {
-    cog_median = getMedian(cog);
-    cog = splay(cog, cog_median);
-  } else {
-    return cog;
-  }
 }
 
 buffer mk_random_buffer(int size)
@@ -200,16 +188,4 @@ void test_scan(cog *c, long low, long high)
   iterator iter = scan(c, low, high);
   iter_dump(iter);
   iter_cleanup(iter);
-}
-
-long long int twoPow(long long int exp)
-{
-  long long int base = 2;
-  long long int result = 1;
-  while (exp) {
-    if (exp & 1) result *= base;
-    exp >>= 1;
-    base *= base;
-  }
-  return result;
 }

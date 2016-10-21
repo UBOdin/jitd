@@ -8,10 +8,6 @@
 #include "cracker.h"
 
 
-#ifdef __HARVEST
-struct cog *harvest = NULL;
-#endif
-
 static long int epoch_tracker = 0;
 
 /**
@@ -94,11 +90,7 @@ cog *pushdown_concats(cog *c, long low, long high)
         new_rhs = make_concat(lhs->data.btree.rhs, array2);
       }
       cog *btree;
-      //#ifndef __ADVANCED
-      //btree = make_btree(new_lhs, new_rhs, lhs->data.btree.sep);
-      //#else
       btree = makeBtreeWithReads(new_lhs, new_rhs, lhs->data.btree.sep, lhs->data.btree.rds);
-      //#endif
       cleanup(c);
       return pushdown_concats(btree, low, high); 
     }
@@ -121,7 +113,6 @@ cog *pushdown_concats(cog *c, long low, long high)
  */
 cog *crack_one(cog *c, long val) 
 {
-  //printf("Man\n");
   assert(c != NULL);
   if(c->type == COG_SORTEDARRAY) {
     return c;
@@ -131,25 +122,17 @@ cog *crack_one(cog *c, long val)
     if(val == c->data.btree.sep) {
       return c;
     } else if(val < c->data.btree.sep) {
-      //printf("Stop segfaulting please\n");
       assert(lhs != NULL);
       lhs = crack_one(lhs, val);
     } else {
       rhs = crack_one(rhs, val);
     }
     assert(lhs != NULL && rhs != NULL);
-    //printf("Woah\n");
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long val = c->data.btree.sep;
-      //#ifndef __ADVANCED
-      //return make_btree(lhs, rhs, val);
-      //#else
       return makeBtreeWithReads(lhs, rhs, val, c->data.btree.rds + 1);
-      //#endif
     } else {
-      //#ifdef __ADVANCED
       c->data.btree.rds += 1;
-      //#endif
       return c;
     }
   } else if(c->type == COG_ARRAY) {
@@ -171,11 +154,7 @@ cog *crack_one(cog *c, long val)
     cog *array1 = make_array(low, radixPos - low, c->data.array.records);
     cog *array2 = make_array(radixPos, high - radixPos, c->data.array.records);
     cleanup(c);
-    //#ifndef __ADVANCED
-    //return make_btree(array1, array2, val);
-    //#else
     return makeBtreeWithReads(array1, array2, val, 1);
-    //#endif
   } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
@@ -197,24 +176,9 @@ cog *crack_one(cog *c, long val)
     cog *array1 = make_array(0, lowIdx, out);
     cog *array2 = make_array(highIdx + 1, out->size - highIdx - 1, out);
     cleanup(c);
-    //#ifndef __ADVANCED
-    //return make_btree(array1, array2, val);
-    //#else
     return makeBtreeWithReads(array1, array2, val, 1);
-    //#endif
   }
 }
-
-#ifdef __HARVEST
-/**
- * Acquires the last BTree cog that was read from in crack_scan().
- *
- * @return the last BTree cog that was read from in crack_scan().
- */
-struct cog *getHarvest() {
-  return harvest;
-}
-#endif
 
 /**
  * Perform cracking on a particular cog.
@@ -226,64 +190,38 @@ struct cog *getHarvest() {
  */
 cog *crack_scan(cog *c, long low, long high, bool rebalance) 
 {
-  //printf("Hi\n");
   if(c->type == COG_SORTEDARRAY) {
     return c;
   } else if(c->type == COG_BTREE) {
-    //printf("Horse\n");
     c = pivot_if_needed(rebalance, c);
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
-    //#ifdef __ADVANCED
     long reads = 0;
-    //#endif
     if(low < c->data.btree.sep) {
       if(high < c->data.btree.sep) {
         lhs = crack_scan(lhs, low, high, rebalance);
-        //#ifdef __HARVEST
-        //harvest = lhs;
-        //#endif
-
-        //#ifdef __ADVANCED
         reads += 2;
-        //#endif
       } else {
         lhs = crack_one(lhs, low);
-        //#ifdef __HARVEST
-        //harvest = lhs;
-        //#endif
-
-        //#ifdef __ADVANCED
         reads += 1;
-        //#endif
       }
     }
     if(high > c->data.btree.sep) {
       if(low > c->data.btree.sep) {
         rhs = crack_scan(rhs, low, high, rebalance);
-        //#ifdef __ADVANCED
         reads += 2;
-        //#endif
       } else {
         rhs = crack_one(rhs, high);
-        //#ifdef __ADVANCED
         reads += 1;
-        //#endif
       }
     }
 
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long sep = c->data.btree.sep;
       free(c);
-      //#ifndef __ADVANCED
-      //return make_btree(lhs, rhs, sep);
-      //#else
       return makeBtreeWithReads(lhs, rhs, sep, c->data.btree.rds + reads);
-      //#endif
     } else {
-      //#ifdef __ADVANCED
       c->data.btree.rds += reads;
-      //#endif
       return c;
     }
   } else if(c->type == COG_ARRAY) {
@@ -312,11 +250,7 @@ cog *crack_scan(cog *c, long low, long high, bool rebalance)
     cog *array2 = make_array(lowRadixPos, highRadixPos-lowRadixPos, c->data.array.records);
     cog *array3 = make_array(highRadixPos, highIdx-highRadixPos, c->data.array.records);
     cleanup(c);
-    //#ifndef __ADVANCED
-    //return make_btree(array1, make_btree(array2, array3, high), low);
-    //#else
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
-    //#endif
   } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
@@ -348,11 +282,7 @@ cog *crack_scan(cog *c, long low, long high, bool rebalance)
     cog *array1 = make_array(0, lowIdx, out);
     cog *array2 = make_array(lowIdx, midIdx - lowIdx, out);
     cog *array3 = make_array(highIdx + 1, out->size - highIdx -1, out);
-    //#ifndef __ADVANCED
-    //return make_btree(array1, make_btree(array2, array3, high), low);
-    //#else
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
-    //#endif
   } 
 }
 
@@ -372,6 +302,14 @@ cog *crack(cog *c, long low, long high)
   return cog;
 }
 
+/**
+ * Do splay tree pivot if needed, intended to be used as traversing
+ * down the Btree nodes.
+ *
+ * @param cog - the current cog
+ * @param rebalance - check for pivot condition
+ * @return - pivoted/non-pivoted cog
+ */
 struct cog *pivot_if_needed(bool rebalance, struct cog *c) 
 {
   if (c->type == COG_BTREE && rebalance && offbalance_exist(c) && pivot_advantage(c)) {
@@ -381,6 +319,14 @@ struct cog *pivot_if_needed(bool rebalance, struct cog *c)
   }
 }
 
+/** 
+ * Check for significant off balance of cumulative reads in one of 
+ * the children.
+ *
+ * @param - current cog
+ * @return - true if one of the children has cumulative reads that's 
+ *           2/3 or more the size of the current cog's cumulative reads
+ */
 bool offbalance_exist(struct cog *c) 
 {
   long parentRds = c->data.btree.rds;
@@ -394,6 +340,15 @@ bool offbalance_exist(struct cog *c)
   }
 }
 
+/** 
+ * Further check to see if off balance is caused by outer branches
+ * of child who has the large cumulative reads which will be worth doing a 
+ * pivot (pivot doesn't move inner branch up).
+ *
+ * @param - current cog
+ * @return - true if the outer child of the child is causing the large
+ *           cumulative reads of the child false otherwise
+ */
 bool pivot_advantage(struct cog *c) 
 {
   cog *lhs = c->data.btree.lhs;
@@ -413,6 +368,13 @@ bool pivot_advantage(struct cog *c)
   return false;
 }
 
+/** 
+ * Move appropriate child to the top while maintaining tree
+ * integrity
+ *
+ * @param - current cog
+ * @return - rotated cog
+ */
 struct cog *pivot(struct cog *c) 
 {
   cog *lhs = c->data.btree.lhs;
@@ -428,12 +390,10 @@ struct cog *pivot(struct cog *c)
 struct cog *left_to_top(struct cog *c)
 {
   assert(c->type == COG_BTREE);
-  //printf("Pow1\n");
   long total = c->data.btree.rds;
   struct cog *lhs = c->data.btree.lhs;
   c->data.btree.rds -= getCumulativeReads(lhs);
   c->data.btree.rds += getCumulativeReads(lhs->data.btree.rhs);
-  //printf("Pow2\n");
   lhs->data.btree.rds = total;
   c->data.btree.lhs = lhs->data.btree.rhs;
   lhs->data.btree.rhs = c;
