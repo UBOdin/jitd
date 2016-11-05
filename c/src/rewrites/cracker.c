@@ -90,7 +90,11 @@ cog *pushdown_concats(cog *c, long low, long high)
         new_rhs = make_concat(lhs->data.btree.rhs, array2);
       }
       cog *btree;
+      #ifndef __BASIC
       btree = makeBtreeWithReads(new_lhs, new_rhs, lhs->data.btree.sep, lhs->data.btree.rds);
+      #else
+      btree = makeBtreeWithoutReads(new_lhs, new_rhs, lhs->data.btree.sep);
+      #endif
       cleanup(c);
       return pushdown_concats(btree, low, high); 
     }
@@ -130,9 +134,15 @@ cog *crack_one(cog *c, long val)
     assert(lhs != NULL && rhs != NULL);
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long val = c->data.btree.sep;
+      #ifndef __BASIC
       return makeBtreeWithReads(lhs, rhs, val, c->data.btree.rds + 1);
+      #else
+      return makeBtreeWithoutReads(lhs, rhs, val);
+      #endif
     } else {
+      #ifndef __BASIC
       c->data.btree.rds += 1;
+      #endif
       return c;
     }
   } else if(c->type == COG_ARRAY) {
@@ -219,9 +229,15 @@ cog *crack_scan(cog *c, long low, long high, bool rebalance)
     if(c->data.btree.lhs != lhs || c->data.btree.rhs != rhs) {
       long sep = c->data.btree.sep;
       free(c);
+      #ifndef __BASIC
       return makeBtreeWithReads(lhs, rhs, sep, c->data.btree.rds + reads);
+      #else
+      return makeBtreeWithoutReads(lhs, rhs, sep);
+      #endif
     } else {
+      #ifndef __BASIC
       c->data.btree.rds += reads;
+      #endif
       return c;
     }
   } else if(c->type == COG_ARRAY) {
@@ -329,6 +345,7 @@ struct cog *pivot_if_needed(bool rebalance, struct cog *c)
  */
 bool offbalance_exist(struct cog *c) 
 {
+  #ifndef __BASIC
   long parentRds = c->data.btree.rds;
   cog *lhs = c->data.btree.lhs;
   cog *rhs = c->data.btree.rhs;
@@ -338,8 +355,10 @@ bool offbalance_exist(struct cog *c)
   } else {
     return false;
   }
+  #else
+  return false;
+  #endif
 }
-
 /** 
  * Further check to see if off balance is caused by outer branches
  * of child who has the large cumulative reads which will be worth doing a 
@@ -351,6 +370,7 @@ bool offbalance_exist(struct cog *c)
  */
 bool pivot_advantage(struct cog *c) 
 {
+  #ifndef __BASIC
   cog *lhs = c->data.btree.lhs;
   cog *rhs = c->data.btree.rhs;
   if (lhs->type == COG_BTREE && lhs->data.btree.lhs->type == COG_BTREE) {
@@ -365,6 +385,7 @@ bool pivot_advantage(struct cog *c)
       return true;
     }
   }
+  #endif
   return false;
 }
 
@@ -377,6 +398,7 @@ bool pivot_advantage(struct cog *c)
  */
 struct cog *pivot(struct cog *c) 
 {
+  #ifndef __BASIC
   cog *lhs = c->data.btree.lhs;
   cog *rhs = c->data.btree.rhs;
   if (lhs->data.btree.rds >= (2*(c->data.btree.rds))/3) {
@@ -384,11 +406,13 @@ struct cog *pivot(struct cog *c)
   } else if (rhs->data.btree.rds >= (2*(c->data.btree.rds))/3) {
     c = right_to_top(c);
   }
+  #endif
   return c;
 }
 
 struct cog *left_to_top(struct cog *c)
 {
+  #ifndef __BASIC
   assert(c->type == COG_BTREE);
   long total = c->data.btree.rds;
   struct cog *lhs = c->data.btree.lhs;
@@ -398,10 +422,14 @@ struct cog *left_to_top(struct cog *c)
   c->data.btree.lhs = lhs->data.btree.rhs;
   lhs->data.btree.rhs = c;
   return lhs;
+  #else
+  return c;
+  #endif
 }
 
 struct cog *right_to_top(struct cog *c)
 {
+  #ifndef __BASIC
   long total = c->data.btree.rds;
   struct cog *rhs = c->data.btree.rhs;
   c->data.btree.rds -= getCumulativeReads(rhs);
@@ -410,4 +438,7 @@ struct cog *right_to_top(struct cog *c)
   c->data.btree.rhs = rhs->data.btree.lhs;
   rhs->data.btree.lhs = c;
   return rhs;
+  #else
+  return c;
+  #endif
 }
