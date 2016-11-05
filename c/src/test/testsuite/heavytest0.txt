@@ -1,6 +1,4 @@
 insert random 1000000
 heavyhit 0 0 1000000 0.1 0.8
-workload 2 0 1000000000 1000
-run
-heavyshift 500000
+workload 0 0 100000000 1000
 run

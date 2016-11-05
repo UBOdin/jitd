@@ -24,13 +24,15 @@ struct workload_test *make_workload_test(
     workload_type type,
     bool rebalance, 
     long number_of_reads, 
-    long range)
+    long range,
+    time_pattern timer)
 {
   workload_test *w = malloc(sizeof(struct workload_test));
   w->type = type;
   w->rebalance = rebalance;
   w->number_of_reads = number_of_reads;
   w->range = range;
+  w->timer = timer;
   return w;
 }
 
@@ -38,6 +40,7 @@ struct cog *test_reads(struct cog *cog, struct workload_test *w)
 {
   struct cog  *cog_return;
   workload_type type = w->type;
+  time_pattern timer = w->timer;
   struct timeval stop, start;
 
   gettimeofday(&start, NULL);
@@ -63,30 +66,38 @@ struct cog *test_reads(struct cog *cog, struct workload_test *w)
 
   long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
   long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
-  printf("Took %lld milliseconds\n", stopms - startms);
+  if (timer == TOTAL) printf("Took %lld milliseconds\n", stopms - startms);
   return cog_return;
 }
 
 struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
 {
-  printf("Testing JITD performance with random reads ");
-  if (w->rebalance) printf("with rebalancing ");
-  else printf("without rebalancing ");
-  printf("on cog size of %d while performing ", cog_length(cog));
-  printf("%ld reads\n", w->number_of_reads);
-  printf("Range value is %ld\n", w->range);
+  printf("%d size array\n", cog_length(cog));
+  printf("random\n");
+  if (w->rebalance) printf("rebalance\n");
+  else printf("no rebalance\n");
+  //printf("%ld reads\n", w->number_of_reads);
+  //printf("Range value is %ld\n", w->range);
 
   long number = w->number_of_reads;
   long range = w->range;
   bool rebalance = w->rebalance;
+  time_pattern timer = w->timer;
+  struct timeval stop, start;
 
   for (int i = 0; i < number; i++) {
     long a = rand() % range;
     long b = rand() % range;
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
+    gettimeofday(&start, NULL);
     cog = crack_scan(cog, low, high, rebalance);
+    gettimeofday(&stop, NULL);
+    unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
+    unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
+    if (timer == EACH) printf("%lld|", stopms - startms);
   }
+  printf("\n");
   return cog;
 }
 
@@ -116,39 +127,37 @@ struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w)
 
 struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
 {
-  printf("Testing JITD performance with heavyhitter reads ");
-  if (w->rebalance) printf("with rebalancing ");
-  else printf("without rebalancing ");
+  printf("%d size array\n", cog_length(cog));
+  printf("heavy\n");
+  if (w->rebalance) printf("rebalance");
+  else printf("no rebalance");
   printf("on cog size of %d while performing ", cog_length(cog));
-  printf("%ld reads\n", w->number_of_reads);
-  printf("Range value is %ld\n", w->range);
-  printf("With a shift of %d\n", w->heavy->key_shift);
+  //printf("%ld reads\n", w->number_of_reads);
+  //printf("Range value is %ld\n", w->range);
+  //printf("With a shift of %d\n", w->heavy->key_shift);
 
   struct heavyhit *heavy = w->heavy;
   bool rebalance = w->rebalance;
   long number = w->number_of_reads;
   long range = w->range;
   int key_shift = heavy->key_shift;
+  time_pattern timer = w->timer;
   int mod_value = heavy->upper_bound;
   int heavy_value;
+  struct timeval stop, start;
   rand_val(1400);
 
   for (int i = 1; i < number; i++) {
     heavy_value = (next_value(heavy) + key_shift) % mod_value;
+    gettimeofday(&start, NULL);
     cog = crack_scan(cog, heavy_value, heavy_value + range, rebalance);
+    gettimeofday(&stop, NULL);
+    unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
+    unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
+    if (timer == EACH) printf("%lld|", stopms - startms);
     //printf("Heavy hit gave out: %d\n", heavy_value);
   }
-  return cog;
-}
-
-struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i)
-{
-  struct cog *cog_median;
-  if(rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) {
-    cog_median = getMedian(cog);
-    cog = splay(cog, cog_median);
-    splayCount++;
-  }
+  printf("\n");
   return cog;
 }
 

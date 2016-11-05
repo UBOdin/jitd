@@ -4,6 +4,11 @@
 #include <stdbool.h>
 #include "heavyhit.h"
 
+typedef enum
+{
+    TOTAL, EACH
+} time_pattern;
+
 typedef enum 
 {
   RANDOM, ZIPFIAN, HEAVYHITTER
@@ -17,13 +22,15 @@ typedef struct workload_test
   bool rebalance;
   long number_of_reads;
   long range;
+  time_pattern timer;
 } workload_test;
 
 struct workload_test *make_workload_test(
     workload_type type,
     bool rebalance, 
     long number_of_reads, 
-    long range
+    long range,
+    time_pattern pattern
     );
 
 struct cog *test_reads(struct cog *cog, struct workload_test *w);

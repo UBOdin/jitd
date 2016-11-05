@@ -1,0 +1,3 @@
+insert random 10000000
+workload 0 0 100000 1000 1
+run

@@ -427,13 +427,10 @@ struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay,
 long getCumulativeReads(struct cog *cog) {
   if (cog == NULL) 
   {
-    //printf("pppppppppppppp\n");
     return 0;
   }
   else if (cog->type == COG_BTREE)
   {
-    //printf("zzzzzzzzz\n");
-    //printf("%d\n", cog->type);
     return 0;
   }
   else
