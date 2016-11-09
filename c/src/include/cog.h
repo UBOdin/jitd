@@ -17,7 +17,7 @@ typedef struct cog
   union 
   {
     struct { struct cog *lhs; struct cog *rhs; } concat;
-    #ifndef __BASIC
+    #ifdef __BASIC
     struct { struct cog *lhs; struct cog *rhs; long sep; } btree;
     #else
     struct 
@@ -26,7 +26,6 @@ typedef struct cog
       struct cog *rhs; 
       long sep; 
       long rds; 
-      long epoch;
     } btree;
     #endif
     struct { int start; int len; buffer records; } array;
@@ -130,7 +129,7 @@ int get_length(list *l);
  * @return the newly created BTree cog
  */
 #ifdef __BASIC
-cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep);
+cog *makeBtreeWithoutReads(struct cog *lhs, struct cog *rhs, long sep);
 #else
 cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds);
 #endif

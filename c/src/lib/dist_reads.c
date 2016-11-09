@@ -14,8 +14,6 @@
 #define BUFFER_SIZE 10
 #define KEY_RANGE 1000000
 
-static long long int splayCount;
-
 void free_workload_test(workload_test *w) { 
   free(w); 
 }
@@ -83,19 +81,24 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
   long range = w->range;
   bool rebalance = w->rebalance;
   time_pattern timer = w->timer;
-  struct timeval stop, start;
+  //struct timeval stop, start;
+  struct timespec stop, start;
 
   for (int i = 0; i < number; i++) {
     long a = rand() % range;
     long b = rand() % range;
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
-    gettimeofday(&start, NULL);
+    //gettimeofday(&start, NULL);
+    timespec_get(&start, TIME_UTC);
     cog = crack_scan(cog, low, high, rebalance);
-    gettimeofday(&stop, NULL);
-    unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
-    unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
-    if (timer == EACH) printf("%lld|", stopms - startms);
+    //gettimeofday(&stop, NULL);
+    timespec_get(&stop, TIME_UTC);
+    //unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
+    //unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
+    unsigned long long startns = (long long)start.tv_sec * 1000000000LL + start.tv_nsec;
+    unsigned long long stopns = (long long)stop.tv_sec * 1000000000LL + stop.tv_nsec;
+    if (timer == EACH) printf("%lld|", stopns - startns);
   }
   printf("\n");
   return cog;
@@ -144,17 +147,23 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
   time_pattern timer = w->timer;
   int mod_value = heavy->upper_bound;
   int heavy_value;
-  struct timeval stop, start;
+  //struct timeval stop, start;
+  struct timespec stop, start;
   rand_val(1400);
 
   for (int i = 1; i < number; i++) {
     heavy_value = (next_value(heavy) + key_shift) % mod_value;
-    gettimeofday(&start, NULL);
+    //gettimeofday(&start, NULL);
+    timespec_get(&start, TIME_UTC);
     cog = crack_scan(cog, heavy_value, heavy_value + range, rebalance);
-    gettimeofday(&stop, NULL);
-    unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
-    unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
-    if (timer == EACH) printf("%lld|", stopms - startms);
+    //gettimeofday(&stop, NULL);
+    timespec_get(&stop, TIME_UTC);
+    //unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
+    //unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
+    unsigned long long startns = (long long)start.tv_sec * 1000000000LL + start.tv_nsec;
+    unsigned long long stopns = (long long)stop.tv_sec * 1000000000LL + stop.tv_nsec;
+    if (timer == EACH) printf("%lld|", stopns - startns);
+    //if (timer == EACH) printf("%lld|", stopms - startms);
     //printf("Heavy hit gave out: %d\n", heavy_value);
   }
   printf("\n");
