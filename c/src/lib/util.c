@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
+#include <assert.h>
+#include <stdbool.h>
 
 #include "cog.h"
 #include "cracker.h"
@@ -57,11 +59,11 @@ void printTreeCog(struct cog *cog) {
 
   if (cog->type == COG_BTREE) 
   {
-  #ifndef __ADVANCED
-    printf("≤ %ld", cog->data.btree.sep);
-  #else
-    printf("%ld|%ld", cog->data.btree.rds, getReadsAtNode(cog));
-  #endif
+  //#ifndef __ADVANCED
+    //printf("≤ %ld", cog->data.btree.sep);
+  //#else
+    printf("<%ld,%ld,%ld", cog->data.btree.sep, cog->data.btree.rds, getReadsAtNode(cog));
+  //#endif
   }
 }
 
@@ -88,7 +90,6 @@ void printCog(struct cog *cog)
       printTreeCog(cog);
     }
   }
-
   printf("\n");
 }
 
@@ -145,21 +146,76 @@ void printJITD(struct cog *cog, int depth) {
   }
 }
 
-#ifdef __ADVANCED
+void printSimpleCog(struct cog *cog) {
+  if (cog == NULL) {
+    printf("NULL");
+  } else {
+    if (cog->type == COG_ARRAY) {
+      printf("A");
+    } else if (cog->type == COG_SORTEDARRAY) {
+      printf("S");
+    } else if (cog->type == COG_CONCAT) {
+      printf("U");
+    } else if (cog->type == COG_BTREE) {
+      printf("B");
+    }
+  }
+}
+
+void printSimpleJITD(struct cog *cog, int depth) {
+  if (cog == NULL) return;
+
+  if (cog->type == COG_CONCAT || cog->type == COG_BTREE) {
+    if (cog->type == COG_CONCAT) {
+      if (cog->data.btree.rhs != NULL) {
+        printSimpleJITD(cog->data.concat.rhs, depth + 1);
+      }
+    }
+    if (cog->type == COG_BTREE) {
+      if (cog->data.btree.rhs != NULL) {
+        printSimpleJITD(cog->data.btree.rhs, depth + 1);
+      }
+    }
+
+    printSimpleCog(cog);
+
+    if (cog->type == COG_CONCAT)  {
+      if (cog->data.concat.lhs != NULL) {
+        printSimpleJITD(cog->data.concat.lhs, depth + 1);
+      }
+    }
+    if (cog->type == COG_BTREE) {
+      if (cog->data.concat.lhs != NULL) {
+        printSimpleJITD(cog->data.btree.lhs, depth + 1);
+      }
+    }
+  } else {
+    
+  }
+  printSimpleCog(cog);
+}
+
+//#ifdef __ADVANCED
 void jsonize(struct cog *cog, FILE *file) {
   if (cog == NULL) fprintf(file, "null");
 
   if (cog->type == COG_BTREE) {
-    fprintf(file, "{\"name\":\"%li ", cog->data.btree.sep);
-    fprintf(file, "Total: %li ", cog->data.btree.rds);
-    fprintf(file, "Reads: %li\",", getReadsAtNode(cog));
-    fprintf(file, "\"children\":[");
+    fprintf(file, "{\"type\": \"BTREE\"");
+    fprintf(file, ",\"sep\": %ld", cog->data.btree.sep);
+    fprintf(file, ",\"lhs\":");
     jsonize(cog->data.btree.lhs, file);
-    fprintf(file, ",");
+    fprintf(file, ",\"rhs\":");
     jsonize(cog->data.btree.rhs, file);
-    fprintf(file, "]}");
+    fprintf(file, "}");
+  } else if (cog->type == COG_CONCAT) {
+    fprintf(file, "{\"type\": \"CONCAT\"");
+    fprintf(file, ",\"lhs\":");
+    jsonize(cog->data.concat.lhs, file);
+    fprintf(file, ",\"rhs\":");
+    jsonize(cog->data.concat.rhs, file);
+    fprintf(file, "}");
   } else {
-    fprintf(file, "{\"name\":\"Elements\"}");
+    fprintf(file, "{\"type\":\"None\"}");
   }
 }
 
@@ -169,20 +225,20 @@ void jsonize(struct cog *cog, FILE *file) {
  * @param cog - the root cog
  * @param name - output file name
  */
-void jsonJITD(struct cog *cog, char *name) {
-  FILE *file = fopen(name, "w");
+void jsonJITD(struct cog *cog) {
+  FILE *file = fopen("test.json", "w");
   jsonize(cog, file);
   fclose(file);
 }
-#endif
+//#endif
 
 /** Prints the current pre-processor mode. */
 void printMode() {
-#ifndef __ADVANCED
-  printf("Classic Mode!\n");
-#else
+//#ifndef __ADVANCED
+  //printf("Classic Mode!\n");
+//#else
   printf("Advanced Mode!\n");
-#endif
+//#endif
 }
 
 /**
@@ -269,6 +325,32 @@ struct cog *getMedian(struct cog *root) {
   struct cog *median = list[count/2];
   free(list);
   return median;
+}
+
+struct cog *get_most_read(struct cog *root)
+{
+  long count = getBtreeNodeCount(root);
+  struct cog **list = inorder(root, count);
+  struct cog *most_read = find_most_read(list);
+  free(list);
+  return most_read;
+}
+
+struct cog *find_most_read(struct cog **list)
+{
+  struct cog *most_read = list[0];
+  int total_length = cog_length(*list);
+  int largest_reads = 0;
+  int i;
+  for (i = 0; i < total_length; i++)
+  {
+    if (list[i]->type == COG_BTREE && list[i]->data.btree.rds > largest_reads)
+    {
+      largest_reads = list[i]->data.btree.rds;
+      most_read = list[i];
+    }
+  }
+  return most_read;
 }
 
 /**
@@ -389,7 +471,7 @@ struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay,
 }
 #endif
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 /**
  * Acquires the cumulative reads at a node if possible.
  *
@@ -397,8 +479,18 @@ struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay,
  * @return the cumulative reads at the cog, 0 if it is NULL or it is not a BTree cog
  */
 long getCumulativeReads(struct cog *cog) {
-  if (cog == NULL || cog->type != COG_BTREE) return 0;
-  return cog->data.btree.rds;
+  if (cog == NULL) 
+  {
+    return 0;
+  }
+  else if (cog->type != COG_BTREE)
+  {
+    return 0;
+  }
+  else
+  {
+    return cog->data.btree.rds;
+  }
 }
 
 /**
@@ -414,4 +506,4 @@ long getReadsAtNode(struct cog *cog) {
   count -= getCumulativeReads(cog->data.btree.rhs);
   return count;
 }
-#endif
+//#endif

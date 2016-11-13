@@ -2,7 +2,12 @@
 #define UTIL_LIB_H_SHIELD
 
 #include "cog.h"
+#include <stdbool.h>
 
+/**
+ * TODO
+ */
+void printArrayCog(struct cog *cog);
 
 /**
  * Prints the internal representation of the JITD providing a detailed layout
@@ -13,15 +18,16 @@
  */
 void printJITD(struct cog *c, int depth);
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 /**
  * Converts the JITD to JSON and places it in the file './test.txt'.
  *
  * @param cog - the root cog
  * @param name - output file name
  */
-void jsonJITD(struct cog *cog, char *name);
-#endif
+void jsonJITD(struct cog *cog);
+//void jsonJITD(struct cog *cog, char *name);
+//#endif
 
 /** Prints the current pre-processor mode. */
 void printMode();
@@ -51,6 +57,10 @@ struct cog **inorder(struct cog *cog, long count);
  * @return the median node of a JITD
  */
 struct cog *getMedian(struct cog *root);
+
+struct cog *get_most_read(struct cog *root);
+
+struct cog *find_most_read(struct cog **list);
 
 /**
  * Executes a given function and times the execution.
@@ -117,7 +127,7 @@ cog *getRandomArray(int size, int range);
 struct cog *splayOnHarvest(struct cog *cog, long reads, long range, int doSplay, int steps);
 #endif
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 /**
  * Acquires the cumulative reads at a node if possible.
  *
@@ -133,6 +143,12 @@ long getCumulativeReads(struct cog *cog);
  * @return the actual read count for that given BTree node
  */
 long getReadsAtNode(struct cog *cog);
-#endif
+//#endif
+
+bool condition_for_pivot(struct cog *c);
+
+void printSimpleCog(struct cog *cog);
+
+void printSimpleJITD(struct cog *cog, int depth);
 
 #endif

@@ -15,49 +15,44 @@
 #define KEY_RANGE 1000000
 
 void free_workload_test(workload_test *w) { 
-  cleanup(w->cog);
   free(w); 
 }
 
 struct workload_test *make_workload_test(
     workload_type type,
     bool rebalance, 
-    long test_array_size,
     long number_of_reads, 
-    long range)
+    long range,
+    time_pattern timer)
 {
   workload_test *w = malloc(sizeof(struct workload_test));
   w->type = type;
   w->rebalance = rebalance;
-  w->test_array_size = test_array_size;
   w->number_of_reads = number_of_reads;
   w->range = range;
+  w->timer = timer;
   return w;
 }
 
-struct cog *testReads(struct workload_test *w)
+struct cog *test_reads(struct cog *cog, struct workload_test *w)
 {
-  struct cog *cog, *cog_return;
-  cog = w->cog;
+  struct cog  *cog_return;
   workload_type type = w->type;
-  bool rebalance = w->rebalance;
-  long number_of_reads = w->number_of_reads;
-  long range = w->range;
-  long arraySize = w->test_array_size;
+  time_pattern timer = w->timer;
   struct timeval stop, start;
 
   gettimeofday(&start, NULL);
   if (type == RANDOM)
   {
-    cog_return = randomread_randomarray(cog, rebalance, number_of_reads, range);
+    cog_return = randomreads_on_cog(cog, w);
   }
   else if (type == ZIPFIAN)
   {
-    cog_return = zipfianread_randomarray(cog, rebalance, number_of_reads, range);
+    cog_return = zipfianreads_on_cog(cog, w);
   }
   else if (type == HEAVYHITTER)
   {
-    cog_return = heavyhitread_randomarray(cog, rebalance, number_of_reads, range);
+    cog_return = heavyhitreads_on_cog(cog, w);
   }
   else
   {
@@ -69,83 +64,101 @@ struct cog *testReads(struct workload_test *w)
 
   long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
   long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
-  printf("Took %lld milliseconds\n", stopms - startms);
-  w->cog = cog_return;
+  if (timer == TOTAL) printf("Took %lld milliseconds\n", stopms - startms);
   return cog_return;
 }
 
-struct cog *randomread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range)
+struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
 {
-  printf("Testing JITD performance on random array with random reads ");
-  if (rebalance) printf("with rebalancing ");
-  else printf("without rebalancing ");
-  printf("on array size of %d while performing ", cog_length(cog));
-  printf("%ld reads\n", number);
+  printf("%d size array\n", cog_length(cog));
+  printf("random\n");
+  if (w->rebalance) printf("rebalance\n");
+  else printf("no rebalance\n");
 
-  printf("For range value %ld: ", range);
-  cog = randomReads(cog, number, range);
-  if (rebalance) { splay(cog, getMedian(cog)); }
+  long number = w->number_of_reads;
+  long range = w->range;
+  bool rebalance = w->rebalance;
+  time_pattern timer = w->timer;
+  //struct timeval stop, start;
+  struct timespec stop, start;
+
+  for (int i = 0; i < number; i++) {
+    long a = rand() % range;
+    long b = rand() % range;
+    long low = a <= b ? a : b;
+    long high = a > b ? a : b;
+    //gettimeofday(&start, NULL);
+    timespec_get(&start, TIME_UTC);
+    cog = crack_scan(cog, low, high, rebalance);
+    //gettimeofday(&stop, NULL);
+    timespec_get(&stop, TIME_UTC);
+    //unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
+    //unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
+    unsigned long long startns = (long long)start.tv_sec * 1000000000LL + start.tv_nsec;
+    unsigned long long stopns = (long long)stop.tv_sec * 1000000000LL + stop.tv_nsec;
+    if (timer == EACH) printf("%lld|", stopns - startns);
+  }
+  printf("\n");
   return cog;
 }
 
-struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range) 
+struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w) 
 {
-  printf("Testing JITD performance on random array with zipfian reads ");
-  if (rebalance) printf("with rebalancing ");
+  printf("Testing JITD performance with zipfian reads ");
+  if (w->rebalance) printf("with rebalancing ");
   else printf("without rebalancing ");
-  printf("on array size of %d while performing ", cog_length(cog));
-  printf("%ld reads\n", number);
-  printf("For range value %ld: ", range);
+  printf("on cog size of %d while performing ", cog_length(cog));
+  printf("%ld reads\n", w->number_of_reads);
+  printf("Range value is %ld\n", w->range);
 
-  float alpha =0.99;
+  long number = w->number_of_reads;
+  long range = w->range;
+  bool rebalance = w->rebalance;
+  float alpha = 0.99;
   int n=KEY_RANGE;
   int zipf_rv;
-  int splayCount = 0;
   rand_val(1400);
-  struct cog *cog_median;
 
-  for (int i=1; i<number; i++) {
+  for (int i = 1; i < number; i++) {
     zipf_rv = zipf(alpha, n);
-    cog = crack_scan(cog, zipf_rv, zipf_rv + range);
-    if(rebalance && i > 1000 && i%(twoPow(splayCount)) == 0) {
-      cog_median = getMedian(cog);
-      cog = splay(cog, cog_median);
-      splayCount++;
-    }
-    // Use this if statement instead of one above for really slow performance
-    //if(rebalance && (i > 100 || i%2 == 0)) {
-    //  cog_median = getMedian(cog);
-    //  cog = splay(cog, cog_median);
-    //}
+    cog = crack_scan(cog, zipf_rv, zipf_rv + range, rebalance);
   }
   return cog;
 }
 
-struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range) 
+struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
 {
-  //float alpha = 0.99;
-  //int n = KEY_RANGE;
-  //int heavy_rv;
-  //rand_val(1400);
-  //struct cog *cog_median;
+  printf("%d size array\n", cog_length(cog));
+  printf("heavy\n");
+  if (w->rebalance) printf("rebalance");
+  else printf("no rebalance");
+  printf("shift at halfway will be %d\n", w->heavy->key_shift);
 
-  //for (int i=1; i<number; i++) 
-  //{
-  //  heavy_rv = heavy(alpha, n);
-  //  cog = crack_scan(cog, heavy_rv, heavy_rv + range);
-  //  if(i > 1000 || i%2 == 0) 
-  //  {
-  //    cog_median = getMedian(cog);
-  //    cog = splay(cog, cog_median);
-  //  }
-  //}
+  struct heavyhit *heavy = w->heavy;
+  bool rebalance = w->rebalance;
+  long number = w->number_of_reads;
+  long range = w->range;
+  int key_shift = heavy->key_shift;
+  time_pattern timer = w->timer;
+  int mod_value = heavy->upper_bound;
+  int heavy_value;
+  struct timespec stop, start;
+  rand_val(1400);
+
+  for (int i = 1; i < number; i++) {
+    heavy_value = (next_value(heavy) + key_shift) % mod_value;
+    timespec_get(&start, TIME_UTC);
+    cog = crack_scan(cog, heavy_value, heavy_value + range, rebalance);
+    timespec_get(&stop, TIME_UTC);
+    unsigned long long startns = (long long)start.tv_sec * 1000000000LL + start.tv_nsec;
+    unsigned long long stopns = (long long)stop.tv_sec * 1000000000LL + stop.tv_nsec;
+    if (timer == EACH) printf("%lld|", stopns - startns);
+  }
+  printf("\n");
   return cog;
 }
 
-buffer mk_random_buffer(int size) 
+buffer mk_random_buffer(int size)
 {
   buffer b = buffer_alloc(size);
   int i;
@@ -181,16 +194,4 @@ void test_scan(cog *c, long low, long high)
   iterator iter = scan(c, low, high);
   iter_dump(iter);
   iter_cleanup(iter);
-}
-
-long long int twoPow(long long int exp)
-{
-  long long int base = 2;
-  long long int result = 1;
-  while (exp) {
-    if (exp & 1) result *= base;
-    exp >>= 1;
-    base *= base;
-  }
-  return result;
 }

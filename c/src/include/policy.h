@@ -1,7 +1,7 @@
 #ifndef POLICY_LIB_H_SHIELD
 #define POLICY_LIB_H_SHIELD
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 #include "cog.h"
 
 
@@ -65,5 +65,5 @@ long getThreshold();
  * @return the number of splays performed during the last zipfinize operation
  */
 long getSplays();
-#endif
+//#endif
 #endif

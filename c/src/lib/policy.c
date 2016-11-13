@@ -1,4 +1,4 @@
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 #include <stdio.h>
 #include <limits.h>
 
@@ -166,4 +166,4 @@ long getThreshold() {
 long getSplays() {
   return _splays;
 }
-#endif
+//#endif

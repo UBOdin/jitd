@@ -1,0 +1,14 @@
+#!/bin/bash
+
+outputdestination=../../paper-JITD-Journal/testlogs/raw_data/rawtestlog.txt
+echo -e "--Running testsuite on $(date "+%m-%d-%Y %H:%M:%S")\n" >> $outputdestination
+COUNTER=0
+for f in src/test/testsuite/randomreadssuite/*.txt
+do
+  echo "$f********" >> $outputdestination
+  while [COUNTER -lt 5]; do
+    ./btree $f >> $outputdestination
+    let COUNTER = COUNTER + 1
+  done
+  echo -e "" >> $outputdestination
+done

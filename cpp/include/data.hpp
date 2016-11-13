@@ -7,7 +7,7 @@
 #include <functional>
 
 template <class Tuple>
-  using Buffer          = typename std::shared_ptr< std::vector<Tuple> >;
+  using Buffer          = typename std::shared_ptr< std::vector<Tuple>>;
 template <class Tuple>
   using BufferElement   = typename std::vector<Tuple>::const_iterator;
 

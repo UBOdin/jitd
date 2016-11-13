@@ -57,9 +57,9 @@ cog *make_btree( struct cog *lhs, struct cog *rhs, long sep )
   ret->data.btree.lhs = lhs;
   ret->data.btree.rhs = rhs;
   ret->data.btree.sep = sep;
-  #ifdef __ADVANCED
+  //#ifdef __ADVANCED
   ret->data.btree.rds = 0;
-  #endif
+  //#endif
   return ret;
 }
 cog *make_array( int start, int len, buffer records ) 
@@ -439,7 +439,6 @@ cog *fold(stack_triple **stack)
   return c;
 }
 
-#ifdef __ADVANCED
 /**
  * Creates a BTree and also sets the reads to a predefined value.
  *
@@ -449,6 +448,17 @@ cog *fold(stack_triple **stack)
  * @param rds - predefined number of reads
  * @return the newly created BTree cog
  */
+#ifdef __BASIC
+cog *makeBtreeWithoutReads(struct cog *lhs, struct cog *rhs, long sep) 
+{
+  cog *ret = malloc(sizeof(struct cog));
+  ret->type = COG_BTREE;
+  ret->data.btree.lhs = lhs;
+  ret->data.btree.rhs = rhs;
+  ret->data.btree.sep = sep;
+  return ret;
+}
+#else
 cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds) 
 {
   cog *ret = malloc(sizeof(struct cog));

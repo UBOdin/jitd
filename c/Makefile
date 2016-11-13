@@ -9,7 +9,7 @@ FILES = \
 
 
 CC = gcc -std=c11 -Isrc/include -g
-advanced: CC = gcc -D__ADVANCED -std=c11 -Isrc/include -g
+basic: CC = gcc -D__BASIC -std=c11 -Isrc/include -g
 harvest: CC = gcc -D__HARVEST -std=c11 -Isrc/include -g
 
 test: $(TARGETS)
@@ -24,7 +24,7 @@ $(TARGETS) : % : $(patsubst %, %.o, $(FILES)) src/test/%_test.c
 %.o : %.c
 	$(CC) -c -o $@ $< -lm
 
-advanced: test
+basic: test
 
 harvest: test
 

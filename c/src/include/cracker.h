@@ -1,9 +1,13 @@
 #ifndef CRACKER_H_SHEILD
 #define CRACKER_H_SHEILD
 
+#include <stdbool.h>
+
 cog *pushdown_concats(cog *c, long low, long high);
 
-cog *crack_scan(cog *c, long low, long high);
+//cog *crack_scan(cog *c, long low, long high);
+
+cog *crack_scan(cog *c, long low, long high, bool rebalance);
 
 #ifdef __HARVEST
 
@@ -21,5 +25,17 @@ struct cog *getHarvest();
 cog *crack_one(cog *c, long val);
 
 cog *crack(cog *c, long low, long high);
+
+struct cog *pivot_if_needed(bool rebalance, struct cog *c);
+
+bool offbalance_exist(struct cog *c);
+
+bool pivot_advantage(struct cog *c);
+
+struct cog *pivot(struct cog *c);
+
+struct cog *left_to_top(struct cog *c);
+
+struct cog *right_to_top(struct cog *c);
 
 #endif //CRACKER_H_SHEILD

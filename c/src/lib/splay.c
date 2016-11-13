@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "cog.h"
 
-#ifdef __ADVANCED
+//#ifdef __ADVANCED
 #include "util.h"
-#endif
+//#endif
 
 
 /**
@@ -15,7 +16,7 @@
  * @return the new root of the rearranged tree
  */
 struct cog *zig(struct cog *root, struct cog *node) {
-  #ifdef __ADVANCED
+  #ifndef __BASIC
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.lhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.rhs);
@@ -34,7 +35,7 @@ struct cog *zig(struct cog *root, struct cog *node) {
  * @return the new root of the rearranged tree
  */
 struct cog *zag(struct cog *root, struct cog *node) {
-  #ifdef __ADVANCED
+  #ifndef __BASIC
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.rhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.lhs);
@@ -54,7 +55,7 @@ struct cog *zag(struct cog *root, struct cog *node) {
  */
 struct cog *zigzig(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.lhs;
-  #ifdef __ADVANCED
+  #ifndef __BASIC
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.lhs);
   root->data.btree.rds += getCumulativeReads(parent->data.btree.rhs);
@@ -79,7 +80,7 @@ struct cog *zigzig(struct cog *root, struct cog *node) {
  */
 struct cog *zagzag(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.rhs;
-  #ifdef __ADVANCED
+  #ifndef __BASIC
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.rhs);
   root->data.btree.rds += getCumulativeReads(parent->data.btree.lhs);
@@ -104,7 +105,7 @@ struct cog *zagzag(struct cog *root, struct cog *node) {
  */
 struct cog *zigzag(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.lhs;
-  #ifdef __ADVANCED
+  #ifndef __BASIC
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.lhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.rhs);
@@ -128,7 +129,7 @@ struct cog *zigzag(struct cog *root, struct cog *node) {
  */
 struct cog *zagzig(struct cog *root, struct cog *node) {
   struct cog *parent = root->data.btree.rhs;
-  #ifdef __ADVANCED
+  #ifndef __BASIC
   long total = root->data.btree.rds;
   root->data.btree.rds -= getCumulativeReads(root->data.btree.rhs);
   root->data.btree.rds += getCumulativeReads(node->data.btree.lhs);

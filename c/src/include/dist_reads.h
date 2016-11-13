@@ -2,6 +2,12 @@
 #define DIST_READS_H_SHEILD
 
 #include <stdbool.h>
+#include "heavyhit.h"
+
+typedef enum
+{
+    TOTAL, EACH
+} time_pattern;
 
 typedef enum 
 {
@@ -10,46 +16,38 @@ typedef enum
 
 typedef struct workload_test
 {
-  struct cog *cog;
   workload_type type;
+  struct zipfian *zipfian;
+  struct heavyhit *heavy;
   bool rebalance;
-  long test_array_size;
   long number_of_reads;
   long range;
+  time_pattern timer;
 } workload_test;
 
 struct workload_test *make_workload_test(
     workload_type type,
     bool rebalance, 
-    long test_array_size,
     long number_of_reads, 
-    long range
+    long range,
+    time_pattern pattern
     );
 
-struct cog *testReads(struct workload_test *w);
-
-struct cog *doZipfianReads(struct cog *cog, long number, long range);
-
-struct cog *zipfianReads_splay(struct cog *cog, long number, long range);
-
-struct cog *heavyHitterNoSplay();
-
-struct cog *heavyHitterWithSplay();
+struct cog *test_reads(struct cog *cog, struct workload_test *w);
 
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads);
 
-void free_workload_test(workload_test *w);
+struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w);
 
-struct cog *execute_workload_test(struct workload_test *w);
+struct cog *zipfianreads_on_cog(struct cog *cog, struct workload_test *w);
 
-struct cog *zipfianread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range);
+struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w);
 
-struct cog *randomread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range);
+struct cog *splay_once(struct cog *cog, int i);
 
-struct cog *heavyhitread_randomarray(struct cog *cog, bool rebalance, 
-    long number, long range);
+struct cog *mostread_policy(struct cog *cog, bool rebalance, int i);
+
+struct cog *getmedian_policy(struct cog *cog, bool rebalance, int i);
 
 buffer mk_random_buffer(int size);
 
@@ -62,5 +60,7 @@ cog *mk_sorted_array(int size);
 void test_scan(cog *c, long low, long high);
 
 long long int twoPow(long long int exp);
+
+void free_workload_test(workload_test *w);
 
 #endif //DIST_READS_H_SHEILD

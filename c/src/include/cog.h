@@ -17,10 +17,16 @@ typedef struct cog
   union 
   {
     struct { struct cog *lhs; struct cog *rhs; } concat;
-    #ifndef __ADVANCED
+    #ifdef __BASIC
     struct { struct cog *lhs; struct cog *rhs; long sep; } btree;
     #else
-    struct { struct cog *lhs; struct cog *rhs; long sep; long rds; } btree;
+    struct 
+    { 
+      struct cog *lhs; 
+      struct cog *rhs; 
+      long sep; 
+      long rds; 
+    } btree;
     #endif
     struct { int start; int len; buffer records; } array;
     struct { int start; int len; buffer records; } sortedarray;
@@ -113,7 +119,6 @@ cog *fold(stack_triple **stack);
 
 int get_length(list *l);
 
-#ifdef __ADVANCED
 /**
  * Creates a BTree and also sets the reads to a predefined value.
  *
@@ -123,6 +128,9 @@ int get_length(list *l);
  * @param rds - predefined number of reads
  * @return the newly created BTree cog
  */
+#ifdef __BASIC
+cog *makeBtreeWithoutReads(struct cog *lhs, struct cog *rhs, long sep);
+#else
 cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds);
 #endif
 

@@ -3,6 +3,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <time.h>
+#include <string.h>
 
 #include "cog.h"
 #include "cracker.h"
@@ -125,30 +127,16 @@ void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
   printf("\n");
 }
 
-struct cog *execute_workload_test(struct workload_test *w)
-{
-  struct cog *cog;
-  w->cog = cog;
-  cog = mk_random_array(w->test_array_size);
-  w->cog = cog;
-  cog = testReads(w);
-  /* remember to free workload when done */
-  return cog;
-}
-
 void test8()
 {
   printf("test 8\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(RANDOM, true, 1000000, 10000, 10000);
-  cog = execute_workload_test(work);
-  work->cog = cog;
-  work->range = 5000;
-  cog = testReads(work);
-  work->cog = cog;
-  work->range = 1000;
-  cog = testReads(work);
+  cog = mk_random_array(10000);
+  work = make_workload_test(RANDOM, true, 10000, 1000000, 0);
+  cog = test_reads(cog, work);
+  free_cog(cog);
+  free_workload_test(work);
   printf("\n");
 }
 
@@ -157,8 +145,10 @@ void test9()
   printf("test 9\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(ZIPFIAN, false, 1000000000, 1000000, 1000);
-  execute_workload_test(work);
+  cog = mk_random_array(1000000);  
+  work = make_workload_test(ZIPFIAN, false, 1000, 1000, 0);
+  cog = test_reads(cog, work);
+  free_cog(cog);
   free_workload_test(work);
   printf("\n");
 }
@@ -167,9 +157,10 @@ void test10()
 {
   printf("test 10\n");
   struct workload_test *work;
-  struct cog *cog;
-  work = make_workload_test(ZIPFIAN, true, 1000000000, 1000000, 1000);
-  execute_workload_test(work);
+  struct cog *cog = mk_random_array(1000000);  
+  work = make_workload_test(ZIPFIAN, true, 1000, 1000, 0);
+  cog = test_reads(cog, work);
+  free_cog(cog);
   free_workload_test(work);
   printf("\n");
 }
@@ -179,8 +170,13 @@ void test11()
   printf("test 11\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, false, 10000, 10000, 1000);
-  execute_workload_test(work);
+  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000, 0);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
+  cog = test_reads(cog, work);
+  //printJITD(cog, 0);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
   free_workload_test(work);
   printf("\n");
 }
@@ -190,34 +186,202 @@ void test12()
   printf("test 12\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, true, 10000, 10000, 1000);
-  execute_workload_test(work);
+  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000, 0);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
+  cog = test_reads(cog, work);
+  //printJITD(cog, 0);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
   free_workload_test(work);
   printf("\n");
 }
 
+void test13()
+{
+  printf("test 13\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000, 0);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
+  cog = test_reads(cog, work);
+  work->heavy->key_shift = 500000;
+  cog = test_reads(cog, work);
+  //printJITD(cog, 0);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
+  free_workload_test(work);
+  printf("\n");
+}
+
+void test14()
+{
+  printf("test 14\n");
+  struct workload_test *work;
+  struct cog *cog;
+  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000, 0);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
+  cog = mk_random_array(1000000);
+  cog = test_reads(cog, work);
+  work->heavy->key_shift = 500000;
+  cog = test_reads(cog, work);
+  //printJITD(cog, 0);
+  free_cog(cog);
+  free_heavyhit(work->heavy);
+  free_workload_test(work);
+  printf("\n");
+}
+
+void treetest1()
+{
+  printf("tree test 1\n");
+  printf("Testing to make sure find most read and splay works\n");
+  struct cog *cog;
+  struct workload_test *work;
+  cog = mk_random_array(100);
+  printf("Before splaying: \n");
+  printJITD(cog, 0);
+  printf("\n");
+  work = make_workload_test(RANDOM, false, 100, 1000000, 0);
+  cog = test_reads(cog, work);
+  printf("After splaying: \n");
+  printJITD(cog, 0);
+  printf("\n");
+}
+
+void treetest2()
+{
+  printf("tree test 2\n");
+  printf("Testing performance of find most read to splay\n");
+  struct cog *cog;
+  struct workload_test *work;
+  cog = mk_random_array(100);
+  printf("Before splaying: \n");
+  printJITD(cog, 0);
+  printf("\n");
+  work = make_workload_test(RANDOM, true, 100, 1000000, 0);
+  cog = test_reads(cog, work);
+  printf("After splaying: \n");
+  printJITD(cog, 0);
+  printf("\n");
+}
+
+void treetest3()
+{
+  printf("tree test 3\n"); 
+  printf("Testing if splay operations work\n");
+  struct cog *cog;
+  struct workload_test *work;
+  cog = mk_random_array(100);
+  work = make_workload_test(HEAVYHITTER, true, 100, 1000, 0);
+  work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
+  cog = test_reads(cog, work);
+  printJITD(cog, 0);
+  printf("\n");
+}
+
+void run_input(char *filename);
+
+void run_input(char *filename)
+{
+  //printf("Running test from %s\n", filename);
+  FILE *input;
+  char item[50];
+  struct cog *cog;
+  struct workload_test *work;
+  struct heavyhit *heavy;
+  input = fopen(filename, "r");
+  while (!feof(input)) {
+    if (fscanf(input, "%s", item) == 1) {
+      if (strcmp(item, "insert") == 0) {
+        int size;
+        fscanf(input, "%s %d", item, &size);
+        cog = mk_random_array(size);
+        //printf("Created a randomm array of size %d\n", size);
+      } else if (strcmp(item, "heavyhit") == 0) {
+        int key_shift;
+        int lower_bound;
+        int upper_bound;
+        double hot_data_fraction;
+        double hot_access_fraction;
+        fscanf(input, "%d %d %d %lf %lf", &key_shift, &lower_bound, 
+            &upper_bound, &hot_data_fraction, &hot_access_fraction);
+        heavy = create_heavyhit(key_shift, lower_bound, upper_bound, 
+                    hot_data_fraction, hot_access_fraction);
+        //printf("Created heavy hitter generator\n");
+      } else if (strcmp(item, "workload") == 0) {
+        int type;
+        int rebalance;
+        long number_of_reads;
+        long range;
+        time_pattern timer;
+        fscanf(input, "%d %d %ld %ld %d", &type, &rebalance, &number_of_reads, 
+            &range, &timer);
+        work = make_workload_test(type, (bool)rebalance, 
+                   number_of_reads, range, timer);
+        if (type == HEAVYHITTER) {
+          work->heavy = heavy;
+        }
+        //printf("Created workload test\n");
+      } else if (strcmp(item, "run") == 0) {
+        cog = test_reads(cog, work);
+      } else if (strcmp(item, "dump") == 0) {
+        printSimpleJITD(cog, 0);
+        printf("\n");
+      } else if (strcmp(item, "jsonizedump") == 0) {
+        //FILE *jsonfile = fopen("test.json", "w");
+        //jsonize(cog, jsonfile);
+        jsonJITD(cog);
+      } else if (strcmp(item, "heavyshift") == 0) {
+        int key_shift;
+        fscanf(input, "%d", &key_shift);
+        work->heavy->key_shift = key_shift;
+        //printf("Shifted heavyhit workload by %d\n", key_shift);
+      }
+    }
+  }
+}
+
 int main(int argc, char **argv) 
 {
-  int rand_start = 42; //time(NULL)
-  //srand(rand_start);
-  //test1();
-  //srand(rand_start);
-  //test2();
-  //srand(rand_start);
-  //test3();
-  //srand(rand_start);
-  //test4();
-  //srand(rand_start);
-  //test5();
-  //srand(rand_start);
-  //test6();
-  //srand(rand_start);
-  //test7();
-  //srand(rand_start);
-  //test8();
-  srand(rand_start);
-  test9();
-  test10();
-  //test11();
-  //test12();
+  if (argc < 2){
+    printf("Please input argument. --default for default tests, ");
+    printf("--treetests for tree tests, \n");
+    printf("<filename> to execute test instruction in that file\n");
+    exit(0);
+  } else if (strcmp(argv[1], "--default") == 0) {
+    int rand_start = 42; //time(NULL)
+    srand(rand_start);
+    test1();
+    srand(rand_start);
+    test2();
+    srand(rand_start);
+    test3();
+    srand(rand_start);
+    test4();
+    srand(rand_start);
+    test5();
+    srand(rand_start);
+    test6();
+    srand(rand_start);
+    test7();
+    srand(rand_start);
+    test8();
+    srand(rand_start);
+    test9();
+    test10();
+    test11();
+    test12();
+    test13();
+    test14();
+  } else if (strcmp(argv[1], "--treetests") == 0) {
+    int rand_start = 42; //time(NULL)
+    srand(rand_start);
+    treetest1();
+    treetest2();
+    treetest3();
+  } else {
+    run_input(argv[1]);
+  }
 }
