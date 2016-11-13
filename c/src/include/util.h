@@ -25,7 +25,8 @@ void printJITD(struct cog *c, int depth);
  * @param cog - the root cog
  * @param name - output file name
  */
-void jsonJITD(struct cog *cog, char *name);
+void jsonJITD(struct cog *cog);
+//void jsonJITD(struct cog *cog, char *name);
 //#endif
 
 /** Prints the current pre-processor mode. */
@@ -145,5 +146,9 @@ long getReadsAtNode(struct cog *cog);
 //#endif
 
 bool condition_for_pivot(struct cog *c);
+
+void printSimpleCog(struct cog *cog);
+
+void printSimpleJITD(struct cog *cog, int depth);
 
 #endif

@@ -146,21 +146,76 @@ void printJITD(struct cog *cog, int depth) {
   }
 }
 
+void printSimpleCog(struct cog *cog) {
+  if (cog == NULL) {
+    printf("NULL");
+  } else {
+    if (cog->type == COG_ARRAY) {
+      printf("A");
+    } else if (cog->type == COG_SORTEDARRAY) {
+      printf("S");
+    } else if (cog->type == COG_CONCAT) {
+      printf("U");
+    } else if (cog->type == COG_BTREE) {
+      printf("B");
+    }
+  }
+}
+
+void printSimpleJITD(struct cog *cog, int depth) {
+  if (cog == NULL) return;
+
+  if (cog->type == COG_CONCAT || cog->type == COG_BTREE) {
+    if (cog->type == COG_CONCAT) {
+      if (cog->data.btree.rhs != NULL) {
+        printSimpleJITD(cog->data.concat.rhs, depth + 1);
+      }
+    }
+    if (cog->type == COG_BTREE) {
+      if (cog->data.btree.rhs != NULL) {
+        printSimpleJITD(cog->data.btree.rhs, depth + 1);
+      }
+    }
+
+    printSimpleCog(cog);
+
+    if (cog->type == COG_CONCAT)  {
+      if (cog->data.concat.lhs != NULL) {
+        printSimpleJITD(cog->data.concat.lhs, depth + 1);
+      }
+    }
+    if (cog->type == COG_BTREE) {
+      if (cog->data.concat.lhs != NULL) {
+        printSimpleJITD(cog->data.btree.lhs, depth + 1);
+      }
+    }
+  } else {
+    
+  }
+  printSimpleCog(cog);
+}
+
 //#ifdef __ADVANCED
 void jsonize(struct cog *cog, FILE *file) {
   if (cog == NULL) fprintf(file, "null");
 
   if (cog->type == COG_BTREE) {
-    fprintf(file, "{\"name\":\"%li ", cog->data.btree.sep);
-    fprintf(file, "Total: %li ", cog->data.btree.rds);
-    fprintf(file, "Reads: %li\",", getReadsAtNode(cog));
-    fprintf(file, "\"children\":[");
+    fprintf(file, "{\"type\": \"BTREE\"");
+    fprintf(file, ",\"sep\": %ld", cog->data.btree.sep);
+    fprintf(file, ",\"lhs\":");
     jsonize(cog->data.btree.lhs, file);
-    fprintf(file, ",");
+    fprintf(file, ",\"rhs\":");
     jsonize(cog->data.btree.rhs, file);
-    fprintf(file, "]}");
+    fprintf(file, "}");
+  } else if (cog->type == COG_CONCAT) {
+    fprintf(file, "{\"type\": \"CONCAT\"");
+    fprintf(file, ",\"lhs\":");
+    jsonize(cog->data.concat.lhs, file);
+    fprintf(file, ",\"rhs\":");
+    jsonize(cog->data.concat.rhs, file);
+    fprintf(file, "}");
   } else {
-    fprintf(file, "{\"name\":\"Elements\"}");
+    fprintf(file, "{\"type\":\"None\"}");
   }
 }
 
@@ -170,8 +225,8 @@ void jsonize(struct cog *cog, FILE *file) {
  * @param cog - the root cog
  * @param name - output file name
  */
-void jsonJITD(struct cog *cog, char *name) {
-  FILE *file = fopen(name, "w");
+void jsonJITD(struct cog *cog) {
+  FILE *file = fopen("test.json", "w");
   jsonize(cog, file);
   fclose(file);
 }

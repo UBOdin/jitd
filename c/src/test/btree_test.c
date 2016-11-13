@@ -327,7 +327,12 @@ void run_input(char *filename)
       } else if (strcmp(item, "run") == 0) {
         cog = test_reads(cog, work);
       } else if (strcmp(item, "dump") == 0) {
-        printJITD(cog, 0);
+        printSimpleJITD(cog, 0);
+        printf("\n");
+      } else if (strcmp(item, "jsonizedump") == 0) {
+        //FILE *jsonfile = fopen("test.json", "w");
+        //jsonize(cog, jsonfile);
+        jsonJITD(cog);
       } else if (strcmp(item, "heavyshift") == 0) {
         int key_shift;
         fscanf(input, "%d", &key_shift);
