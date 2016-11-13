@@ -214,6 +214,12 @@ void jsonize(struct cog *cog, FILE *file) {
     fprintf(file, ",\"rhs\":");
     jsonize(cog->data.concat.rhs, file);
     fprintf(file, "}");
+  } else if (cog->type == COG_ARRAY) {
+    fprintf(file, "{\"type\": \"ARRAY\"");
+    fprintf(file, "}");
+  } else if (cog->type == COG_SORTEDARRAY) {
+    fprintf(file, "{\"type\": \"SORTEDARRAY\"");
+    fprintf(file, "}");
   } else {
     fprintf(file, "{\"type\":\"None\"}");
   }
