@@ -62,8 +62,7 @@ void printTreeCog(struct cog *cog) {
   //#ifndef __ADVANCED
     //printf("≤ %ld", cog->data.btree.sep);
   //#else
-    printf("%ld,%ld|%ld,%ld", cog->data.btree.sep, 
-        cog->data.btree.rds, getReadsAtNode(cog), cog->data.btree.epoch);
+    printf("<%ld,%ld,%ld", cog->data.btree.sep, cog->data.btree.rds, getReadsAtNode(cog));
   //#endif
   }
 }
@@ -429,7 +428,7 @@ long getCumulativeReads(struct cog *cog) {
   {
     return 0;
   }
-  else if (cog->type == COG_BTREE)
+  else if (cog->type != COG_BTREE)
   {
     return 0;
   }

@@ -320,13 +320,14 @@ void run_input(char *filename)
             &range, &timer);
         work = make_workload_test(type, (bool)rebalance, 
                    number_of_reads, range, timer);
-        if (type == HEAVYHITTER)
-        {
+        if (type == HEAVYHITTER) {
           work->heavy = heavy;
         }
         //printf("Created workload test\n");
       } else if (strcmp(item, "run") == 0) {
         cog = test_reads(cog, work);
+      } else if (strcmp(item, "dump") == 0) {
+        printJITD(cog, 0);
       } else if (strcmp(item, "heavyshift") == 0) {
         int key_shift;
         fscanf(input, "%d", &key_shift);
