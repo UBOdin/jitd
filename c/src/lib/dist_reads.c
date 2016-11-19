@@ -83,8 +83,8 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
   struct timespec stop, start;
 
   for (int i = 0; i < number; i++) {
-    long a = rand() % range;
-    long b = rand() % range;
+    long a = rand() % KEY_RANGE;
+    long b = rand() % KEY_RANGE;
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
     //gettimeofday(&start, NULL);

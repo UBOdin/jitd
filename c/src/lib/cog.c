@@ -50,6 +50,7 @@ cog *make_concat( struct cog *lhs, struct cog *rhs )
   ret->data.concat.rhs = rhs;
   return ret;
 }
+
 cog *make_btree( struct cog *lhs, struct cog *rhs, long sep ) 
 {
   cog *ret = malloc(sizeof(struct cog));
@@ -57,11 +58,12 @@ cog *make_btree( struct cog *lhs, struct cog *rhs, long sep )
   ret->data.btree.lhs = lhs;
   ret->data.btree.rhs = rhs;
   ret->data.btree.sep = sep;
-  //#ifdef __ADVANCED
+  #ifndef __BASIC
   ret->data.btree.rds = 0;
-  //#endif
+  #endif
   return ret;
 }
+
 cog *make_array( int start, int len, buffer records ) 
 {
   cog *ret = malloc(sizeof(struct cog));
@@ -72,6 +74,7 @@ cog *make_array( int start, int len, buffer records )
   buffer_retain(records);
   return ret;
 }
+
 cog *make_sortedarray( int start, int len, buffer records ) 
 {
   cog *ret = malloc(sizeof(struct cog));
@@ -82,6 +85,7 @@ cog *make_sortedarray( int start, int len, buffer records )
   buffer_retain(records);
   return ret;
 }
+
 extracted_components *make_extracted_components(struct cog *lhs, struct cog *rhs, long low_key, long high_key, iterator iter) 
 {
   extracted_components *extracted_components = malloc(sizeof(struct extracted_components));

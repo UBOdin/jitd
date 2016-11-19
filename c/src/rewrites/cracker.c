@@ -90,10 +90,10 @@ cog *pushdown_concats(cog *c, long low, long high)
         new_rhs = make_concat(lhs->data.btree.rhs, array2);
       }
       cog *btree;
-      #ifndef __BASIC
-      btree = makeBtreeWithReads(new_lhs, new_rhs, lhs->data.btree.sep, lhs->data.btree.rds);
-      #else
+      #ifdef __BASIC
       btree = makeBtreeWithoutReads(new_lhs, new_rhs, lhs->data.btree.sep);
+      #else
+      btree = makeBtreeWithReads(new_lhs, new_rhs, lhs->data.btree.sep, lhs->data.btree.rds);
       #endif
       cleanup(c);
       return pushdown_concats(btree, low, high); 
@@ -164,7 +164,11 @@ cog *crack_one(cog *c, long val)
     cog *array1 = make_array(low, radixPos - low, c->data.array.records);
     cog *array2 = make_array(radixPos, high - radixPos, c->data.array.records);
     cleanup(c);
+    #ifndef __BASIC
     return makeBtreeWithReads(array1, array2, val, 1);
+    #else
+    return makeBtreeWithoutReads(array1, array2, val);
+    #endif
   } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
@@ -186,7 +190,11 @@ cog *crack_one(cog *c, long val)
     cog *array1 = make_array(0, lowIdx, out);
     cog *array2 = make_array(highIdx + 1, out->size - highIdx - 1, out);
     cleanup(c);
+    #ifndef __BASIC
     return makeBtreeWithReads(array1, array2, val, 1);
+    #else
+    return makeBtreeWithoutReads(array1, array2, val);
+    #endif
   }
 }
 
@@ -266,7 +274,11 @@ cog *crack_scan(cog *c, long low, long high, bool rebalance)
     cog *array2 = make_array(lowRadixPos, highRadixPos-lowRadixPos, c->data.array.records);
     cog *array3 = make_array(highRadixPos, highIdx-highRadixPos, c->data.array.records);
     cleanup(c);
+    #ifndef __BASIC
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
+    #else
+    return makeBtreeWithoutReads(array1, makeBtreeWithoutReads(array2, array3, high), low);
+    #endif
   } else {
     buffer out = buffer_alloc(cog_length(c) + 1);
     record buf = out->data;
@@ -298,7 +310,11 @@ cog *crack_scan(cog *c, long low, long high, bool rebalance)
     cog *array1 = make_array(0, lowIdx, out);
     cog *array2 = make_array(lowIdx, midIdx - lowIdx, out);
     cog *array3 = make_array(highIdx + 1, out->size - highIdx -1, out);
+    #ifndef __BASIC
     return makeBtreeWithReads(array1, makeBtreeWithReads(array2, array3, high, 1), low, 2);
+    #else
+    return makeBtreeWithoutReads(array1, makeBtreeWithoutReads(array2, array3, high), low);
+    #endif
   } 
 }
 

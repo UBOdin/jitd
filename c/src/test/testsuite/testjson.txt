@@ -1,5 +1,24 @@
 insert random 1000000
+jsonizedump
 heavyhit 0 0 1000000 0.1 0.8
-workload 0 0 1000 1000
+workload 2 0 10000 1000
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
+run
+jsonizedump
 run
 jsonizedump

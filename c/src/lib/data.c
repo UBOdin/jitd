@@ -75,17 +75,14 @@ void record_dump(record r, int start, int end)
   printf("\n");
 }
 
-void record_sort(record r, int start, int end)
-{
+void record_sort(record r, int start, int end) {
   int mid, i;
   long pivot;
   //printf("Sorting %d-%d\n", start, end);
   //record_dump(r, start, end);
   if(end - start <= 1){ return; }
-  if(end - start == 2)
-  {
-    if(r[start].key > r[start+1].key)
-    {
+  if(end - start == 2) {
+    if(r[start].key > r[start+1].key) {
       record_swap(&(r[start]), &(r[start+1]));
     }
     return;
@@ -93,13 +90,10 @@ void record_sort(record r, int start, int end)
   mid = start;
   i = start;
   pivot = r[start + rand() % (end-start)].key+1;
-  while(i < end)
-  {
+  while(i < end) {
     //printf("         %ld \n", r[i].key);
-    if(r[i].key < pivot)
-    {
-      if(i != mid)
-      {
+    if(r[i].key < pivot) {
+      if(i != mid) {
         //printf("          swap %d <-> %d\n", i, mid);
         record_swap(&(r[mid]), &(r[i]));
       }
@@ -108,20 +102,17 @@ void record_sort(record r, int start, int end)
     i++;
   }
   //printf("  pivot: %ld @ %d in %d-%d\n", pivot, mid, start, end);
-  if(mid > start)
-  {
+  if(mid > start) {
     //printf("recur left\n");
     record_sort(r, start, mid);
   }
-  if(mid < end)
-  {
+  if(mid < end) {
     //printf("recur right\n");
     record_sort(r, mid, end);
   }
 }
 
 int record_binarysearch(record r, long key, int start, int len)
-
 {
   int mid;
   if(len < 1) { return start; }
