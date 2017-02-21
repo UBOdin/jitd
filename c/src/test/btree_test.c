@@ -314,7 +314,7 @@ void run_input(char *filename)
         long range;
         time_pattern timer;
         int sort;
-        fscanf(input, "%d %d %d %ld %ld %d %d", &type, &rebalance, &number_of_reads, 
+        fscanf(input, "%d %d %ld %ld %d %d", &type, &rebalance, &number_of_reads, 
             &range, &timer, &sort);
         work = make_workload_test(type, (bool)rebalance, 
                    number_of_reads, range, timer, (bool)sort);
