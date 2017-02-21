@@ -23,7 +23,7 @@ struct workload_test *make_workload_test(
     bool rebalance, 
     long number_of_reads, 
     long range,
-    time_pattern timer
+    time_pattern timer,
     bool base_sort
     )
 {
@@ -79,7 +79,6 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
   long range = w->range;
   bool rebalance = w->rebalance;
   time_pattern timer = w->timer;
-  policy_type policy = w->policy;
   struct timespec stop, start;
 
   for (int i = 0; i < number; i++) {
@@ -88,9 +87,9 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
     timespec_get(&start, TIME_UTC);
-    if (policy == CRACK){
+    if (!w->base_sort){
       cog = crack_scan(cog, low, high, rebalance);
-    } else if (policy == CRACKMERGE) {
+    } else {
       printf("WEEEEE\n");
     }
     timespec_get(&stop, TIME_UTC);

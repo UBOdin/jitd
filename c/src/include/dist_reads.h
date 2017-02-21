@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include "heavyhit.h"
 
-/* AMERGE should be done using code compiled with __BASIC command*/
 typedef enum {
    CRACK, CRACKSORT
 } policy_type;
@@ -25,8 +24,7 @@ typedef struct workload_test {
   long number_of_reads;
   long range;
   time_pattern timer;
-  policy_type policy;
-  bool base_sort
+  bool base_sort;
 } workload_test;
 
 struct workload_test *make_workload_test(
@@ -34,7 +32,7 @@ struct workload_test *make_workload_test(
   bool rebalance, 
   long number_of_reads, 
   long range,
-  time_pattern pattern
+  time_pattern pattern,
   bool base_sort
   );
 

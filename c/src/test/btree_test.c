@@ -130,7 +130,7 @@ void test8()
   struct workload_test *work;
   struct cog *cog;
   cog = mk_random_array(10000);
-  work = make_workload_test(RANDOM, true, 10000, 1000000, 0);
+  work = make_workload_test(RANDOM, true, 10000, 1000000, 0, 0);
   cog = test_reads(cog, work);
   free_cog(cog);
   free_workload_test(work);
@@ -143,7 +143,7 @@ void test9()
   struct workload_test *work;
   struct cog *cog;
   cog = mk_random_array(1000000);  
-  work = make_workload_test(ZIPFIAN, false, 1000, 1000, 0);
+  work = make_workload_test(ZIPFIAN, false, 1000, 1000, 0, 0);
   cog = test_reads(cog, work);
   free_cog(cog);
   free_workload_test(work);
@@ -155,7 +155,7 @@ void test10()
   printf("test 10\n");
   struct workload_test *work;
   struct cog *cog = mk_random_array(1000000);  
-  work = make_workload_test(ZIPFIAN, true, 1000, 1000, 0);
+  work = make_workload_test(ZIPFIAN, true, 1000, 1000, 0, 0);
   cog = test_reads(cog, work);
   free_cog(cog);
   free_workload_test(work);
@@ -167,7 +167,7 @@ void test11()
   printf("test 11\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000, 0);
+  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000, 0, 0);
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
   cog = test_reads(cog, work);
@@ -183,7 +183,7 @@ void test12()
   printf("test 12\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000, 0);
+  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000, 0, 0);
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
   cog = test_reads(cog, work);
@@ -199,7 +199,7 @@ void test13()
   printf("test 13\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000, 0);
+  work = make_workload_test(HEAVYHITTER, false, 10000000, 1000, 0, 0);
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
   cog = test_reads(cog, work);
@@ -217,7 +217,7 @@ void test14()
   printf("test 14\n");
   struct workload_test *work;
   struct cog *cog;
-  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000, 0);
+  work = make_workload_test(HEAVYHITTER, true, 10000000, 1000, 0, 0);
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = mk_random_array(1000000);
   cog = test_reads(cog, work);
@@ -240,7 +240,7 @@ void treetest1()
   printf("Before splaying: \n");
   printJITD(cog, 0);
   printf("\n");
-  work = make_workload_test(RANDOM, false, 100, 1000000, 0);
+  work = make_workload_test(RANDOM, false, 100, 1000000, 0, 0);
   cog = test_reads(cog, work);
   printf("After splaying: \n");
   printJITD(cog, 0);
@@ -257,7 +257,7 @@ void treetest2()
   printf("Before splaying: \n");
   printJITD(cog, 0);
   printf("\n");
-  work = make_workload_test(RANDOM, true, 100, 1000000, 0);
+  work = make_workload_test(RANDOM, true, 100, 1000000, 0, 0);
   cog = test_reads(cog, work);
   printf("After splaying: \n");
   printJITD(cog, 0);
@@ -271,7 +271,7 @@ void treetest3()
   struct cog *cog;
   struct workload_test *work;
   cog = mk_random_array(100);
-  work = make_workload_test(HEAVYHITTER, true, 100, 1000, 0);
+  work = make_workload_test(HEAVYHITTER, true, 100, 1000, 0, 0);
   work->heavy = create_heavyhit(0, 0, 1000000, 0.1, 0.5);
   cog = test_reads(cog, work);
   printJITD(cog, 0);
@@ -313,10 +313,11 @@ void run_input(char *filename)
         long number_of_reads;
         long range;
         time_pattern timer;
-        fscanf(input, "%d %d %d %ld %ld %d", &type, &rebalance, &number_of_reads, 
-            &range, &timer);
-        work = make_workload_test(type, policy, (bool)rebalance, 
-                   number_of_reads, range, timer);
+        int sort;
+        fscanf(input, "%d %d %d %ld %ld %d %d", &type, &rebalance, &number_of_reads, 
+            &range, &timer, &sort);
+        work = make_workload_test(type, (bool)rebalance, 
+                   number_of_reads, range, timer, (bool)sort);
         if (type == HEAVYHITTER) {
           work->heavy = heavy;
         }
@@ -337,10 +338,6 @@ void run_input(char *filename)
         fscanf(input, "%d", &key_shift);
         work->heavy->key_shift = key_shift;
         //printf("Shifted heavyhit workload by %d\n", key_shift);
-      } else if (strcmp(item, "crackmerge") == 0) {
-        work->policy = CRACKMERGE;
-      } else if (strcmp(item, "crack") == 0) {
-        work->policy = CRACK;
       }
     }
   }
