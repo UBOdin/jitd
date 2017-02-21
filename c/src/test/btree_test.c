@@ -313,9 +313,9 @@ void run_input(char *filename)
         long number_of_reads;
         long range;
         time_pattern timer;
-        fscanf(input, "%d %d %ld %ld %d", &type, &rebalance, &number_of_reads, 
+        fscanf(input, "%d %d %d %ld %ld %d", &type, &rebalance, &number_of_reads, 
             &range, &timer);
-        work = make_workload_test(type, (bool)rebalance, 
+        work = make_workload_test(type, policy, (bool)rebalance, 
                    number_of_reads, range, timer);
         if (type == HEAVYHITTER) {
           work->heavy = heavy;

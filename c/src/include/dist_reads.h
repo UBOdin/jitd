@@ -6,7 +6,7 @@
 
 /* AMERGE should be done using code compiled with __BASIC command*/
 typedef enum {
-  CRACKMERGE, CRACK
+   CRACK, CRACKSORT
 } policy_type;
 
 typedef enum {
