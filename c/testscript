@@ -1,14 +1,21 @@
 #!/bin/bash
 
-outputdestination=../../paper-JITD-Journal/testlogs/raw_data/rawtestlog.txt
+outputdestination=../../jitd_textdump/raw_data/heavyhitwithshift_withreadcounter/100000000.txt
+input=src/test/testsuite/withreadstests/heavy_withreads_withshift_100000000.txt
 echo -e "--Running testsuite on $(date "+%m-%d-%Y %H:%M:%S")\n" >> $outputdestination
 COUNTER=0
-for f in src/test/testsuite/randomreadssuite/*.txt
-do
-  echo "$f********" >> $outputdestination
-  while [COUNTER -lt 5]; do
-    ./btree $f >> $outputdestination
-    let COUNTER = COUNTER + 1
-  done
-  echo -e "" >> $outputdestination
+while [ $COUNTER -lt 10 ]; do
+  echo -e "======================\n" >> $outputdestination
+  ./btree $input >> $outputdestination
+  let COUNTER=COUNTER+1
 done
+echo -e "" >> $outputdestination
+#for f in src/test/testsuite/randomreadssuite/*.txt
+#do
+#  echo "$f********" >> $outputdestination
+#  while [COUNTER -lt 10]; do
+#    ./btree $f >> $outputdestination
+#    let COUNTER = COUNTER + 1
+#  done
+#  echo -e "" >> $outputdestination
+#done

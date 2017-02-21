@@ -225,7 +225,6 @@ void jsonize(struct cog *cog, FILE *file) {
     fprintf(file, "{\"type\":\"None\"}");
   }
 }
-#endif
 
 /**
  * Converts the JITD to JSON and places it in the file './test.txt'.
@@ -239,7 +238,7 @@ void jsonJITD(struct cog *cog) {
   fprintf(file, "\n");
   fclose(file);
 }
-//#endif
+#endif
 
 /** Prints the current pre-processor mode. */
 void printMode() {

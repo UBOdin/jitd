@@ -18,8 +18,7 @@ static long int epoch_tracker = 0;
  * @param high - the higher range for the operation
  * @return the root of the resulting tree
  */
-cog *pushdown_concats(cog *c, long low, long high) 
-{
+cog *pushdown_concats(cog *c, long low, long high) {
   if(c->type == COG_BTREE) {
     cog *lhs = c->data.btree.lhs;
     cog *rhs = c->data.btree.rhs;
@@ -115,8 +114,7 @@ cog *pushdown_concats(cog *c, long low, long high)
  * @param val - the partition value for cracking.
  * @return the root of the resulting tree
  */
-cog *crack_one(cog *c, long val) 
-{
+cog *crack_one(cog *c, long val) {
   assert(c != NULL);
   if(c->type == COG_SORTEDARRAY) {
     return c;
@@ -206,8 +204,7 @@ cog *crack_one(cog *c, long val)
  * @param high - the higher range for cog
  * @return the root of the resulting tree
  */
-cog *crack_scan(cog *c, long low, long high, bool rebalance) 
-{
+cog *crack_scan(cog *c, long low, long high, bool rebalance) {
   if(c->type == COG_SORTEDARRAY) {
     return c;
   } else if(c->type == COG_BTREE) {
@@ -326,8 +323,7 @@ cog *crack_scan(cog *c, long low, long high, bool rebalance)
  * @param high - the higher range for scan
  * @return the root of the resulting tree
  */
-cog *crack(cog *c, long low, long high) 
-{
+cog *crack(cog *c, long low, long high) {
   cog *cog;
   cog = pushdown_concats(c, low, high);
   cog = crack_scan(cog, low, high, false);
@@ -342,8 +338,7 @@ cog *crack(cog *c, long low, long high)
  * @param rebalance - check for pivot condition
  * @return - pivoted/non-pivoted cog
  */
-struct cog *pivot_if_needed(bool rebalance, struct cog *c) 
-{
+struct cog *pivot_if_needed(bool rebalance, struct cog *c) {
   if (c->type == COG_BTREE && rebalance && offbalance_exist(c) && pivot_advantage(c)) {
     return pivot(c);
   } else {
@@ -359,8 +354,7 @@ struct cog *pivot_if_needed(bool rebalance, struct cog *c)
  * @return - true if one of the children has cumulative reads that's 
  *           2/3 or more the size of the current cog's cumulative reads
  */
-bool offbalance_exist(struct cog *c) 
-{
+bool offbalance_exist(struct cog *c) {
   #ifndef __BASIC
   long parentRds = c->data.btree.rds;
   cog *lhs = c->data.btree.lhs;
@@ -384,8 +378,7 @@ bool offbalance_exist(struct cog *c)
  * @return - true if the outer child of the child is causing the large
  *           cumulative reads of the child false otherwise
  */
-bool pivot_advantage(struct cog *c) 
-{
+bool pivot_advantage(struct cog *c) {
   #ifndef __BASIC
   cog *lhs = c->data.btree.lhs;
   cog *rhs = c->data.btree.rhs;
@@ -412,8 +405,7 @@ bool pivot_advantage(struct cog *c)
  * @param - current cog
  * @return - rotated cog
  */
-struct cog *pivot(struct cog *c) 
-{
+struct cog *pivot(struct cog *c) {
   #ifndef __BASIC
   cog *lhs = c->data.btree.lhs;
   cog *rhs = c->data.btree.rhs;
@@ -426,8 +418,7 @@ struct cog *pivot(struct cog *c)
   return c;
 }
 
-struct cog *left_to_top(struct cog *c)
-{
+struct cog *left_to_top(struct cog *c) {
   #ifndef __BASIC
   assert(c->type == COG_BTREE);
   long total = c->data.btree.rds;
@@ -443,8 +434,7 @@ struct cog *left_to_top(struct cog *c)
   #endif
 }
 
-struct cog *right_to_top(struct cog *c)
-{
+struct cog *right_to_top(struct cog *c) {
   #ifndef __BASIC
   long total = c->data.btree.rds;
   struct cog *rhs = c->data.btree.rhs;

@@ -4,18 +4,20 @@
 #include <stdbool.h>
 #include "heavyhit.h"
 
-typedef enum
-{
-    TOTAL, EACH
+/* AMERGE should be done using code compiled with __BASIC command*/
+typedef enum {
+  CRACKMERGE, CRACK
+} policy_type;
+
+typedef enum {
+  TOTAL, EACH
 } time_pattern;
 
-typedef enum 
-{
+typedef enum {
   RANDOM, ZIPFIAN, HEAVYHITTER
 } workload_type;
 
-typedef struct workload_test
-{
+typedef struct workload_test {
   workload_type type;
   struct zipfian *zipfian;
   struct heavyhit *heavy;
@@ -23,15 +25,18 @@ typedef struct workload_test
   long number_of_reads;
   long range;
   time_pattern timer;
+  policy_type policy;
+  bool base_sort
 } workload_test;
 
 struct workload_test *make_workload_test(
-    workload_type type,
-    bool rebalance, 
-    long number_of_reads, 
-    long range,
-    time_pattern pattern
-    );
+  workload_type type,
+  bool rebalance, 
+  long number_of_reads, 
+  long range,
+  time_pattern pattern
+  bool base_sort
+  );
 
 struct cog *test_reads(struct cog *cog, struct workload_test *w);
 

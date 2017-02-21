@@ -3,8 +3,7 @@
 
 #include <stdlib.h>
 
-typedef struct heavyhit
-{
+typedef struct heavyhit {
   int key_shift;
   int lower_bound;
   int upper_bound;

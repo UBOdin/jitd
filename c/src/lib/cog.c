@@ -5,8 +5,7 @@
 
 void free_cog(cog *c) { free(c); }
 
-void clean(cog *c) 
-{
+void clean(cog *c) {
   switch(c->type) 
   {
     case COG_CONCAT:
@@ -20,10 +19,8 @@ void clean(cog *c)
   }
 }
 
-void cleanup(cog *c)
-{
-  switch(c->type)
-  {
+void cleanup(cog *c) {
+  switch(c->type) {
     case COG_CONCAT:
       cleanup(c->data.concat.lhs);
       cleanup(c->data.concat.rhs);
@@ -42,8 +39,7 @@ void cleanup(cog *c)
   free_cog(c);
 }
 
-cog *make_concat( struct cog *lhs, struct cog *rhs ) 
-{
+cog *make_concat( struct cog *lhs, struct cog *rhs ) {
   cog *ret = malloc(sizeof(struct cog));
   ret->type = COG_CONCAT;
   ret->data.concat.lhs = lhs;
@@ -51,8 +47,7 @@ cog *make_concat( struct cog *lhs, struct cog *rhs )
   return ret;
 }
 
-cog *make_btree( struct cog *lhs, struct cog *rhs, long sep ) 
-{
+cog *make_btree( struct cog *lhs, struct cog *rhs, long sep ) {
   cog *ret = malloc(sizeof(struct cog));
   ret->type = COG_BTREE;
   ret->data.btree.lhs = lhs;
@@ -64,8 +59,7 @@ cog *make_btree( struct cog *lhs, struct cog *rhs, long sep )
   return ret;
 }
 
-cog *make_array( int start, int len, buffer records ) 
-{
+cog *make_array( int start, int len, buffer records ) {
   cog *ret = malloc(sizeof(struct cog));
   ret->type = COG_ARRAY;
   ret->data.array.start = start;
@@ -75,8 +69,7 @@ cog *make_array( int start, int len, buffer records )
   return ret;
 }
 
-cog *make_sortedarray( int start, int len, buffer records ) 
-{
+cog *make_sortedarray( int start, int len, buffer records ) {
   cog *ret = malloc(sizeof(struct cog));
   ret->type = COG_SORTEDARRAY;
   ret->data.sortedarray.start = start;
@@ -86,8 +79,7 @@ cog *make_sortedarray( int start, int len, buffer records )
   return ret;
 }
 
-extracted_components *make_extracted_components(struct cog *lhs, struct cog *rhs, long low_key, long high_key, iterator iter) 
-{
+extracted_components *make_extracted_components(struct cog *lhs, struct cog *rhs, long low_key, long high_key, iterator iter) {
   extracted_components *extracted_components = malloc(sizeof(struct extracted_components));
   extracted_components->lhs = lhs;
   extracted_components->rhs = rhs;
@@ -97,15 +89,13 @@ extracted_components *make_extracted_components(struct cog *lhs, struct cog *rhs
   return extracted_components;
 }
 
-void cleanup_extracted_components(extracted_components *extracted_components) 
-{
+void cleanup_extracted_components(extracted_components *extracted_components) {
   cleanup(extracted_components->lhs);
   cleanup(extracted_components->rhs);
   iter_cleanup(extracted_components->iter);
 }
 
-iterator scan( struct cog *cog, long low, long high ) 
-{
+iterator scan( struct cog *cog, long low, long high ) {
   if( cog->type == COG_BTREE ) 
     {
       struct cog *a = cog->data.btree.lhs;
@@ -159,8 +149,7 @@ iterator scan( struct cog *cog, long low, long high )
 }
 
 //Scans the full the Cog and returns iterator.
-iterator scan_full_array( struct cog *cog) 
-{
+iterator scan_full_array( struct cog *cog) {
   if( cog->type == COG_BTREE )
     {
       struct cog *a = cog->data.btree.lhs;
@@ -216,8 +205,7 @@ iterator scan_full_array( struct cog *cog)
 }
 
 // Calculates the length of the Cog.
-int cog_length(struct cog *cog) 
-{
+int cog_length(struct cog *cog) {
   if(cog->type == COG_BTREE) 
   {
     return cog_length(cog->data.btree.lhs) + cog_length(cog->data.btree.rhs);
@@ -236,14 +224,12 @@ int cog_length(struct cog *cog)
   }
 }
 
-list *create_list() 
-{
+list *create_list() {
   list *head = (struct list*)malloc(sizeof(list));
   return head;
 }
 
-void cleanup_list(list *list) 
-{
+void cleanup_list(list *list) {
   struct list *temp;
   int count=0;
   while(list != NULL) 
@@ -260,8 +246,7 @@ void cleanup_list(list *list)
   printf("Free Count %d\n", count);
 }
 
-int list_has_next(list *list) 
-{
+int list_has_next(list *list) {
   if(list->next != NULL) 
   {
     return 1;
@@ -272,8 +257,7 @@ int list_has_next(list *list)
   }
 }
 
-list *get_cog_from_list(list *list, struct cog *cog) 
-{
+list *get_cog_from_list(list *list, struct cog *cog) {
   cog->type = list->cog->type;
   cog->data.sortedarray.start = list->cog->data.sortedarray.start;
   cog->data.sortedarray.len = list->cog->data.sortedarray.len;
@@ -281,8 +265,7 @@ list *get_cog_from_list(list *list, struct cog *cog)
   return list->next;
 }
 
-int get_length(list *list) 
-{
+int get_length(list *list) {
   int count =0;
   while(list != NULL && list->cog != NULL) 
   {
@@ -292,16 +275,14 @@ int get_length(list *list)
   return count;
 }
 
-void convert_to_sortedarray(struct cog *cog) 
-{
+void convert_to_sortedarray(struct cog *cog) {
   cog->type = COG_SORTEDARRAY;
   cog->data.sortedarray.records = cog->data.array.records;
   cog->data.sortedarray.start = 0;
   cog->data.sortedarray.len = cog->data.array.len;
 }
 
-struct cog *array_load(iterator iter,int len) 
-{
+struct cog *array_load(iterator iter,int len) {
   int i=0;
   record r = malloc(sizeof(struct record));
   buffer out = buffer_alloc(len);
@@ -318,8 +299,7 @@ struct cog *array_load(iterator iter,int len)
   return make_array(0, len, out);
 }
 
-long cog_min(struct cog *c) 
-{
+long cog_min(struct cog *c) {
   long min;
   switch(c->type) 
   {
@@ -350,31 +330,27 @@ long cog_min(struct cog *c)
   return min;
 }
 
-stack_triple *create_stack() 
-{
+stack_triple *create_stack() {
   stack_triple *stack = malloc(sizeof(stack_triple));
   stack->triple = NULL;
   stack->next = NULL;
   return stack;
 }
 
-void push_stack(struct triple *t, stack_triple **top) 
-{
+void push_stack(struct triple *t, stack_triple **top) {
   stack_triple *new = create_stack();
   new->triple = t;
   new->next = *top;
   *top = new;
 }
 
-stack_triple *pop_stack(stack_triple **top) 
-{
+stack_triple *pop_stack(stack_triple **top) {
   stack_triple *temp = *top;
   *top = (*top)->next;
   return temp;
 }
 
-int stack_empty(stack_triple **top) 
-{
+int stack_empty(stack_triple **top) {
   if((*top)->triple == NULL) 
   {
     return 1;
@@ -385,35 +361,29 @@ int stack_empty(stack_triple **top)
   }
 }
 
-int peek_depth(stack_triple **top) 
-{
+int peek_depth(stack_triple **top) {
   return (*top)->triple->depth;
 }
 
-triple *create_triple() 
-{
+triple *create_triple() {
   triple *new = malloc(sizeof(struct triple));
   new->cog = NULL;
   return new;
 }
 
-double_struct *create_double_struct() 
-{
+double_struct *create_double_struct() {
   double_struct *new = malloc(sizeof(double_struct));
   return new;
 }
 
-void cleanup_stack(stack_triple *stack) 
-{
+void cleanup_stack(stack_triple *stack) {
   free(stack->triple);
   free(stack);
 }
 
-void fold_append(stack_triple **stack, struct cog *c, long low) 
-{
+void fold_append(stack_triple **stack, struct cog *c, long low) {
   int depth = 0;
-  while(stack_empty(stack) !=1 && depth == peek_depth(stack)) 
-  {
+  while(stack_empty(stack) !=1 && depth == peek_depth(stack)) {
     stack_triple *temp_stack = pop_stack(stack);
     c = make_btree(temp_stack->triple->cog, c, low);
     low = temp_stack->triple->key;
@@ -427,12 +397,10 @@ void fold_append(stack_triple **stack, struct cog *c, long low)
   push_stack(entry, stack);
 }
 
-cog *fold(stack_triple **stack) 
-{
+cog *fold(stack_triple **stack) {
   if(stack_empty(stack)) return NULL;
   stack_triple *head = pop_stack(stack);
-  while(stack_empty(stack) != 1) 
-  {
+  while(stack_empty(stack) != 1) {
     stack_triple *prev = pop_stack(stack);
     head->triple->cog = make_btree(prev->triple->cog, head->triple->cog, head->triple->key);
     head->triple->key = prev->triple->key;
@@ -453,8 +421,7 @@ cog *fold(stack_triple **stack)
  * @return the newly created BTree cog
  */
 #ifdef __BASIC
-cog *makeBtreeWithoutReads(struct cog *lhs, struct cog *rhs, long sep) 
-{
+cog *makeBtreeWithoutReads(struct cog *lhs, struct cog *rhs, long sep) {
   cog *ret = malloc(sizeof(struct cog));
   ret->type = COG_BTREE;
   ret->data.btree.lhs = lhs;
@@ -463,8 +430,7 @@ cog *makeBtreeWithoutReads(struct cog *lhs, struct cog *rhs, long sep)
   return ret;
 }
 #else
-cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds) 
-{
+cog *makeBtreeWithReads(struct cog *lhs, struct cog *rhs, long sep, long rds) {
   cog *ret = malloc(sizeof(struct cog));
   ret->type = COG_BTREE;
   ret->data.btree.lhs = lhs;

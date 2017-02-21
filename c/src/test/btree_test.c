@@ -51,7 +51,6 @@ void test3()
   printf("\n");
 }
 
-/*|__test4__|*/
 void test4() 
 {
   printf("test 4\n");
@@ -67,7 +66,6 @@ void test4()
   printf("\n");
 }
 
-/*|__test5__|*/
 void test5() 
 {
   // Perform the test for adaptive merge
@@ -106,7 +104,6 @@ void test7()
   testTreeOnArrayCrack(true, 1000000, 10000);
 }
 
-/*|__testTreeOnArrayCrack__|*/
 void testTreeOnArrayCrack(bool rebalance, int arraySize, int reads)
 {
   printf("Testing JITD performance on random array with random reads ");
@@ -332,12 +329,18 @@ void run_input(char *filename)
       } else if (strcmp(item, "jsonizedump") == 0) {
         //FILE *jsonfile = fopen("test.json", "w");
         //jsonize(cog, jsonfile);
+        #ifndef __BASIC
         jsonJITD(cog);
+        #endif
       } else if (strcmp(item, "heavyshift") == 0) {
         int key_shift;
         fscanf(input, "%d", &key_shift);
         work->heavy->key_shift = key_shift;
         //printf("Shifted heavyhit workload by %d\n", key_shift);
+      } else if (strcmp(item, "crackmerge") == 0) {
+        work->policy = CRACKMERGE;
+      } else if (strcmp(item, "crack") == 0) {
+        work->policy = CRACK;
       }
     }
   }
@@ -345,7 +348,7 @@ void run_input(char *filename)
 
 int main(int argc, char **argv) 
 {
-  if (argc < 2){
+  if (argc < 2) {
     printf("Please input argument. --default for default tests, ");
     printf("--treetests for tree tests, \n");
     printf("<filename> to execute test instruction in that file\n");

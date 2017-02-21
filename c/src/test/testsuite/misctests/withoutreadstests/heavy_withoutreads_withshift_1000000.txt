@@ -1,0 +1,6 @@
+insert random 10000000
+heavyhit 0 0 1000000 0.1 0.8
+workload 2 0 1000000 1000 0
+run
+heavyshift 500000
+run

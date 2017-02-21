@@ -23,7 +23,9 @@ struct workload_test *make_workload_test(
     bool rebalance, 
     long number_of_reads, 
     long range,
-    time_pattern timer)
+    time_pattern timer
+    bool base_sort
+    )
 {
   workload_test *w = malloc(sizeof(struct workload_test));
   w->type = type;
@@ -31,6 +33,7 @@ struct workload_test *make_workload_test(
   w->number_of_reads = number_of_reads;
   w->range = range;
   w->timer = timer;
+  w->base_sort = base_sort;
   return w;
 }
 
@@ -42,20 +45,16 @@ struct cog *test_reads(struct cog *cog, struct workload_test *w)
   struct timeval stop, start;
 
   gettimeofday(&start, NULL);
-  if (type == RANDOM)
-  {
+  if (type == RANDOM) {
     cog_return = randomreads_on_cog(cog, w);
   }
-  else if (type == ZIPFIAN)
-  {
+  else if (type == ZIPFIAN) {
     cog_return = zipfianreads_on_cog(cog, w);
   }
-  else if (type == HEAVYHITTER)
-  {
+  else if (type == HEAVYHITTER) {
     cog_return = heavyhitreads_on_cog(cog, w);
   }
-  else
-  {
+  else {
     printf("Invalid workload type, please specify RANDOM, ZIPFIAN, ");
     printf("or HEAVYHITTER, program now terminating\n");
     exit(0);
@@ -65,6 +64,7 @@ struct cog *test_reads(struct cog *cog, struct workload_test *w)
   long long startms = start.tv_sec * 1000LL + start.tv_usec / 1000;
   long long stopms = stop.tv_sec * 1000LL + stop.tv_usec / 1000;
   if (timer == TOTAL) printf("Took %lld milliseconds\n", stopms - startms);
+  printf("\n");
   return cog_return;
 }
 
@@ -79,7 +79,7 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
   long range = w->range;
   bool rebalance = w->rebalance;
   time_pattern timer = w->timer;
-  //struct timeval stop, start;
+  policy_type policy = w->policy;
   struct timespec stop, start;
 
   for (int i = 0; i < number; i++) {
@@ -87,13 +87,13 @@ struct cog *randomreads_on_cog(struct cog *cog, struct workload_test *w)
     long b = rand() % KEY_RANGE;
     long low = a <= b ? a : b;
     long high = a > b ? a : b;
-    //gettimeofday(&start, NULL);
     timespec_get(&start, TIME_UTC);
-    cog = crack_scan(cog, low, high, rebalance);
-    //gettimeofday(&stop, NULL);
+    if (policy == CRACK){
+      cog = crack_scan(cog, low, high, rebalance);
+    } else if (policy == CRACKMERGE) {
+      printf("WEEEEE\n");
+    }
     timespec_get(&stop, TIME_UTC);
-    //unsigned long long startms = start.tv_sec * 1000000LL + start.tv_usec;
-    //unsigned long long stopms = stop.tv_sec * 1000000LL + stop.tv_usec;
     unsigned long long startns = (long long)start.tv_sec * 1000000000LL + start.tv_nsec;
     unsigned long long stopns = (long long)stop.tv_sec * 1000000000LL + stop.tv_nsec;
     if (timer == EACH) printf("%lld|", stopns - startns);
@@ -130,9 +130,12 @@ struct cog *heavyhitreads_on_cog(struct cog *cog, struct workload_test *w)
 {
   printf("%d size array\n", cog_length(cog));
   printf("heavy\n");
-  if (w->rebalance) printf("rebalance");
-  else printf("no rebalance");
-  printf("shift at halfway will be %d\n", w->heavy->key_shift);
+  if (w->rebalance) printf("rebalance\n");
+  else printf("no rebalance\n");
+  if (w->timer == EACH)
+    printf("shift at halfway will be %d\n", w->heavy->key_shift);
+  else
+    printf("keyshift of %d\n", w->heavy->key_shift);
 
   struct heavyhit *heavy = w->heavy;
   bool rebalance = w->rebalance;
